@@ -7,6 +7,19 @@
 # Email: (mjo@cs.unm DOT edu)
 # 
 
-cmake_minimum_required(3.0)
+cmake_minimum_required( VERSION 3.0 )
+
+project(MexIFace VERSION 0.1.0 LANGUAGES CXX)
+
+#Export all these variables in Package
+set(MexIFace_CMAKE_DIR ${CMAKE_SOURCE_DIR}/cmake)
+set(MexIFace_CMAKE_MODULES_DIR ${MexIFace_CMAKE_DIR}/Modules)
+set(MexIFace_CMAKE_TOOLCHAINS_DIR ${MexIFace_CMAKE_DIR}/Toolchains)
+set(MexIFace_CMAKE_BUILDCONFIG_DIR ${MexIFace_CMAKE_DIR}/BuildConfig)
+set(MexIFace_CMAKE_SCRIPTS_DIR ${MexIFace_CMAKE_DIR}/Scripts)
+set(MexIFace_CMAKE_TEMPLATES_DIR ${MexIFace_CMAKE_DIR}/Templates)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${MexIFace_CMAKE_MODULES_DIR})
+
+include(MexIFace)
 
 add_subdirectory( src )

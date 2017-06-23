@@ -8,20 +8,20 @@
 # we can use static libraries if the files are compiled with -fPIC.  Thus we
 # are using the MXE shared target
 #
-set(MXE_ROOT $ENV{MXE_ROOT})
-set(USER_W64_CROSS_ROOT $ENV{USER_W64_CROSS_ROOT})
+set(OSXCROSS_ROOT $ENV{OSXCROSS_ROOT})
+set(USER_CROSS_PATH $ENV{MACI64_PATH})
 set(TARGET_ARCH x86_64-w64-mingw32)
 set(TARGET_MXE_ARCH ${TARGET_ARCH}.shared)
 set(MXE_ARCH_ROOT ${MXE_ROOT}/usr/${TARGET_MXE_ARCH})
 set(MXE_BIN_DIR ${MXE_ROOT}/usr/bin)
 set(MXE_BIN_PFX ${MXE_BIN_DIR}/${TARGET_MXE_ARCH})
 #Look here for libraries at install time
-set(LIB_SEARCH_PATHS "${MXE_ROOT}/usr/${TARGET_MXE_ARCH}/lib"
-                     "${MXE_ROOT}/usr/${TARGET_MXE_ARCH}/bin"
-                     "${MXE_ROOT}/usr/bin"
-                     "${MXE_ROOT}/usr/lib"
-                     "${MXE_ROOT}/usr/lib/gcc/x86_64-w64-mingw32.shared/4.9.4/"
-                     "${USER_W64_CROSS_ROOT}/lib")
+# set(LIB_SEARCH_PATHS "${MXE_ROOT}/usr/${TARGET_MXE_ARCH}/lib"
+#                      "${MXE_ROOT}/usr/${TARGET_MXE_ARCH}/bin"
+#                      "${MXE_ROOT}/usr/bin"
+#                      "${MXE_ROOT}/usr/lib"
+#                      "${MXE_ROOT}/usr/lib/gcc/x86_64-w64-mingw32.shared/4.9.4/"
+#                      "${USER_W64_CROSS_ROOT}/lib")
 
 set(CMAKE_SYSTEM_NAME Windows)
 
