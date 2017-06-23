@@ -1,8 +1,0 @@
-# MexIFace CMake build system
-# Mark J. Olah (mjo@cs.unm DOT edu)
-# 03-2014
-#
-# Windows fixup/packaging script for "make install"
-
-include(@LOCAL_CMAKE_DIR@/BundleUtils-W64.cmake)
-fixup_w64_libs("@CMAKE_INSTALL_PREFIX@" "@W64_DLLS@" "@LIB_SEARCH_PATHS@")
