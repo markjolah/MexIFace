@@ -93,10 +93,10 @@ public:
 
     /**
      * @brief Access element at coords
-     * @param sX The x coordinate (1st dim).
-     * @param sY The y coordinate (2nd dim).
-     * @param sZ The z coordinate (3rd dim).
-     * @param sN The n (hyperslice) coordinate (4th dim).
+     * @param iX The x coordinate (1st dim).
+     * @param iY The y coordinate (2nd dim).
+     * @param iZ The z coordinate (3rd dim).
+     * @param iN The n (hyperslice) coordinate (4th dim).
      * @returns A reference to the element
      */
     ElemT& operator()(int iX, int iY, int iZ, int iN) const

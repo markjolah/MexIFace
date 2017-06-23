@@ -1,3 +1,10 @@
+#Local checkout of gh-pages branch
+_gh_pages
+#Local Build dir-tree
+_build
+#Local install dir
+_install
+
 # Prerequisites
 *.d
 
@@ -30,3 +37,4 @@
 *.exe
 *.out
 *.app
+*.kate-swp

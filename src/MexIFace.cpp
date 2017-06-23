@@ -327,7 +327,7 @@ void MexIFace::error(std::string condition, std::string message) const
 /**
  * @brief Reports an error condition in a specified component to Matlab using the mexErrMsgIdAndTxt function
  *
- * @param condition A string describing the component in which the error was encountered.
+ * @param component A string describing the component in which the error was encountered.
  * @param condition A string describing the error condition encountered.
  * @param message An informative message to accompany the error.
  */
@@ -348,9 +348,13 @@ std::string MexIFace::make_valid_error_mesgid(std::string component, std::string
 }
 
 /**
- * @brief A helper function for processing strings into matlab structures.
+ * @brief Determines if the keyword p from a StatsT represents a sub-struct
  *
- * @param p is the parameter name in the StatsT map.
+ * Substructs are indicated by using the matlab syntax "subname.param1", "subname.param2", etc.
+ * All keys beginning with the same sub-struct name are grouped together into a matalab structure which is
+ * stored in the parent structure.
+ * 
+ * @param p is the parameter name in the to level StatsT map.
  */
 bool isSubStruct(MexIFace::StatsT::value_type &p)
 {
@@ -358,9 +362,12 @@ bool isSubStruct(MexIFace::StatsT::value_type &p)
 }
 
 /**
- * @brief A helper function for processing strings into matlab structures.
+ * @brief Outputs a StatsT as a matlab structure appended to the method's return value.
  *
- * @param stats A StatsT type maping from strings to scalar doubles.
+ * A new matlab struct is created populated with the key/value pairs in stats and then
+ * is appended to the function outputs.
+ * 
+ * @param stats A StatsT type mapping from strings to scalar doubles.
  */
 void MexIFace::outputStatsToStruct(const StatsT &stats)
 {
@@ -378,9 +385,9 @@ void MexIFace::outputStatsToStruct(const StatsT &stats)
 }
 
 /**
- * @brief A helper function for processing strings into matlab structures.
+ * @brief Outputs a VecStatsT as a matlab structure appended to the method's return value.
  *
- * @param stats A VecStatsT type maping from strings to scalar doubles.
+ * @param stats A VecStatsT type mapping from strings to arrays of doubles.
  */
 void MexIFace::outputStatsToDoubleVecStruct(const VecStatsT &stats)
 {
@@ -404,9 +411,9 @@ void MexIFace::outputStatsToDoubleVecStruct(const VecStatsT &stats)
 
 
 /**
- * @brief A helper function for processing strings into matlab structures.
+ * @brief Process a matlab structure returning a StatsT mapping from keys to double
  *
- * @param stats A StatsT type maping from strings to scalar doubles.
+ * @param mxdata A matlab parameter to process.  Must be a structure where all values are scalars.
  */
 MexIFace::StatsT 
 MexIFace::getDoubleStruct(const mxArray *mxdata)
@@ -425,9 +432,9 @@ MexIFace::getDoubleStruct(const mxArray *mxdata)
 
 
 /**
- * @brief A helper function for processing strings into matlab structures.
+ * @brief Process a matlab structure returning a VecStatsT mapping from keys to column vectors
  *
- * @param stats A VecStatsT type maping from strings to 1D vectors (possibly scalars too)
+ * @param mxdata A Matlabn pameter to process.  Must be a structure where all values are 1D arrays.
  */
 MexIFace::VecStatsT 
 MexIFace::getDoubleVecStruct(const mxArray *mxdata)
@@ -451,7 +458,7 @@ MexIFace::getDoubleVecStruct(const mxArray *mxdata)
  * @param[in] _nlhs The number of left-hand-side (input) arguments passed from the Matlab side of the Iface.
  * @param[in] _lhs The input arguments passed from the Matlab side of the Iface.
  * @param[in] _nrhs The number of right-hand-side (output) arguments requested from the Matlab side of the Iface.
- * @param[in,out] _lhs The output arguments requested from the Matlab side of the Iface to be filled in.
+ * @param[in,out] _rhs The output arguments requested from the Matlab side of the Iface to be filled in.
  *
  * This command is the main entry point for the .mex file, and allows the mexFunction to act like a class interface.
  * Special \@new, \@delete, \@static strings allow objects to be created and destroyed and static functions to be called
