@@ -22,5 +22,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${MexIFace_CMAKE_MODULES_DIR})
 
 include(MexIFace)
 include(MexIFace-Doxygen)
+include(MexIFace-PackageConfig)
 
-add_subdirectory( src )
+add_subdirectory(src)
