@@ -23,9 +23,9 @@ target_link_libraries( MexIFace "${MATLAB_LIBRARIES}")
 # Package Configuration and Exports
 include(CMakePackageConfigHelpers)
 set(CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR}/config) #Directory for generated .cmake config file
-set(EXPORT_TARGETS_NAME ${PROJECT_NAME}-targets)
-set(PROJECT_CONFIG_NAME ${PROJECT_NAME}-config)
-set(VERSION_CONFIG_FILE ${CONFIG_DIR}/${PROJECT_NAME}-config-version.cmake)
+set(EXPORT_TARGETS_NAME ${PROJECT_NAME}Targets)
+set(PROJECT_CONFIG_NAME ${PROJECT_NAME}Config)
+set(VERSION_CONFIG_FILE ${CONFIG_DIR}/${PROJECT_NAME}ConfigVersion.cmake)
 set(PROJECT_CONFIG_FILE ${CONFIG_DIR}/${PROJECT_CONFIG_NAME}.cmake)
 set(PROJECT_CONFIG_TEMPLATE_FILE ${MexIFace_CMAKE_TEMPLATES_DIR}/${PROJECT_CONFIG_NAME}.cmake.in)
 set(MexIFace_CONFIG_INSTALL_DIR lib/cmake/${PROJECT_NAME}) #Where to install project config .cmake files
