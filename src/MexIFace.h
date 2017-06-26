@@ -1,7 +1,7 @@
 /** @file MexIFace.h
  * @author Mark J. Olah (mjo\@cs.unm DOT edu)
  * @date 2013-2017
- * @copyright See LICENSE file.
+ * @copyright Licensed under the Apache License, Version 2.0.  See LICENSE file.
  * @brief The class declaration and inline and templated functions for MexIFace.
  */
 
@@ -26,7 +26,7 @@
 #include "explore.h"
 #include "MexUtils.h"
 
-#define MAX_STR_LEN 512 /**< The maximum length of string we will accept from Matlab */
+namespace mexiface {
 
 /** @class MexIFace 
  * @brief Acts as a base class for implementing a C++ class <--> Matlab class interface.
@@ -88,6 +88,8 @@ public:
     MexIFace(std::string name);
     void mexFunction(unsigned _nlhs, mxArray *_lhs[], unsigned _nrhs, const mxArray *_rhs[]);
 protected:
+    static unsigned constexpr MAX_STR_LEN=512; /**< Maximum length of string we will accept from Matlab */
+
     typedef std::map<std::string, boost::function<void()>> MethodMap; /**< The type of mapping for mapping names to member functions to call */
     MethodMap methodmap; /**< A map from names to wrapped member functions to be called */
     MethodMap staticmethodmap; /**< A map from names to wrapped static member functions to be called */
@@ -1082,6 +1084,7 @@ void MexIFace::outputCubeCellArray(const CubeField<ElemT> &field)
     }
     lhs[lhs_idx++] = arr; //Save cell-array as output
 }
+} /* namespace mexiface */
 
 
 #endif /* _MEXIFACE_H */

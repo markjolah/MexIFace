@@ -4,6 +4,8 @@
  * This code is slightly modified version of the example code provided by mathworks for an
  * explore.cpp MEX module.  Original Copyright notice attached below.
  *
+ * TODO: Remove this dependency on Matlab copyright
+ *
  */
 
 /*=================================================================
@@ -18,14 +20,8 @@
 #include <cstring>
 #include "explore.h"
 
-#ifdef WIN32
-//This used to require an "I" but now "z" works too in WIN32.  Potentially remove this whole macro now.
-// #define XFMT_SIZE_T "I"
-#define XFMT_SIZE_T "z"
-#else
-#define XFMT_SIZE_T "z"
-#endif
-
+namespace mexiface{
+namespace explore{
 /* Pass analyze_cell a pointer to a cell mxArray.  Each element
    in a cell mxArray is called a "cell"; each cell holds zero
    or one mxArray.  analyze_cell accesses each cell and displays
@@ -192,11 +188,11 @@ void analyze_sparse(const mxArray *array_ptr)
         if (starting_row_index == stopping_row_index) continue;
         for (current_row_index = starting_row_index; current_row_index < stopping_row_index; current_row_index++){
             if (mxIsComplex(array_ptr))  {
-                snprintf(buf, 100, "\t(%%%su,%%%su) = %%g+%%g i\n",XFMT_SIZE_T,XFMT_SIZE_T);
+                snprintf(buf, 100, "\t(%%%su,%%%su) = %%g+%%g i\n","z","z");
                 mexPrintf(buf,ir[current_row_index]+1,col+1, pr[total], pi[total]);
                 total++;
             } else {
-                snprintf(buf, 100, "\t(%%%su,%%%su) = %%g\n",XFMT_SIZE_T,XFMT_SIZE_T);
+                snprintf(buf, 100, "\t(%%%su,%%%su) = %%g\n","z","z");
                 mexPrintf(buf,ir[current_row_index]+1, col+1, pr[total++]);
             }
         }
@@ -510,7 +506,7 @@ void get_characteristics(const mxArray *array_ptr)
   temp_string=(char *)mxCalloc(64, sizeof(char));
 
   for (c=0; c<number_of_dimensions; c++) {
-    sprintf(temp_string, "%" XFMT_SIZE_T "dx", dims[c]);
+      sprintf(temp_string, "%zdx", dims[c]);
     strcat(shape_string, temp_string);
   }
 
@@ -518,7 +514,7 @@ void get_characteristics(const mxArray *array_ptr)
   /* replace the last 'x' with a space */
   shape_string[length_of_shape_string-1]='\0';
   if (length_of_shape_string > 16) {
-    sprintf(shape_string, "%" XFMT_SIZE_T "u-D", number_of_dimensions);
+      sprintf(shape_string, "%zu-D", number_of_dimensions);
   }
   mexPrintf("Dimensions: %s\n", shape_string);
   
@@ -562,3 +558,5 @@ mxClassID analyze_class(const mxArray *array_ptr)
     return(category);
 }
 
+} /* namespace mexiface::explore */
+} /* namespace mexiface */

@@ -1,7 +1,7 @@
 /** @file hypercube.h
  * @author Mark J. Olah (mjo\@cs.unm DOT edu)
  * @date 2013-2017
- * @copyright See LICENSE file.
+ * @copyright Licensed under the Apache License, Version 2.0.  See LICENSE file.
  * @brief The class declaration and inline and templated functions for hypercube.
  */
 
@@ -12,6 +12,10 @@
 #include <memory>
 #include <vector>
 #include <stdexcept>
+
+namespace mexiface {
+
+
 /**
  * @brief A class to create a 4D armadillo array that can use externally allocated memory.
  *
@@ -138,5 +142,6 @@ private:
 typedef Hypercube<double> hypercube;
 typedef Hypercube<float>  fhypercube;
 
+} /* namespace mexiface */
 
 #endif /* _HYPERCUBE_H */

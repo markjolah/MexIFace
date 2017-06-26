@@ -1,7 +1,7 @@
 /** @file MexUtils.h
  * @author Mark J. Olah (mjo\@cs.unm DOT edu)
  * @date 2013-2017
- * @copyright See LICENSE file.
+ * @copyright Licensed under the Apache License, Version 2.0.  See LICENSE file.
  * @brief Helper functions for working with Matlab mxArrays and mxClassIDs
  *
  */
@@ -11,6 +11,8 @@
 
 #include <cstdint>
 #include "mex.h"
+
+namespace mexiface {
 
 /**
  * @brief Returns a string representation of the mxArray class name
@@ -55,5 +57,7 @@ template<class T> mxClassID get_mx_class(){return mxUNKNOWN_CLASS;}
  * without using it directlty as a mexFunction.
  */
 void exploreMexArgs(int nargs, const mxArray *args[] );
+
+} /* namespace mexiface */
 
 #endif /* _MEXUTILS_H */

@@ -1,7 +1,7 @@
 /** @file MexIFace.cpp
  * @author Mark J. Olah (mjo\@cs.unm DOT edu)
  * @date 2013-2017
- * @copyright See LICENSE file.
+ * @copyright Licensed under the Apache License, Version 2.0.  See LICENSE file.
  * @brief The class definition for MexIFace.
  */
 
@@ -15,6 +15,7 @@
 #include <thread>
 #include "omp.h"
 
+namespace mexiface {
 
 MexIFace::MexIFace(std::string name) : mex_name(name) 
 {
@@ -487,3 +488,4 @@ void MexIFace::mexFunction(uint32_t _nlhs, mxArray *_lhs[], uint32_t _nrhs, cons
     }
 }
 
+} /* namespace mexiface */

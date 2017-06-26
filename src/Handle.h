@@ -1,7 +1,7 @@
 /** @file Handle.h
  * @author Mark J. Olah (mjo\@cs.unm DOT edu)
  * @date 2013-2017
- * @copyright See LICENSE file.
+ * @copyright Licensed under the Apache License, Version 2.0.  See LICENSE file.
  * @brief Helper class and templated functions to represent and manipulate Handles to C++ objects as Matlab mxArrays
  */
 
@@ -12,6 +12,7 @@
 #include <string>
 #include <typeinfo>
 
+namespace mexiface {
 
 /** @brief A class to represent and manipulate handles to C++ classes that can be wrapped as
  * Matlab arrays, allowing C++ objects to persist between Mex calls.
@@ -163,5 +164,7 @@ void Handle<T>::destroyObject(const mxArray *arr)
     delete getHandle(arr); //This destroys the handle object, and the Handle's destructor will destroy the actual wrapped object.
     mexUnlock(); /* Decrement the lock count */
 }
+
+} /* namespace mexiface */
 
 #endif // _HANDLE_H

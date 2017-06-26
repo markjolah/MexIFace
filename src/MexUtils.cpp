@@ -1,13 +1,14 @@
 /** @file MexUtils.cpp
  * @author Mark J. Olah (mjo\@cs.unm DOT edu)
  * @date 2013-2017
- * @copyright See LICENSE file.
+ * @copyright Licensed under the Apache License, Version 2.0.  See LICENSE file.
  * @brief Helper functions for working with Matlab mxArrays and mxClassIDs
  */
 
 #include "MexUtils.h"
 #include "explore.h"
 
+namespace mexiface {
 
 const char* get_mx_class_name(const mxArray *array)
 {
@@ -72,7 +73,10 @@ void exploreMexArgs(int nargs, const mxArray *args[] )
     for (int i=0; i<nargs; i++)  {
         mexPrintf("\n\n");
         mexPrintf("Name: %s%d%c\n", "arg[",i,"]");
-        get_characteristics(args[i]);
-        analyze_class(args[i]);
+        explore::get_characteristics(args[i]);
+        explore::analyze_class(args[i]);
     }
 }
+
+} /* namespace mexiface */
+

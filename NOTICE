@@ -2,11 +2,11 @@ MexIFace
 
 A Cross-Platform C++ / MEX Object-based interface wrapper and CMake build tool.
 
-Copyright 2013-2017 
+Copyright 2014-2017 
 Author: Mark J. Olah 
 Email: (mjo@cs.unm DOT edu)
 
-This is free open-source software.  Enjoy!
+This is software is "free," as in beer, and "free," as in speech.  Enjoy!
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

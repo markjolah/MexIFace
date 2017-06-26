@@ -8,7 +8,15 @@
 message(STATUS "[MexIFace]: Configure Libraries")
 # Armadillo
 find_package(Armadillo REQUIRED)
-add_definitions(-DARMA_USE_CXX11 -DARMA_DONT_USE_WRAPPER -DARMA_32BIT_WORD)
+add_definitions(-DARMA_USE_CXX11 -DARMA_DONT_USE_WRAPPER -DARMA_BLAS_LONG)
+add_definitions(-DARMA_DONT_USE_OPENMP) #Want to explicitly use openMP when required
+if(${CMAKE_BUILD_TYPE} MATCHES Debug)
+    add_definitions(-DARMA_PRINT_ERRORS)
+endif()
+# Optionally enable extra debugging from armadillo to log every call.
+if(MexIFace_EXTRA_DEBUG)
+    add_definitions(-DARMA_EXTRA_DEBUG)
+endif()
 
 # OpenMP
 find_package(OpenMP REQUIRED)
@@ -36,7 +44,6 @@ if(WIN32)
 elseif(UNIX)
     set(MEX_EXT mexa64)
     set(MATLAB_ARCH glnxa64)
-    set(MATLAB_LINK_MAPFILE ${MATLAB_ROOT}/extern/lib/${MATLAB_ARCH}/mexFunction.map)
 elseif(APPLE)
     set(MEX_EXT mexi64)
     set(MATLAB_ARCH maci64)
@@ -66,7 +73,11 @@ find_library(MATLAB_MX_LIBRARY mx PATHS ${MATLAB_LIB_DIR})
 find_library(MATLAB_ENG_LIBRARY eng PATHS ${MATLAB_LIB_DIR})
 find_library(MATLAB_MAT_LIBRARY mat PATHS ${MATLAB_LIB_DIR})
 set(MATLAB_LIBRARIES ${MATLAB_MWLAPACK_LIBRARY} ${MATLAB_MWBLAS_LIBRARY} ${MATLAB_MEX_LIBRARY} ${MATLAB_MX_LIBRARY} ${MATLAB_ENG_LIBRARY} ${MATLAB_MAT_LIBRARY})
+#set(MATLAB_LIBRARIES ${MATLAB_MEX_LIBRARY} ${MATLAB_MX_LIBRARY} ${MATLAB_ENG_LIBRARY} ${MATLAB_MAT_LIBRARY})
 set(MATLAB_INCLUDE ${MATLAB_ROOT}/extern/include ) #Matlab include dir
+if(UNIX)
+    set(MATLAB_LINK_MAPFILE ${MATLAB_ROOT}/extern/lib/${MATLAB_ARCH}/mexFunction.map)
+endif()
 
 # Compiler Definitions
 if (WIN32)
@@ -81,10 +92,16 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_WARN_FLAGS} ${GCC_STD_FLAGS} ${GCC
 
 #Debug compiler options
 set(CMAKE_DEBUG_POSTFIX ".debug" CACHE STRING "Debug file extension")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -O")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O -Wfatal-errors")
 #Release compiler options
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DARMA_NO_DEBUG -DNDEBUG")
-
+#Detect if we are a debug build at configure time which is cannot be done with a gererator expression
+if(${CMAKE_BUILD_TYPE} MATCHES Debug)
+    set(MexIFace_DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
+else()
+    set(MexIFace_DEBUG_POSTFIX "")
+endif()
+message(STATUS "[MexIFace] DebugPostfix: ${MexIFace_DEBUG_POSTFIX}")
 
 
 
