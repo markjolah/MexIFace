@@ -1,4 +1,4 @@
-% GUIBuilder.m - A base class for making GUIs for class interaction
+% MexIFace.GUIBuilder.m - A base class for making GUIs for class interaction
 %
 % Mark J. Olah (mjo@cs.unm DOT edu)
 % 2014 - 2017
@@ -51,8 +51,8 @@ classdef GUIBuilder < handle
                 delete(obj.guiFig);
             end
             obj.guiFig=[];            
-            obj.waitbarH=GUIBuilder.closeCloseableHandles(obj.waitbarH);
-            obj.guiOpenFigs=GUIBuilder.closeCloseableHandles(obj.guiOpenFigs);
+            obj.waitbarH=MexIFace.GUIBuilder.closeCloseableHandles(obj.waitbarH);
+            obj.guiOpenFigs=MexIFace.GUIBuilder.closeCloseableHandles(obj.guiOpenFigs);
             obj.inGui=false;            
         end
     end
@@ -141,10 +141,10 @@ classdef GUIBuilder < handle
         function setDefaultableControl(obj,h,prop)
             % This is to highlight the background of the entry uicontrols for "preserved properties"
             if isempty(obj.(prop)) && isfield(obj.preservedProperties,prop) && ~isempty(obj.preservedProperties.(prop))
-                h.String = arr2str(obj.preservedProperties.(prop));
+                h.String = MexIFace.arr2str(obj.preservedProperties.(prop));
                 h.BackgroundColor = obj.color_preservedBG;
             else
-                h.String = arr2str(obj.(prop));
+                h.String = MexIFace.arr2str(obj.(prop));
                 h.BackgroundColor = obj.color_editBG;
             end
         end        
@@ -193,7 +193,7 @@ classdef GUIBuilder < handle
             uicontrol('Parent',parent,'Style','text','String',name,...
                 'Position',[loc label_sz],...
                 'HorizontalAlignment','left','FontSize',font_size);
-            editH=uicontrol('Parent',parent,'Style','edit','String',arr2str(val),...
+            editH=uicontrol('Parent',parent,'Style','edit','String',MexIFace.arr2str(val),...
                 'Position',[loc(1)+label_sz(1)+sp, loc(2), edit_sz],...
                 'HorizontalAlignment','right','FontSize',font_size);
         end
@@ -209,7 +209,7 @@ classdef GUIBuilder < handle
             edit_pos = pos;
             edit_pos(1) = edit_pos(1)+ext(3)+2;
             edit_pos(3) = pos(3) -ext(3)-2;
-            editH=uicontrol('Parent',parent,'Style','popupmenu','String',cellmap(@arr2str,vals),...
+            editH=uicontrol('Parent',parent,'Style','popupmenu','String',MexIFace.cellmap(@MexIFace.arr2str,vals),...
                 'Position',edit_pos,'HorizontalAlignment','right');
         end
 
@@ -218,7 +218,7 @@ classdef GUIBuilder < handle
             uicontrol('Parent',parent,'Style','text','String',name,...
                 'Position',[loc label_sz],...
                 'HorizontalAlignment','left','FontSize',font_size);
-            editH=uicontrol('Parent',parent,'Style','edit','String',arr2str(val),...
+            editH=uicontrol('Parent',parent,'Style','edit','String',MexIFace.arr2str(val),...
                 'Position',[loc(1)+label_sz(1)+sp, loc(2), edit_sz],...
                 'HorizontalAlignment','right','FontSize',font_size);
         end
@@ -251,7 +251,7 @@ classdef GUIBuilder < handle
         end
 
         function CB=safeCallback(cb_func)
-            % useage: GUIBuilder.safeCallback(@myactual_CB)
+            % useage: MexIFace.GUIBuilder.safeCallback(@myactual_CB)
             %
             % returns a function handle for callback useage that will check
             % for errors and report them as a popup errordlg, and still give you a text output to use
@@ -283,7 +283,7 @@ classdef GUIBuilder < handle
             cpos = cellmatfun(@getpixelposition, panelH.Children); %children positions
             if ~isempty(cpos)
                 max_sz = max(cpos(:,1:2)+cpos(:,3:4),[],1);
-                pos = [pos(1:2) max_sz+[3 7]*GUIBuilder.default_spacing];
+                pos = [pos(1:2) max_sz+[3 7]*MexIFace.GUIBuilder.default_spacing];
                 panelH.Position = pos;
             end
         end
@@ -298,7 +298,7 @@ classdef GUIBuilder < handle
                 cpos=cellmatfun(@getpixelposition, tabs(n).Children); %children positions
                 if ~isempty(cpos)
                     tab_max_sz=max(cpos(:,1:2)+cpos(:,3:4),[],1);
-                    g_sz = max(g_sz, tab_max_sz+[3 7]*GUIBuilder.default_spacing);
+                    g_sz = max(g_sz, tab_max_sz+[3 7]*MexIFace.GUIBuilder.default_spacing);
                 end
             end
             g_sz(2) = g_sz(2)+20; %space for headers
@@ -325,7 +325,7 @@ classdef GUIBuilder < handle
                 bbox = H{1}.Position;
                 return;
             end
-            cur_pos=cell2mat(cellmap(@(h) h.Position,H(:)));
+            cur_pos=cell2mat(MexIFace.cellmap(@(h) h.Position,H(:)));
             new_pos=align(cur_pos, varargin{:});
             for n=1:numel(H)
                 H{n}.Position = new_pos(n,:); %Actually move the uicontrol elements.  Matlab 'align' doesnt do this for you.
@@ -351,7 +351,7 @@ classdef GUIBuilder < handle
                 error('GUIBuilder:makeFigureMenu','Got inconsitent list of labels and CBs');
             end
             menuH = uimenu(figH, 'Label',title);
-            CBs = cellmap(@GUIBuilder.safeCallback,CBs); % Make callbacks safe
+            CBs = MexIFace.cellmap(@MexIFace.GUIBuilder.safeCallback,CBs); % Make callbacks safe
             for i = 1:length(labels)
                 if isempty(labels{i})
                     uimenu(menuH, 'Separator','on');
@@ -378,7 +378,7 @@ classdef GUIBuilder < handle
                 error('GUIBuilder:makeContextMenu','Got inconsitent list of labels and CBs');
             end
             menuH = uicontextmenu();
-            CBs = cellmap(@GUIBuilder.safeCallback,CBs); % Make callbacks safe
+            CBs = MexIFace.cellmap(@MexIFace.GUIBuilder.safeCallback,CBs); % Make callbacks safe
             seperator='off';
             for i = 1:length(labels)
                 if isempty(labels{i})
@@ -396,7 +396,7 @@ classdef GUIBuilder < handle
                 error('GUIBuilder:makeJavaContextMenu','Got inconsitent list of labels and CBs');
             end
             menuH = javaObjectEDT('javax.swing.JPopupMenu');
-            CBs = cellmap(@GUIBuilder.safeCallback,CBs); % Make callbacks safe
+            CBs = MexIFace.cellmap(@MexIFace.GUIBuilder.safeCallback,CBs); % Make callbacks safe
             for i = 1:length(labels)
                 if isempty(labels{i})
                     menuH.addSeparator();
@@ -421,7 +421,7 @@ classdef GUIBuilder < handle
             % tableH - a uitable handle of a table that should have the row-selection property turned on.
             % mousePressedCallback - Function handle to a callback for a mouse press
             %
-            hJTable = GUIBuilder.getJTableHandle(tableH);
+            hJTable = MexIFace.GUIBuilder.getJTableHandle(tableH);
             hJTable.setNonContiguousCellSelection(false);
             hJTable.setColumnSelectionAllowed(false);
             hJTable.setRowSelectionAllowed(true);
@@ -447,7 +447,7 @@ classdef GUIBuilder < handle
         function clearJTableCallbacks(tableH)
             % Should be called on GUI close to enmsure we clean up and can free the object.  This is
             % important if you have used the other 'JTable" methods in GUIBuilder
-            hJTable = GUIBuilder.getJTableHandle(tableH);
+            hJTable = MexIFace.GUIBuilder.getJTableHandle(tableH);
             CB = handle(hJTable,'CallbackProperties');
             CB.MousePressedCallback = [];
         end
@@ -500,28 +500,28 @@ classdef GUIBuilder < handle
         
         function handles=buttonCol(parent, area, button_sz, names, CBs, varargin)
             N=length(names);
-            if N*(GUIBuilder.default_spacing+button_sz(2))>area(4)
+            if N*(MexIFace.GUIBuilder.default_spacing+button_sz(2))>area(4)
                 error('GUIBuilder:buttonRow', 'area too small');
             end
             handles=cell(1,N);
             pos=[area(1:2), button_sz];
-            CBs=cellmap(@GUIBuilder.safeCallback,CBs); % Make callbacks safe
+            CBs=MexIFace.cellmap(@MexIFace.GUIBuilder.safeCallback,CBs); % Make callbacks safe
             for n=1:N
                handles{n}=uicontrol('Parent', parent, 'Style','pushbutton','String',names{n},...
                                     'Position', pos, 'Callback', CBs{n},varargin{:});
             end
-            align([handles{:}],'Left','Fixed',GUIBuilder.default_spacing);
+            align([handles{:}],'Left','Fixed',MexIFace.GUIBuilder.default_spacing);
         end
 
         function Hs=buttonRow(parent, area, button_sz, names, CBs, varargin)
             N=length(names);
-            sp=GUIBuilder.default_spacing;
+            sp=MexIFace.GUIBuilder.default_spacing;
             buts_per_row=floor(area(3)/(button_sz(1)+sp));
             nrows=ceil(N/buts_per_row);
             pos=[area(1:2), button_sz];
             Hs=cell(1,N);
             pos(2)=pos(2)+(nrows-1)*(button_sz(2)+sp);
-            CBs=cellmap(@GUIBuilder.safeCallback,CBs); % Make callbacks safe
+            CBs=MexIFace.cellmap(@MexIFace.GUIBuilder.safeCallback,CBs); % Make callbacks safe
             for r=1:nrows
                 row_st=1+(r-1)*buts_per_row;
                 row_end=min(r*buts_per_row,N);
@@ -529,7 +529,7 @@ classdef GUIBuilder < handle
                    Hs{n}=uicontrol('Parent',parent,'Style','pushbutton','String',names{n},...
                                      'Position',pos,'Callback', CBs{n},varargin{:});
                 end
-                align([Hs{row_st:row_end}],'Fixed',GUIBuilder.default_spacing,'Bottom');
+                align([Hs{row_st:row_end}],'Fixed',MexIFace.GUIBuilder.default_spacing,'Bottom');
                 pos(2)=pos(2)-button_sz(2)-sp;
             end
         end
@@ -537,10 +537,10 @@ classdef GUIBuilder < handle
         function handles=labeledHEdits(parent, area, height, hNames, labels, values, CBs)
             N=length(labels);
             H=cell(2,N);
-            sp=GUIBuilder.default_spacing;
+            sp=MexIFace.GUIBuilder.default_spacing;
             label_pos=[area(1:2), (area(3)-sp)/2, height];
             exts=zeros(N,4);
-            CBs=cellmap(@GUIBuilder.safeCallback,CBs); % Make callbacks safe
+            CBs=MexIFace.cellmap(@MexIFace.GUIBuilder.safeCallback,CBs); % Make callbacks safe
             for n=N:-1:1
                 H{1,n}=uicontrol('Parent',parent,'Style','text','String',labels{n},...
                                  'Position',label_pos,'HorizontalAlignment','left');
@@ -559,7 +559,7 @@ classdef GUIBuilder < handle
                     H{2,n}=uicontrol('Parent',parent,'String',values{n},...
                                      'Position',edit_pos,'HorizontalAlignment','left');
                 else
-                    H{2,n}=uicontrol('Parent',parent,'String',arr2str(values{n}),...
+                    H{2,n}=uicontrol('Parent',parent,'String',MexIFace.arr2str(values{n}),...
                                      'Position',edit_pos,'HorizontalAlignment','right');
                 end
                 handles.(hNames{n}) = H{2,n};
@@ -577,10 +577,10 @@ classdef GUIBuilder < handle
         function handles=labeledVEdits(parent, area, height, hNames, labels, values, CBs)
             N=length(labels);
             H=cell(2,N);
-            sp=GUIBuilder.default_spacing;
+            sp=MexIFace.GUIBuilder.default_spacing;
             label_pos=[area(1:2), area(3)-sp, height];
             exts=zeros(N,4);
-            CBs=cellmap(@GUIBuilder.safeCallback,CBs); % Make callbacks safe
+            CBs=MexIFace.cellmap(@MexIFace.GUIBuilder.safeCallback,CBs); % Make callbacks safe
             for n=N:-1:1
                 H{1,n}=uicontrol('Parent', parent, 'Style','text','String',labels{n},...
                                  'Position', label_pos,'HorizontalAlignment','left');
@@ -594,9 +594,9 @@ classdef GUIBuilder < handle
             edit_pos=[area(1:2), area(3)-sp, height];
             for n=N:-1:1
                 H{2,n}=uicontrol('Parent', parent, 'Style','edit',...
-                                 'String',arr2str(values{n}),...
+                                 'String',MexIFace.arr2str(values{n}),...
                                  'Position', edit_pos, 'HorizontalAlignment','left',...
-                                 'BackgroundColor',GUIBuilder.color_editBG);
+                                 'BackgroundColor',MexIFace.GUIBuilder.color_editBG);
                 if length(CBs)>=n && ~isempty(CBs{n})
                    H{2,n}.Callback=CBs{n};
                 end
@@ -606,7 +606,7 @@ classdef GUIBuilder < handle
         end
                
         function gridH = makePropertyGrid(panH,pane_title,prop_struct, param_info, position)
-            props = cellmap(@makePropGridField, fieldnames(prop_struct));
+            props = MexIFace.cellmap(@makePropGridField, fieldnames(prop_struct));
             gridH = PropertyGrid(panH,'Properties', [props{:}], 'Units','pixels','Position',position);
             gridH.Control.Title=pane_title;
             function pgf = makePropGridField(name)
@@ -735,7 +735,7 @@ classdef GUIBuilder < handle
             [newpathn,~,~]=fileparts(dest);
             Pickle.createDirIfNonexistant(newpathn);
             if check_overwrite
-                GUIBuilder.confirmOverwrite(dest);
+                MexIFace.GUIBuilder.confirmOverwrite(dest);
             end
             if ~strcmp(src,dest)
                 [success,msg,msgid]=copyfile(src,dest);

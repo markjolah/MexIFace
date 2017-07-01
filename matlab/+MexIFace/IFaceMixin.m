@@ -1,4 +1,4 @@
-% IfaceMixin.m
+% IFaceMixin.m
 %
 % Mark J. Olah (mjo@cs.unm DOT edu)
 % 2014 - 2017
@@ -6,7 +6,7 @@
 %
 % A mixin class that is to be inherited from for classes that conform to the Mex_Iface matlab<--->C++ Class interface
 
-classdef IfaceMixin < handle
+classdef IFaceMixin < handle
     properties (Access = protected)
         % ifaceHandle - Function Handle to the Matlab class which is the interface
         ifaceHandle;
@@ -22,7 +22,7 @@ classdef IfaceMixin < handle
     end
 
     methods (Access=protected)
-        function obj=IfaceMixin(ifaceHandle)
+        function obj=IFaceMixin(ifaceHandle)
             % Inputs:
             %  ifaceHandle - A function handle to the *_Iface mex function that implements the C++ side of the interface
             obj.ifaceHandle=ifaceHandle;
@@ -71,7 +71,7 @@ classdef IfaceMixin < handle
 
     methods (Access=protected, Static=true)
         function varargout=callstatic(ifaceHandle, cmdstr, varargin)
-            % This is the entry point to call a static method of the underlying C++ class.  The Matlab side of the wrapped class
+            % callstatic   The entry point to call a static method of the underlying C++ class.  The Matlab side of the wrapped class
             % should internally call this protected method to call static member functions of the C++ class.  Because these are
             % static methods there is no need to have an active intantiation of the C++ class in objectHandle.
             %
@@ -87,15 +87,15 @@ classdef IfaceMixin < handle
         end
 
         function structDict = convertStatsToStructs(statsDict)
-            % Convert a stats dictionary returned from C++ to a structured stats dictionary, i.e., a 
+            % convertStatsToStructs   Convert a stats dictionary returned from C++ to a structured stats dictionary, i.e., a 
             % structure of structres.  Entries like "group.param1", "group.param2" are turned into
             % sub - structures.
             % [in] statsDict - structure mapping parameter names to values
             % [out] structDict - a more structured representation of the same dictionary
             fullnames = fieldnames(statsDict);
-            names = cellmap(@(n) strsplit(n,'.'),fullnames);
+            names = MexIFace.cellmap(@(n) strsplit(n,'.'),fullnames);
             dictname_idxs = cellfun(@numel, names)==2;
-            dictnames = unique(cellmap(@(n) n{1}, names(dictname_idxs)));
+            dictnames = unique(MexIFace.cellmap(@(n) n{1}, names(dictname_idxs)));
             structDict = cell2struct(cell(1,numel(dictnames)),dictnames,2);
             
             for n=1:numel(names)
