@@ -15,7 +15,7 @@ target_include_directories(${MexIFace_LIB} PUBLIC $<BUILD_INTERFACE:${MATLAB_INC
 target_include_directories(${MexIFace_LIB} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}> $<INSTALL_INTERFACE:include/${PROJECT_NAME}>) #MexIFace public includes
 set_target_properties(${MexIFace_LIB} PROPERTIES PUBLIC_HEADER "${MexIFace_HEADERS}")
 # set_target_properties(${MexIFace_LIB} PROPERTIES OUTPUT_NAME MexIFace${CMAKE_DEBUG_POSTFIX})
-
+set_property(GLOBAL APPEND PROPERTY FIXUP_LIBRARY_TARGETS ${MexIFace_LIB})
 #Install libraries and headers
 if(UNIX)
     install(TARGETS ${MexIFace_LIB} EXPORT ${EXPORT_TARGETS_NAME}
@@ -23,9 +23,11 @@ if(UNIX)
             PUBLIC_HEADER DESTINATION include/${PROJECT_NAME} COMPONENT Development)
 elseif(WIN32)
     install(TARGETS ${MexIFace_LIB} EXPORT ${EXPORT_TARGETS_NAME}
-        LIBRARY DESTINATION lib COMPONENT Runtime
+        RUNTIME DESTINATION lib COMPONENT Runtime
+        ARCHIVE DESTINATION lib COMPONENT Development
         PUBLIC_HEADER DESTINATION include/${PROJECT_NAME} COMPONENT Development)
 endif()
 #Install Cmake modules and helper files for development
 install(DIRECTORY ${MexIFace_CMAKE_DIR}/
         DESTINATION ${SHARED_CMAKE_INSTALL_DIR} COMPONENT Development)
+fixup_dependencies(${MexIFace_LIB})

@@ -21,9 +21,9 @@ endif()
 # OpenMP
 find_package(OpenMP REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-if(WIN32)
-    find_library(OPENMP_LIBRARY libgomp-1.dll REQUIRED)
-endif()
+# if(WIN32)
+#     find_library(OPENMP_LIBRARY libgomp-1.dll REQUIRED)
+# endif()
 
 # Pthreads
 if (WIN32)
@@ -35,21 +35,20 @@ message(STATUS "Found Pthread Libarary: ${PTHREAD_LIBRARY}")
 # LAPACK & BLAS
 find_package(LAPACK REQUIRED)
 find_package(BLAS REQUIRED)
-
 # Matlab
 # User must set environment/cmake variable: MATLAB_ROOT
 if(WIN32)
     set(MEX_EXT mexw64)
-    set(MATLAB_ARCH w64)
+    set(MATLAB_ARCH win64)
 elseif(UNIX)
     set(MEX_EXT mexa64)
     set(MATLAB_ARCH glnxa64)
 elseif(APPLE)
-    set(MEX_EXT mexi64)
+    set(MEX_EXT mexmaci64)
     set(MATLAB_ARCH maci64)
 endif()
-message(STATUS "MATLAB arch: ${MATLAB_ARCH}")
-message(STATUS "MATLAB MEX ext: ${MEX_EXT}")
+message(STATUS "[MexIFace] MATLAB arch: ${MATLAB_ARCH}")
+message(STATUS "[MexIFace] MATLAB MEX ext: ${MEX_EXT}")
 #Find MATLAB_ROOT environment variable
 #If cross_compiling we'll look for MATLAB_ROOT_W64 or MATLAB_ROOT_MACI64
 if(NOT MATLAB_ROOT)
@@ -59,19 +58,20 @@ if(NOT MATLAB_ROOT)
         set(MATLAB_ROOT $ENV{MATLAB_ROOT})
     endif()
 endif()
-message(STATUS "MATLAB root: ${MATLAB_ROOT}")
+message(STATUS "[MexIFace] MATLAB root: ${MATLAB_ROOT}")
 if(NOT MATLAB_ROOT)
     message(FATAL_ERROR "Set MATLAB_ROOT to the root of a matlab directory for this arch")
 endif()
 
 set(MATLAB_LIB_DIR ${MATLAB_ROOT}/bin/${MATLAB_ARCH})
-message(STATUS "MATLAB lib dir: ${MATLAB_LIB_DIR}")
-find_library(MATLAB_MWLAPACK_LIBRARY mwlapack PATHS ${MATLAB_LIB_DIR})
-find_library(MATLAB_MWBLAS_LIBRARY mwblas PATHS ${MATLAB_LIB_DIR})
-find_library(MATLAB_MEX_LIBRARY mex PATHS ${MATLAB_LIB_DIR})
-find_library(MATLAB_MX_LIBRARY mx PATHS ${MATLAB_LIB_DIR})
-find_library(MATLAB_ENG_LIBRARY eng PATHS ${MATLAB_LIB_DIR})
-find_library(MATLAB_MAT_LIBRARY mat PATHS ${MATLAB_LIB_DIR})
+set(CMAKE_FIND_ROOT_PATH ${MATLAB_LIB_DIR} ${CMAKE_FIND_ROOT_PATH})
+message(STATUS "[MexIFace] MATLAB lib dir: ${MATLAB_LIB_DIR}")
+find_library(MATLAB_MWLAPACK_LIBRARY mwlapack PATHS ${MATLAB_LIB_DIR} NO_CMAKE_FIND_ROOT_PATH)
+find_library(MATLAB_MWBLAS_LIBRARY mwblas PATHS ${MATLAB_LIB_DIR} NO_CMAKE_FIND_ROOT_PATH)
+find_library(MATLAB_MEX_LIBRARY mex PATHS ${MATLAB_LIB_DIR} NO_CMAKE_FIND_ROOT_PATH)
+find_library(MATLAB_MX_LIBRARY mx PATHS ${MATLAB_LIB_DIR} NO_CMAKE_FIND_ROOT_PATH)
+find_library(MATLAB_ENG_LIBRARY eng PATHS ${MATLAB_LIB_DIR} NO_CMAKE_FIND_ROOT_PATH)
+find_library(MATLAB_MAT_LIBRARY mat PATHS ${MATLAB_LIB_DIR} NO_CMAKE_FIND_ROOT_PATH)
 set(MATLAB_LIBRARIES ${MATLAB_MWLAPACK_LIBRARY} ${MATLAB_MWBLAS_LIBRARY} ${MATLAB_MEX_LIBRARY} ${MATLAB_MX_LIBRARY} ${MATLAB_ENG_LIBRARY} ${MATLAB_MAT_LIBRARY})
 #set(MATLAB_LIBRARIES ${MATLAB_MEX_LIBRARY} ${MATLAB_MX_LIBRARY} ${MATLAB_ENG_LIBRARY} ${MATLAB_MAT_LIBRARY})
 set(MATLAB_INCLUDE ${MATLAB_ROOT}/extern/include ) #Matlab include dir
@@ -92,7 +92,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_WARN_FLAGS} ${GCC_STD_FLAGS} ${GCC
 
 #Debug compiler options
 set(CMAKE_DEBUG_POSTFIX ".debug" CACHE STRING "Debug file extension")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -O -Wfatal-errors")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O")
 #Release compiler options
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DARMA_NO_DEBUG -DNDEBUG")
 #Detect if we are a debug build at configure time which is cannot be done with a gererator expression
@@ -103,5 +103,6 @@ else()
 endif()
 message(STATUS "[MexIFace] DebugPostfix: ${MexIFace_DEBUG_POSTFIX}")
 
-
+## MAC OS X Config ##
+set(CMAKE_MACOSX_RPATH 1) #Enable rpaths on OS X
 

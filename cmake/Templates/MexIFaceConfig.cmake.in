@@ -8,8 +8,8 @@ check_required_components("@PROJECT_NAME@")
 set(MexIFace_CMAKE_DIR @PACKAGE_SHARED_CMAKE_INSTALL_DIR@) #Relative to this file's install location
 set(MexIFace_CMAKE_MODULES_DIR ${MexIFace_CMAKE_DIR}/Modules)
 set(MexIFace_CMAKE_TOOLCHAINS_DIR ${MexIFace_CMAKE_DIR}/Toolchains)
-set(MexIFace_CMAKE_BUILDCONFIG_DIR ${MexIFace_CMAKE_DIR}/BuildConfig)
-set(MexIFace_CMAKE_SCRIPTS_DIR ${MexIFace_CMAKE_DIR}/Scripts)
+set(MexIFace_CMAKE_FUNCTIONS_DIR ${MexIFace_CMAKE_DIR}/Functions)
+set(MexIFace_CMAKE_EXECUTABLE_DIR ${MexIFace_CMAKE_DIR}/Executables)
 set(MexIFace_CMAKE_TEMPLATES_DIR ${MexIFace_CMAKE_DIR}/Templates)
 #Add modules to path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${MexIFace_CMAKE_MODULES_DIR})

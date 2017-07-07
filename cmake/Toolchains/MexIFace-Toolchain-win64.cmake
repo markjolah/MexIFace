@@ -8,15 +8,16 @@
 # we can use static libraries if the files are compiled with -fPIC.  Thus we
 # are using the MXE shared target
 #
-set(MXE_ROOT $ENV{MXE_ROOT})
-set(USER_W64_CROSS_ROOT $ENV{USER_W64_CROSS_ROOT})
-set(TARGET_ARCH x86_64-w64-mingw32)
-set(TARGET_MXE_ARCH ${TARGET_ARCH}.shared)
-set(MXE_ARCH_ROOT ${MXE_ROOT}/usr/${TARGET_MXE_ARCH})
+set(MXE_ROOT $ENV{MEXIFACE_MXE_ROOT})
+set(MXE_TARGET_ARCH x86_64-w64-mingw32.shared)
+set(MXE_HOST_ARCH x86_64-unknown-linux-gnu)
+set(MXE_ARCH_ROOT ${MXE_ROOT}/usr/${MXE_TARGET_ARCH})
 set(MXE_BIN_DIR ${MXE_ROOT}/usr/bin)
-set(MXE_BIN_PFX ${MXE_BIN_DIR}/${TARGET_MXE_ARCH})
+# set(CMAKE_MODULES_DIR ${MXE_ROOT}/usr/${MXE_HOST_ARCH}/share/cmake-3.7/Modules)
+
+message(STATUS "[MexIFace] MXE_ROOT: ${MXE_ROOT}")
 #Look here for libraries at install time
-# set(LIB_SEARCH_PATHS "${MXE_ROOT}/usr/${TARGET_MXE_ARCH}/lib"
+# set(LIB_SEARCH_PAT-HS "${MXE_ROOT}/usr/${TARGET_MXE_ARCH}/lib"
 #                      "${MXE_ROOT}/usr/${TARGET_MXE_ARCH}/bin"
 #                      "${MXE_ROOT}/usr/bin"
 #                      "${MXE_ROOT}/usr/lib"
@@ -26,12 +27,13 @@ set(MXE_BIN_PFX ${MXE_BIN_DIR}/${TARGET_MXE_ARCH})
 set(CMAKE_SYSTEM_NAME Windows)
 
 set(CMAKE_SYSTEM_PROGRAM_PATH ${MXE_BIN_DIR})
-set(CMAKE_C_COMPILER ${MXE_BIN_PFX}-gcc)
-set(CMAKE_CXX_COMPILER ${MXE_BIN_PFX}-g++)
-set(CMAKE_RC_COMPILER ${MXE_BIN_PFX}-windres)
+set(CMAKE_C_COMPILER ${MXE_TARGET_ARCH}-gcc)
+set(CMAKE_CXX_COMPILER ${MXE_TARGET_ARCH}-g++)
+set(CMAKE_RC_COMPILER ${MXE_TARGET_ARCH}-windres)
 
-set(CMAKE_FIND_ROOT_PATH ${MXE_ROOT} ${USER_W64_CROSS_ROOT} ${MXE_ARCH_ROOT})
+set(CMAKE_FIND_ROOT_PATH ${MXE_ROOT} ${MXE_ARCH_ROOT})
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
