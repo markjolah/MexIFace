@@ -56,15 +56,15 @@ function startup@PROJECT_NAME@(debug, install_prefix)
     % mex code <install_prefix>/lib/MexIFace/matlab/*
     mexiface_matlab_code_path = fullfile(mexiface_lib_path,'matlab');
     if ~exist(mexiface_matlab_code_path,'dir')
-        error([func_name, ':InvalidPackageLayout'],['Package ', package_name,' cannot find MexIFace matlab code lib directory: ',mexiface_matlab_code_path]);
+        error([func_name, ':InvalidPackageLayout'],['Package ', package_name,' cannot find MexIFace matlab code lib directory: ',strrep(mexiface_matlab_code_path,'\','/')]);
     end
     
     % package mex modules path <install_prefix>/lib/mex/mex<Arch><Debug>
     if ispc()
         if debug
-            mex_sub_dir='mex.w64.debug';
+            mex_sub_dir='mex.win64.debug';
         else
-            mex_sub_dir='mex.w64';
+            mex_sub_dir='mex.win64';
         end
     elseif isunix()
         if debug
@@ -77,7 +77,7 @@ function startup@PROJECT_NAME@(debug, install_prefix)
     end
     package_mex_arch_path = fullfile(package_lib_path,'mex',mex_sub_dir);
     if(~exist(package_mex_arch_path,'dir'))
-        error('func_name:InvalidPackageLayout',['Package ', package_name,' cannot find matlab mex code directory: ',package_mex_arch_path]);
+        error('func_name:InvalidPackageLayout',['Package ', package_name,' cannot find matlab mex directory: ',strrep(package_mex_arch_path,'\','/')]);
     end
     
     addpath(genpath(mexiface_matlab_code_path));
