@@ -11,7 +11,6 @@
 #include <sstream>
 #include <map>
 #include <vector>
-#include <list>
 #include <algorithm>
 
 #include <armadillo>
@@ -20,11 +19,12 @@
 #include <boost/bind.hpp>
 
 #include "mex.h"
+
 #include "hypercube.h"
 #include "Handle.h"
-
 #include "explore.h"
 #include "MexUtils.h"
+#include "MexIFaceError.h"
 
 namespace mexiface {
 
@@ -69,37 +69,113 @@ namespace mexiface {
  */
 class MexIFace {
 public:
-    using IdxT = arma::uword; /* A logical type for an unsigned integer index */
+    using MXArgCountT = int; /**< Type for the mexFunction arg counts and associated nrhs and nlhs data members  */
+    using IdxT = arma::uword; /**< A logical type for an IdxT integer index */
     using BoolT = uint16_t;
-    typedef std::map<std::string,double> StatsT; /**< A convenient form for reporting dictionaries of named FP data to matlab */
-    typedef std::map<std::string,arma::Col<double>> VecStatsT; /**< A convenient form for reporting dictionaries of named FP vector (or) scalar data to matlab */
-    template<class T> using VectorVector = std::vector<std::vector<T>>; //Alias template for a std::vector of std::vectors
-    template<class T> using VectorList = std::vector<std::list<T>>; //Alias template for a std::vector of std::vectors
-    template<class T> using VecField = arma::field<arma::Col<T>>; //Alias template for a field of vecs
-    template<class T> using MatField = arma::field<arma::Mat<T>>; //Alias template for a field of mats
-    template<class T> using CubeField = arma::field<arma::Cube<T>>; //Alias template for a field of cubes
-    template<class T> using VecVector = std::vector<arma::Col<T>>; //Alias template for a std::vector of vecs
-    template<class T> using MatVector = std::vector<arma::Mat<T>>; //Alias template for a std::vector of mats
-    template<class T> using CubeVector = std::vector<arma::Cube<T>>; //Alias template for a std::vector of cubes
     
+    template<class T> using Vec = arma::Col<T>;
+    template<class T> using Mat = arma::Mat<T>;
+    template<class T> using Cube = arma::Cube<T>;
+    
+    template<class T> using Dict = std::map<std::string,T>; /**< A convenient form for reporting dictionaries of named FP data to matlab */
+    
+    template<class T> using IsArithmeticT = typename std::enable_if<std::is_arithmetic<T>::value>::type;
+    template<class T> using IsIntegralT = typename std::enable_if< std::is_integral<T>::value >::type;
+    template<class T> using IsUnsignedIntegralT = typename std::enable_if< std::is_integral<T>::value && std::is_same<T, typename std::make_unsigned<T>::type>::value >::type;
+    template<class T> using IsFloatingPointT = typename std::enable_if< std::is_floating_point<T>::value >::type;
+    
+    template<template<typename> class Container,class ElemT> using IsNotVecT = typename std::enable_if< !std::is_same<Vec<ElemT>, Container<ElemT>>::value >::type;
+    
+
+    MexIFace(std::string name);
+    void mexFunction(MXArgCountT _nlhs, mxArray *_lhs[], MXArgCountT _nrhs, const mxArray *_rhs[]);
+    
+    /* Public Static methods */
+    template<class ElemT> static void checkType(const mxArray *m);
+    static void checkType(const mxArray *m, mxClassID classid);
+    static void checkNdim(const mxArray *m, mwSize expected_dim);
+    static void checkMaxNdim(const mxArray *m, mwSize max_expected_dim);
+    static void checkScalarSize(const mxArray *m);
+    static void checkVectorSize(const mxArray *m);
+    static void checkVectorSize(const mxArray *m, mwSize expected_numel);
+    static void checkMatrixSize(const mxArray *m, mwSize expected_rows, mwSize expected_cols);
+    static void checkSameLastDim(const mxArray *m1, const mxArray *m2);
+    
+    
+    /* Unchecked converters allowing direct access to mxArray */
+    template<class ElemT=double, typename=IsArithmeticT<ElemT>> 
+    static ElemT toScalar(const mxArray *m);
+    
+    template<class ElemT, typename=IsArithmeticT<ElemT>> 
+    static Vec<ElemT> toVec(const mxArray *m);
+    
+    template<class ElemT, typename=IsArithmeticT<ElemT>> 
+    static Mat<ElemT> toMat(const mxArray *m);
+    
+    template<class ElemT, typename=IsArithmeticT<ElemT>> 
+    static Cube<ElemT> toCube(const mxArray *m);
+    
+    template<class ElemT, typename=IsArithmeticT<ElemT>> 
+    static Hypercube<ElemT> toHypercube(const mxArray *m);
+    
+    
+    
+    static mxArray* toMXArray(bool val);
+    static mxArray* toMXArray(const char* val);
+    static mxArray* toMXArray(std::string val);
+    
+    template<class ElemT, typename=IsArithmeticT<ElemT>> 
+    static mxArray* toMXArray(ElemT val);
+    
+    template<class ElemT, typename=IsArithmeticT<ElemT>> 
+    static mxArray* toMXArray(const Vec<ElemT> &arr);
+
+    template<class ElemT, typename=IsArithmeticT<ElemT>> 
+    static mxArray* toMXArray(const Mat<ElemT> &arr);
+
+    template<class ElemT, typename=IsArithmeticT<ElemT>> 
+    static mxArray* toMXArray(const Cube<ElemT> &arr);
+
+    template<class ElemT, typename=IsArithmeticT<ElemT>> 
+    static mxArray* toMXArray(const Hypercube<ElemT> &arr);
+    
+    template<class ElemT, typename=IsArithmeticT<ElemT>> 
+    static mxArray* toMXArray(const arma::SpMat<ElemT> &arr);
+    
+    template<class ConvertableT> 
+    static mxArray* toMXArray(const Dict<ConvertableT> &arr);
+
+    template<template<typename> class Array, class ConvertableT> 
+    static mxArray* toMXArray(const Array<ConvertableT> &arr);
+
+    
+    template<class SrcIntT,class DestIntT,typename=IsIntegralT<SrcIntT>,typename=IsIntegralT<DestIntT>>
+    static DestIntT checkedIntegerToIntegerConversion(const mxArray *m);
+    
+    template<class SrcFloatT,class DestIntT,typename=IsFloatingPointT<SrcFloatT>,typename=IsIntegralT<DestIntT>>
+    static DestIntT checkedFloatToIntegerConversion(const mxArray *m);
+    
+    template<class SrcIntT,class DestFloatT,typename=IsIntegralT<SrcIntT>,typename=IsFloatingPointT<DestFloatT>>
+    static DestFloatT checkedIntegerToFloatConversion(const mxArray *m);
+    
+    template<class SrcFloatT,class DestFloatT,typename=IsFloatingPointT<SrcFloatT>,typename=IsFloatingPointT<DestFloatT>>
+    static DestFloatT checkedFloatToFloatConversion(const mxArray *m);
+    
+    
+protected:
+    using MethodMap = std::map<std::string, boost::function<void()>>; /**< The type of mapping for mapping names to member functions to call */    
     
     std::string mex_name; /**< A name to use when reporting errors to Matlab */
 
-    MexIFace(std::string name);
-    void mexFunction(unsigned _nlhs, mxArray *_lhs[], unsigned _nrhs, const mxArray *_rhs[]);
-protected:
-    static unsigned constexpr MAX_STR_LEN=512; /**< Maximum length of string we will accept from Matlab */
-
-    typedef std::map<std::string, boost::function<void()>> MethodMap; /**< The type of mapping for mapping names to member functions to call */
     MethodMap methodmap; /**< A map from names to wrapped member functions to be called */
     MethodMap staticmethodmap; /**< A map from names to wrapped static member functions to be called */
 
-    unsigned nlhs; /**< The number of lhs (output) arguments asked for */
+    MXArgCountT nlhs; /**< The number of lhs (output) arguments asked for */
     mxArray **lhs; /**< The lhs (output) arguments to be returned */
-    int lhs_idx=0; /**< The index of the next lhs argument to write as output */
-    unsigned nrhs; /**< The number of rhs (input) arguments given */
+    IdxT lhs_idx=0; /**< The index of the next lhs argument to write as output */
+    MXArgCountT nrhs; /**< The number of rhs (input) arguments given */
     const mxArray **rhs; /**< The rhs (input) arguments given */
-    int rhs_idx=0; /**< The index of the next rhs argument to read as input */
+    IdxT rhs_idx=0; /**< The index of the next rhs argument to read as input */
 
     /* Methods to be overloaded by subclass */
 
@@ -114,14 +190,12 @@ protected:
     virtual void objConstruct() =0;
 
     /**
-     * @brief Called when the mexFunction gets the \@delete command, passing on the remaining input arguments.
-     *
-     * The rhs should be empty, and the lhs (input) should only be given the object handle that was created by a
-     * \@new command.
+     * @brief Called when the mexFunction gets the \@delete command
      *
      * This pure virtual function must be overloaded by the Iface subclass.
+     * @param mxhandle mxArray where the handle is stored
      */
-    virtual void objDestroy()=0;
+    virtual void objDestroy(const mxArray *mxhandle)=0;
 
     /**
      * @brief This is a helper method which saves a pointer to the wrapped class's object in an internal member variable called obj.
@@ -131,820 +205,488 @@ protected:
      */
     virtual void getObjectFromHandle(const mxArray *mxhandle) =0;
 
-    void callMethod(std::string name);
-    void callStaticMethod(std::string name);
-
+    
     /* methods to check the number and shape of arguments */
-    void checkMinNumArgs(int min_nlhs, int min_nrhs) const;
-    void checkMaxNumArgs(int max_nlhs, int max_nrhs) const;
-    void checkNumArgs(int nlhs, int nrhs) const;
-    void checkSameLastDim(const mxArray *m1, const mxArray *m2) const;
-    void checkDim(const mxArray *m, int rows, int cols) const;
+    void checkNumArgs(MXArgCountT expected_nlhs, MXArgCountT expected_nrhs) const;
+    void checkMinNumArgs(MXArgCountT min_nlhs, MXArgCountT min_nrhs) const;
+    void checkMaxNumArgs(MXArgCountT max_nlhs, MXArgCountT max_nrhs) const;
+    void checkInputArgRange(MXArgCountT min_nrhs, MXArgCountT max_nrhs) const;
+    void checkOutputArgRange(MXArgCountT min_nlhs, MXArgCountT max_nlhs) const;
     
-    /* Methods to get simple datatypes from matlab */
-    bool getBool(const mxArray *mxdata=nullptr);
-    int getInt(const mxArray *mxdata=nullptr);
-    unsigned getUnsigned(const mxArray *mxdata=nullptr);
-    float getFloat(const mxArray *mxdata=nullptr);
-    double getDouble(const mxArray *mxdata=nullptr);
-    template<class ElemT> ElemT getScalar(const mxArray *mxdata=nullptr);
+    /* getAs methods attempt to convert from whatever matlab type is in the mxArray
+     * and report an error if conversion would lead to data loss.
+     */
+    template<class ElemT=double> 
+    ElemT getAsScalar(const mxArray *m=nullptr);
     
+    bool getAsBool(const mxArray *m=nullptr);
+    template<class IntT=int64_t, typename = IsIntegralT<IntT>>
+    IntT getAsInt(const mxArray *m=nullptr);
+    template<class UnsignedT=uint64_t, typename=IsUnsignedIntegralT<UnsignedT>>
+    UnsignedT getAsUnsigned(const mxArray *m=nullptr);
+    template<class FloatT=double, typename = IsFloatingPointT<FloatT>>
+    FloatT getAsFloat(const mxArray *m=nullptr);
+
+    template<class ElemT=double, typename=IsArithmeticT<ElemT>>
+    Dict<ElemT> getAsScalarDict(const mxArray *m=nullptr);
+    template<template<typename> class Array = std::vector,class ElemT=double, typename=IsArithmeticT<ElemT>> 
+    Array<ElemT> getAsScalarArray(const mxArray *m=nullptr);
+    
+    /* get methods do not convert any arguments and will throw an exception if the types are not uniform */
     std::string getString(const mxArray *mxdata=nullptr);
-    StatsT getDoubleStruct(const mxArray *mxdata=nullptr);
-    VecStatsT getDoubleVecStruct(const mxArray *mxdata=nullptr);
+    template<class ElemT=double, typename=IsArithmeticT<ElemT>> 
+    ElemT getScalar(const mxArray *mxdata=nullptr);
+    template<class ElemT=double, typename=IsArithmeticT<ElemT>> 
+    Vec<ElemT> getVec(const mxArray *mxdata=nullptr);
+    template<class ElemT=double, typename=IsArithmeticT<ElemT>> 
+    Mat<ElemT> getMat(const mxArray *mxdata=nullptr);
+    template<class ElemT=double, typename=IsArithmeticT<ElemT>> 
+    Cube<ElemT> getCube(const mxArray *mxdata=nullptr);
+    template<class ElemT=double, typename=IsArithmeticT<ElemT>> 
+    Hypercube<ElemT> getHypercube(const mxArray *mxdata=nullptr);
     
-    arma::Col<uint16_t> getU16Vec(const mxArray *mxdata=nullptr);
-    arma::Col<uint32_t> getUVec(const mxArray *mxdata=nullptr);
-    arma::Col<int32_t> getIVec(const mxArray *mxdata=nullptr);
-    arma::Col<float> getFVec(const mxArray *mxdata=nullptr);
-    arma::Col<double> getDVec(const mxArray *mxdata=nullptr);
-    template<class ElemT> arma::Col<ElemT> getVec(const mxArray *mxdata=nullptr);
-    arma::Mat<uint16_t> getU16Mat(const mxArray *mxdata=nullptr);
-    arma::Mat<uint32_t> getUMat(const mxArray *mxdata=nullptr);
-    arma::Mat<int32_t> getIMat(const mxArray *mxdata=nullptr);
-    arma::Mat<float> getFMat(const mxArray *mxdata=nullptr);
-    arma::Mat<double> getDMat(const mxArray *mxdata=nullptr);
-    template<class ElemT> arma::Mat<ElemT> getMat(const mxArray *mxdata=nullptr);
-    arma::Cube<uint16_t> getU16Stack(const mxArray *mxdata=nullptr);
-    arma::Cube<uint32_t> getUStack(const mxArray *mxdata=nullptr);
-    arma::Cube<int32_t> getIStack(const mxArray *mxdata=nullptr);
-    arma::Cube<float> getFStack(const mxArray *mxdata=nullptr);
-    arma::Cube<double> getDStack(const mxArray *mxdata=nullptr);
-    template<class ElemT> arma::Cube<ElemT> getStack(const mxArray *mxdata=nullptr);
-    Hypercube<uint16_t> getU16HyperStack(const mxArray *mxdata=nullptr);
-    Hypercube<uint32_t> getUHyperStack(const mxArray *mxdata=nullptr);
-    Hypercube<int32_t> getIHyperStack(const mxArray *mxdata=nullptr);
-    Hypercube<float> getFHyperStack(const mxArray *mxdata=nullptr);
-    Hypercube<double> getDHyperStack(const mxArray *mxdata=nullptr);
-    template<class ElemT> Hypercube<ElemT> getHyperStack(const mxArray *mxdata=nullptr);
+    template<template<typename> class Array = std::vector, class ElemT=double, typename=IsArithmeticT<ElemT>> 
+    Array<ElemT> getScalarArray(const mxArray *mxdata=nullptr);
+    template<template<typename> class Array = std::vector, class ElemT=double, typename=IsArithmeticT<ElemT>> 
+    Array<Vec<ElemT>> getVecArray(const mxArray *mxdata=nullptr);
+    template<template<typename> class Array = std::vector, class ElemT=double, typename=IsArithmeticT<ElemT>> 
+    Array<Mat<ElemT>> getMatArray(const mxArray *mxdata=nullptr);
+    template<template<typename> class Array = std::vector, class ElemT=double, typename=IsArithmeticT<ElemT>> 
+    Array<Cube<ElemT>> getCubeArray(const mxArray *mxdata=nullptr);
+    template<template<typename> class Array = std::vector, class ElemT=double, typename=IsArithmeticT<ElemT>> 
+    Array<Hypercube<ElemT>> getHypercubeArray(const mxArray *mxdata=nullptr);
+  
+    /* Get a matlab structure of common types as a C++ Dict (aka. std::map<string,T>)*/
+    template<class ElemT=double, typename=IsArithmeticT<ElemT>>
+    Dict<ElemT> getScalarDict(const mxArray *mxdata=nullptr);
+    template<class ElemT=double, typename=IsArithmeticT<ElemT>>
+    Dict<Vec<ElemT>> getVecDict(const mxArray *mxdata=nullptr);
+    template<class ElemT=double, typename=IsArithmeticT<ElemT>>
+    Dict<Mat<ElemT>> getMatDict(const mxArray *mxdata=nullptr);
+    template<class ElemT=double, typename=IsArithmeticT<ElemT>>
+    Dict<Cube<ElemT>> getCubeDict(const mxArray *mxdata=nullptr);
+    template<class ElemT=double, typename=IsArithmeticT<ElemT>>
+    Dict<Hypercube<ElemT>> getHypercubeDict(const mxArray *mxdata=nullptr);
+  
+    /* make methods use matlab to allocate the data as mxArrays and then
+     * share the pointer access through a armadillo object for maximum speed */
+    template<class ElemT=double, typename=IsArithmeticT<ElemT>> 
+    Vec<ElemT> makeOutputArray(IdxT nelem);
+    template<class ElemT=double, typename=IsArithmeticT<ElemT>> 
+    Mat<ElemT> makeOutputArray(IdxT rows, IdxT cols);
+    template<class ElemT=double, typename=IsArithmeticT<ElemT>> 
+    Cube<ElemT> makeOutputArray(IdxT rows, IdxT cols, IdxT slices);
+    template<class ElemT=double, typename=IsArithmeticT<ElemT>> 
+    Hypercube<ElemT> makeOutputArray(IdxT rows, IdxT cols, IdxT slices, IdxT hyperslices);
 
+    /* ouptput methods make a new matlab object copying in data from arguments
+     */
+    void output(mxArray *m);
+    template<class ConvertableT>
+    void output(ConvertableT&& val);
     
-    
-    template<class ElemT> VecField<ElemT> getVecField(const mxArray *mxdata=nullptr);
-    template<class ElemT> MatField<ElemT> getMatField(const mxArray *mxdata=nullptr);
-    template<class ElemT> CubeField<ElemT> getCubeField(const mxArray *mxdata=nullptr);
-    template<class ElemT> VecVector<ElemT> getVecVector(const mxArray *mxdata=nullptr);
-    template<class ElemT> MatVector<ElemT> getMatVector(const mxArray *mxdata=nullptr);
-    template<class ElemT> CubeVector<ElemT> getCubeVector(const mxArray *mxdata=nullptr);
-    
-    
-    /* methods to make matlab objects */
-
-    arma::Col<uint32_t> makeUVec(unsigned rows);
-    arma::Col<int32_t> makeIVec(unsigned rows);
-    arma::Col<float> makeFVec(unsigned rows);
-    arma::Col<double> makeDVec(unsigned rows);
-    template<class ElemT> arma::Col<ElemT> makeVec(unsigned nelem);
-
-    arma::Mat<uint32_t> makeUMat(unsigned rows, unsigned cols);
-    arma::Mat<int32_t> makeIMat(unsigned rows, unsigned cols);
-    arma::Mat<float> makeFMat(unsigned rows, unsigned cols);
-    arma::Mat<double> makeDMat(unsigned rows, unsigned cols);
-    template<class ElemT> arma::Mat<ElemT> makeMat(unsigned rows, unsigned cols);
-
-    arma::Cube<uint32_t> makeUStack(unsigned rows, unsigned cols, unsigned slices);
-    arma::Cube<int32_t> makeIStack(unsigned rows, unsigned cols, unsigned slices);
-    arma::Cube<float> makeFStack(unsigned rows, unsigned cols, unsigned slices);
-    arma::Cube<double> makeDStack(unsigned rows, unsigned cols, unsigned slices);
-    template<class ElemT> arma::Cube<ElemT> makeStack(unsigned rows, unsigned cols, unsigned slices);
-
-    Hypercube<uint16_t> makeU16HyperStack(unsigned rows, unsigned cols, unsigned slices, unsigned hyperslices);
-    Hypercube<uint32_t> makeUHyperStack(unsigned rows, unsigned cols, unsigned slices, unsigned hyperslices);
-    Hypercube<int32_t> makeIHyperStack(unsigned rows, unsigned cols, unsigned slices, unsigned hyperslices);
-    Hypercube<float> makeFHyperStack(unsigned rows, unsigned cols, unsigned slices, unsigned hyperslices);
-    Hypercube<double> makeDHyperStack(unsigned rows, unsigned cols, unsigned slices, unsigned hyperslices);
-    template<class ElemT> Hypercube<ElemT> makeHyperStack(unsigned rows, unsigned cols, unsigned slices, unsigned hyperslices);
-
-    void outputMXArray(mxArray *m);
-
-    template<class ElemT> void outputVec(const arma::Col<ElemT> &arr);
-    void outputDouble(double val);
-    void outputInt(int32_t val);
-    void outputBool(bool val);
-    
-    void outputStatsToStruct(const StatsT &stats);
-    void outputStatsToDoubleVecStruct(const VecStatsT &stats);
-    
-    void outputFVec(const arma::Col<float> &arr);
-    template<int N> void outputDVec(const arma::Col<double>::fixed<N> &arr);
-    void outputDVec(const arma::Col<double> &arr);
-
-    template<class ElemT> void outputMat(const arma::Mat<ElemT> &arr);
-    void outputIMat(const arma::Mat<int32_t> &arr);
-    void outputDMat(const arma::Mat<double> &arr);
-
-    template<class ElemT> void outputStack(const arma::Cube<ElemT> &arr);
-
-    template<class ElemT> void outputSparse(const arma::SpMat<ElemT> &arr);
-
-    template<class ElemT> void outputVecCellArray(const VectorVector<ElemT> &list);
-    template<class ElemT> void outputVecCellArray(const VectorList<ElemT> &list);
-    
-    template<class ElemT> void outputVecCellArray(const VecVector<ElemT> &field);
-    template<class ElemT> void outputMatCellArray(const MatVector<ElemT> &field);
-    template<class ElemT> void outputCubeCellArray(const CubeVector<ElemT> &field);
-    
-    template<class ElemT> void outputVecCellArray(const VecField<ElemT> &field);
-    template<class ElemT> void outputMatCellArray(const MatField<ElemT> &field);
-    template<class ElemT> void outputCubeCellArray(const CubeField<ElemT> &field);
-    
-
-
-    /* Error reporting */
-    void error(std::string condition, std::string message) const;
-    void component_error(std::string component,std::string condition, std::string message) const;
-
-    /* methods to manipulate the arguments */
-    void popRhs();
-    void setArguments(unsigned _nlhs, mxArray *_lhs[], unsigned _nrhs, const mxArray *_rhs[]);
 private:
-    mxArray* makeDouble(double val)const;
-    std::string make_valid_error_mesgid(std::string component, std::string condition) const;
+    /* Error reporting */    
+    void error(std::string condition, std::string message) const;
+    void error(std::string component,std::string condition, std::string message) const;
+
+    void callMethod(std::string name, const MethodMap &map) noexcept;
+    void popRhs();
+    void setArguments(MXArgCountT _nlhs, mxArray *_lhs[], MXArgCountT _nrhs, const mxArray *_rhs[]);    
+    
+    /* Private Static */
+    static std::string remove_alphanumeric(std::string name);
 };
 
-
 template<class ElemT>
-ElemT MexIFace::getScalar(const mxArray *mxdata)
+void MexIFace::checkType(const mxArray *m)
 {
-    if(mxdata==nullptr) mxdata=rhs[rhs_idx++];
-    std::ostringstream msg;
-    int ndims=mxGetNumberOfDimensions(mxdata);
-    int M=mxGetM(mxdata);
-    int N=mxGetN(mxdata);
-    mxClassID classid=get_mx_class<ElemT>();
-    if (mxGetClassID(mxdata)!=classid) {
-        msg<<"getScalar: Expected Type:"<<get_mx_class_name(classid)<<" Got:"<<get_mx_class_name(mxdata);
-        error("InputType",msg.str());
-    } else if (ndims!=2) {
-        msg<<"getScalar: Expected #dims==2. Got:"<<ndims;
-        error("InputShape",msg.str());
-    } else if (M>1 || N>1) {
-        msg<<"getScalar: Expected scalar vector Got:("<<M<<" X "<<N<<")";
-        error("InputShape",msg.str());
+    checkType(m, get_mx_class<ElemT>());
+}
+
+inline
+void MexIFace::checkType(const mxArray *m, mxClassID expected_classid)
+{
+    if (mxGetClassID(m) != expected_classid) {        
+        std::ostringstream msg;
+        msg<<"Expected Type="<<get_mx_class_name(expected_classid)<<" | Got Type="<<get_mx_class_name(m);
+        throw MexIFaceError("BadType",msg.str());
     }
-    return *static_cast<ElemT*>(mxGetData(mxdata));
+}
+
+inline
+void MexIFace::checkNdim(const mxArray *m, mwSize expected_dim)
+{
+    mwSize ndims = mxGetNumberOfDimensions(m);
+    if (ndims != expected_dim) {        
+        std::ostringstream msg;
+        msg<<"Expected #dims="<<expected_dim<<" | Got #dims="<<ndims;
+        throw MexIFaceError("BadDimensionality",msg.str());
+    }
+}
+
+inline
+void MexIFace::checkMaxNdim(const mxArray *m, mwSize max_expected_dim)
+{
+    mwSize ndims = mxGetNumberOfDimensions(m);
+    if (ndims > max_expected_dim) {        
+        std::ostringstream msg;
+        msg<<"Expected #dims <="<<max_expected_dim<<" | Got #dims="<<ndims;
+        throw MexIFaceError("BadDimensionality",msg.str());
+    }
+}
+
+inline
+void MexIFace::checkScalarSize(const mxArray *m)
+{
+    mwSize M = mxGetM(m);
+    mwSize N = mxGetN(m);
+    if (M>1 || N>1) {
+        std::ostringstream msg;
+        msg<<"Expected scalar vector | Got size:["<<M<<" X "<<N<<"]";
+        throw MexIFaceError("BadSize",msg.str());
+    }
+}
+
+inline
+void MexIFace::checkVectorSize(const mxArray *m)
+{
+    mwSize M = mxGetM(m);
+    mwSize N = mxGetN(m);
+    if (M>1 && N>1) {
+        std::ostringstream msg;
+        msg<<"Expected 1D vector | Got size:["<<M<<" X "<<N<<"]";
+        throw MexIFaceError("BadSize",msg.str());
+    }
+}
+
+/** @brief Checks that a matlab mxArray object has the correct 2D dimensions
+ * @param m A pointer to the mxArray to check
+ * @param expected_numel the expected number of elements
+ */
+inline
+void MexIFace::checkVectorSize(const mxArray *m, mwSize expected_numel)
+{
+    mwSize M = mxGetM(m);
+    mwSize N = mxGetN(m);
+    if ((M>1 && N>1) || (N>1 && N != expected_numel) || (M>1 && M != expected_numel)) {
+        std::ostringstream msg;
+        msg<<"Expected vector size:"<<expected_numel<<" | Got size:["<<M<<" X "<<N<<"]";
+        throw MexIFaceError("BadSize",msg.str());
+    }
+}
+
+/** @brief Checks that a matlab mxArray object has the correct 2D dimensions
+ * @param m A pointer to the mxArray to check
+ * @param expected_rows the expected number of rows 
+ * @param expected_cols the expected number of cols 
+ */
+inline
+void MexIFace::checkMatrixSize(const mxArray *m, mwSize expected_rows, mwSize expected_cols)
+{
+    mwSize M = mxGetM(m);
+    mwSize N = mxGetN(m);
+    if ((M != expected_rows) || (N != expected_cols)) {
+        std::ostringstream msg;
+        msg<<"Expected matrix size: ["<<expected_rows<<","<<expected_cols<<"] | Got size:["<<M<<" X "<<N<<"]";
+        throw MexIFaceError("BadSize",msg.str());
+    }
+}
+
+/**
+ * @brief Checks that two matlab mxArray objects have the same sized last dimension.
+ * @param m1 A pointer to the first mxArray to check
+ * @param m2 A pointer to the second mxArray to check
+ *
+ * Throws an exception if the last dimensions do not match.
+ */
+inline
+void MexIFace::checkSameLastDim(const mxArray *m1, const mxArray *m2)
+{
+    mwSize nd1 = mxGetNumberOfDimensions(m1);
+    mwSize nd2 = mxGetNumberOfDimensions(m2);
+    mwSize last1 = mxGetDimensions(m1)[nd1-1];
+    mwSize last2 = mxGetDimensions(m2)[nd2-1];
+    if (last1 != last2){
+        std::ostringstream msg;
+        msg<<"Got last dim1:"<<last1<<"Not matching last dim2:"<<last2;
+        throw MexIFaceError("BadSize",msg.str());
+    }
+}
+
+inline
+void MexIFace::checkInputArgRange(MXArgCountT min_nrhs, MXArgCountT max_nrhs) const
+{
+    if( nrhs < min_nrhs || nrhs > max_nrhs) {
+        std::ostringstream msg;
+        msg<<"Expected #RHS(in) Args: "<<min_nrhs<<" - "<<max_nrhs<<" Got #RHS:"<<nrhs;
+        throw MexIFaceError("BadNumInputArgs",msg.str());
+    }
+}
+
+inline
+void MexIFace::checkOutputArgRange(MXArgCountT min_nlhs, MXArgCountT max_nlhs) const
+{
+    if( nlhs < min_nlhs || nlhs > max_nlhs) {
+        std::ostringstream msg;
+        msg<<"Expected #LHS(out) Args: "<<min_nlhs<<" - "<<max_nlhs<<" Got #LHS:"<<nlhs;
+        throw MexIFaceError("BadNumOutputArgs",msg.str());
+    }
+}
+
+/** @brief Checks the mex function was called with a minimum number of input and output arguments.
+ * @param min_nlhs Minimum number of left hand side (output) arguments required.
+ * @param min_nrhs Minimum number of right hand side (input) arguments required.
+ */
+inline
+void MexIFace::checkMinNumArgs(MXArgCountT min_nlhs, MXArgCountT min_nrhs) const
+{
+    if (nlhs < min_nlhs) {
+        std::ostringstream msg;
+        msg<<"Expected #LHS(out) Args >= "<<min_nlhs<<" | Got #LHS:"<<nlhs;
+        throw MexIFaceError("BadNumOutputArgs",msg.str());
+    }
+    if (nrhs < min_nrhs) {
+        std::ostringstream msg;
+        msg<<"Expected #RHS(in) Args >= "<<min_nrhs<<" | Got #RHS:"<<nrhs;
+        throw MexIFaceError("BadNumInputArgs",msg.str());
+    }
+}
+
+/** @brief Checks the mex function was called with a maximum number of input and output arguments.
+ * @param max_nlhs Maxmum number of left hand side (output) arguments required.
+ * @param max_nrhs Maxmum number of right hand side (input) arguments required.
+ */
+inline
+void MexIFace::checkMaxNumArgs(MXArgCountT max_nlhs,MXArgCountT max_nrhs) const
+{
+    if (nlhs > max_nlhs) {
+        std::ostringstream msg;
+        msg<<"Expected #LHS(out) Args <= "<<max_nlhs<<" | Got #LHS:"<<nlhs;
+        throw MexIFaceError("BadNumOutputArgs",msg.str());
+    }
+    if (nrhs > max_nrhs) {
+        std::ostringstream msg;
+        msg<<"Expected #RHS(in) Args <= "<<max_nrhs<<" | Got #RHS:"<<nrhs;
+        throw MexIFaceError("BadNumInputArgs",msg.str());
+    }
+}
+
+/** @brief Checks the mex function was called with an exact number of input and output arguments.
+ * @param max_nlhs Maxmum number of left hand side (output) arguments required.
+ * @param max_nrhs Maxmum number of right hand side (input) arguments required.
+ */
+inline
+void MexIFace::checkNumArgs(MXArgCountT expected_nlhs, MXArgCountT expected_nrhs) const
+{
+    if (nlhs != expected_nlhs) {
+        std::ostringstream msg;
+        msg<<"Expected #LHS(out) Args = "<<expected_nlhs<<" | Got #LHS:"<<nlhs;
+        throw MexIFaceError("BadNumOutputArgs",msg.str());
+    }
+    if (nrhs != expected_nrhs) {
+        std::ostringstream msg;
+        msg<<"Expected #RHS(in) Args = "<<expected_nrhs<<" | Got #RHS:"<<nrhs;
+        throw MexIFaceError("BadNumInputArgs",msg.str());
+    }
 }
 
 
-/**
- *@brief Create an armadillo Column vector to directly work with the Matlab data for a 1D array of
- *   arbitrary element type.
- *
+template<class ElemT, typename> 
+ElemT MexIFace::toScalar(const mxArray *m)
+{
+    return *static_cast<ElemT*>(mxGetData(m));
+}
+
+/*
+ * 
  * Uses the ability of the armadillo arrays to interpret raw data passed to it as preallocated
- * column major format.   This allows us to open the array data in C++ using Matlab's memory
- * directly instead of having to allocate a separate space and copy.
+ * data.   This allows the array data to be used directly as an armadillo array using Matlab's 
+ * memory directly instead of having to allocate a separate space and copy.
  *
- * @param mxdata The pointer to the mxArray that is to be interpreted as an armadillo array.
- * @returns A new armadillo array that interprets the data stored in the mxdata pointer.
  */
-template<class ElemT>
-arma::Col<ElemT> MexIFace::getVec(const mxArray *mxdata)
+template<class ElemT, typename> 
+MexIFace::Vec<ElemT> MexIFace::toVec(const mxArray *m)
 {
-    if(mxdata==nullptr) mxdata=rhs[rhs_idx++];
-    std::ostringstream msg;
-    int ndims=mxGetNumberOfDimensions(mxdata);
-    int M=mxGetM(mxdata);
-    int N=mxGetN(mxdata);
-    mxClassID classid=get_mx_class<ElemT>();
-    if (mxGetClassID(mxdata)!=classid) {
-        msg<<"getVec: Expected Type:"<<get_mx_class_name(classid)<<" Got:"<<get_mx_class_name(mxdata);
-        error("InputType",msg.str());
-    } else if (ndims!=2) {
-        msg<<"getVec: Expected #dims==2. Got:"<<ndims;
-        error("InputShape",msg.str());
-    } else if (M>1 && N>1) {
-        msg<<"getVec: Expected 1D vector Got:("<<M<<" X "<<N<<")";
-        error("InputShape",msg.str());
-    }
-    return arma::Col<ElemT>(static_cast<ElemT*>(mxGetData(mxdata)), mxGetNumberOfElements(mxdata), false);
+    return {static_cast<ElemT*>(mxGetData(m)), mxGetNumberOfElements(m), false};
 }
 
-/* Template specializations for various element types */
-inline arma::Col<uint16_t> MexIFace::getU16Vec(const mxArray *mxdata) {return getVec<uint16_t>(mxdata);}
-inline arma::Col<uint32_t> MexIFace::getUVec(const mxArray *mxdata) {return getVec<uint32_t>(mxdata);}
-inline arma::Col<int32_t> MexIFace::getIVec(const mxArray *mxdata) {return getVec<int32_t>(mxdata);}
-inline arma::Col<float> MexIFace::getFVec(const mxArray *mxdata) {return getVec<float>(mxdata);}
-inline arma::Col<double> MexIFace::getDVec(const mxArray *mxdata) {return getVec<double>(mxdata);}
-
-
-/**
- * @brief Create an armadillo Mat object to directly work with the Matlab data for a 2D array of
- *   arbitrary element type.
- *
- * Uses the ability of the armadillo arrays to interpret raw data passed to it as preallocated
- * column major format.   This allows us to open the array data in C++ using Matlab's memory
- * directly instead of having to allocate a separate space and copy.
- *
- * @param mxdata The pointer to the mxArray that is to be interpreted as an armadillo array.
- * @returns A new armadillo array that interprets the data stored in the mxdata pointer.
- */
-template<class ElemT>
-arma::Mat<ElemT> MexIFace::getMat(const mxArray *mxdata)
+template<class ElemT, typename> 
+MexIFace::Mat<ElemT> MexIFace::toMat(const mxArray *m)
 {
-    if(mxdata==nullptr) mxdata=rhs[rhs_idx++];
-    std::ostringstream msg;
-    int ndims=mxGetNumberOfDimensions(mxdata);
-    int M=mxGetM(mxdata);
-    int N=mxGetN(mxdata);
-    mxClassID classid=get_mx_class<ElemT>();
-    if (mxGetClassID(mxdata)!=classid) {
-        msg<<"getMat: Expected Type:"<<get_mx_class_name(classid)<<" Got:"<<get_mx_class_name(mxdata);
-        error("InputType",msg.str());
-    } else if (ndims!=2) {
-        msg<<"getMat: Expected #dims==2. Got:"<<ndims;
-        error("InputShape",msg.str());
-    }
-    return arma::Mat<ElemT>(static_cast<ElemT*>(mxGetData(mxdata)), M, N,false);
+    return {static_cast<ElemT*>(mxGetData(m)), mxGetM(m), mxGetN(m),false};
 }
 
-/* Template specializations for various element types */
-inline arma::Mat<uint16_t> MexIFace::getU16Mat(const mxArray *mxdata) {return getMat<uint16_t>(mxdata);}
-inline arma::Mat<uint32_t> MexIFace::getUMat(const mxArray *mxdata) {return getMat<uint32_t>(mxdata);}
-inline arma::Mat<int32_t> MexIFace::getIMat(const mxArray *mxdata) {return getMat<int32_t>(mxdata);}
-inline arma::Mat<float> MexIFace::getFMat(const mxArray *mxdata) {return getMat<float>(mxdata);}
-inline arma::Mat<double> MexIFace::getDMat(const mxArray *mxdata) {return getMat<double>(mxdata);}
-
-
-
-
-/**
-* @brief Create an armadillo Cube object to directly work with the Matlab data for a 3D array of
-*   arbitrary element type.
-*
-* Uses the ability of the armadillo arrays to interpret raw data passed to it as preallocated
-* column major format.   This allows us to open the array data in C++ using Matlab's memory
-* directly instead of having to allocate a separate space and copy.
-*
-* @param mxdata The pointer to the mxArray that is to be interpreted as an armadillo array.
-* @returns A new armadillo array that interprets the data stored in the mxdata pointer.
-*/
-template<class ElemT>
-arma::Cube<ElemT> MexIFace::getStack(const mxArray *mxdata)
+template<class ElemT, typename> 
+MexIFace::Cube<ElemT> MexIFace::toCube(const mxArray *m)
 {
-    if(mxdata==nullptr) mxdata=rhs[rhs_idx++];
-    std::ostringstream msg;
-    int ndims=mxGetNumberOfDimensions(mxdata);
-    int M=mxGetM(mxdata);
-    int N=mxGetN(mxdata);
-    mxClassID classid=get_mx_class<ElemT>();
-    if (mxGetClassID(mxdata)!=classid) {
-        msg<<"getStack: Expected Type:"<<get_mx_class_name(classid)<<"  Got:"<<get_mx_class_name(mxdata);
-        error("InputType",msg.str());
-    } else if (ndims>3) {
-        msg<<"getStack: Expected #dims==3.  Got:"<<ndims;
-        error("InputShape",msg.str());
-    } else if (M<=1 || N<=1) {
-        msg<<"getStack: Expected 3D stack Got:("<<M<<" X "<<N<<")";
-        error("InputShape",msg.str());
-    } else if (ndims==2) {
-        //This is effectively a 1slice-stack.
-        //Matlab automatically removes extra dims of size 1.
-        return arma::Cube<ElemT>(static_cast<ElemT*>(mxGetData(mxdata)),M,N,1,false);
+    if ( mxGetNumberOfDimensions(m) == 2) { // Single slice cube. Matlab automatically removes extra dims of size 1.
+        return {static_cast<ElemT*>(mxGetData(m)), mxGetM(m), mxGetN(m), 1, false};
+    } else {
+        const mwSize *sz = mxGetDimensions(m);
+        return {static_cast<ElemT*>(mxGetData(m)), sz[0], sz[1], sz[2], false};
     }
-    const mwSize *size=mxGetDimensions(mxdata);
-    return arma::Cube<ElemT>(static_cast<ElemT*>(mxGetData(mxdata)),size[0],size[1],size[2], false);
 }
 
-/* Template specializations for various element types */
-inline arma::Cube<uint16_t> MexIFace::getU16Stack(const mxArray *mxdata) {return getStack<uint16_t>(mxdata);}
-inline arma::Cube<uint32_t> MexIFace::getUStack(const mxArray *mxdata) {return getStack<uint32_t>(mxdata);}
-inline arma::Cube<int32_t> MexIFace::getIStack(const mxArray *mxdata) {return getStack<int32_t>(mxdata);}
-inline arma::Cube<float> MexIFace::getFStack(const mxArray *mxdata) {return getStack<float>(mxdata);}
-inline arma::Cube<double> MexIFace::getDStack(const mxArray *mxdata) {return getStack<double>(mxdata);}
-
-/**
-* @brief Create an Hypercube object to directly work with the Matlab data for a 4D array of
-*   arbitrary element type.
-*
-* Uses the ability of the armadillo arrays to interpret raw data passed to it as preallocated
-* column major format.   This allows us to open the array data in C++ using Matlab's memory
-* directly instead of having to allocate a separate space and copy.
-*
-* @param mxdata The pointer to the mxArray that is to be interpreted as an armadillo array.
-* @returns A new Hypercube that interprets the data stored in the mxdata pointer.
-*/
-template<class ElemT>
-Hypercube<ElemT> MexIFace::getHyperStack(const mxArray *mxdata)
+template<class ElemT, typename> 
+Hypercube<ElemT> MexIFace::toHypercube(const mxArray *m)
 {
-    if(mxdata==nullptr) mxdata=rhs[rhs_idx++];
-    std::ostringstream msg;
-    int ndims=mxGetNumberOfDimensions(mxdata);
-    const mwSize *size=mxGetDimensions(mxdata);
-    mxClassID classid=get_mx_class<ElemT>();
-    if (mxGetClassID(mxdata)!=classid) {
-        msg<<"getHyperStack: Expected Type:"<<get_mx_class_name(classid)<<" Got:"<<get_mx_class_name(mxdata);
-        error("InputType",msg.str());
-    } else if (ndims<3 || ndims>4)  {
-        msg<<"getHyperStack: Expected #dims==4. Got:"<<ndims;
-        error("InputShape",msg.str());
-    } else if (size[0]<=1 || size[1]<=1) {
-        msg<<"getHyperStack: Expected 4D stack Got Dim:"<<ndims<<" size:("<<size[0]<<","<<size[1]<<","<<size[2];
-        if(ndims==4)  msg<<","<<size[3];
-        msg<<")";
-        error("InputShape",msg.str());
-    } else if (ndims==3) {
-        //This is effectively a 1slice-stack.
-        //Matlab automatically removes extra dims of size 1.
-        return Hypercube<ElemT>(static_cast<ElemT*>(mxGetData(mxdata)),size[0],size[1],size[2],1);
+    int ndims = mxGetNumberOfDimensions(m);
+    const mwSize *sz = mxGetDimensions(m);
+    if ( ndims == 2) { // Single slice and single hyper-slice cube. Matlab automatically removes extra dims of size 1.
+        return {static_cast<ElemT*>(mxGetData(m)), mxGetM(m), mxGetN(m), 1, 1};
+    } else if ( ndims == 3) { // Single hyper-slice cube. Matlab automatically removes extra dims of size 1.
+        return {static_cast<ElemT*>(mxGetData(m)), sz[0], sz[1], sz[2], 1};
+    } else {
+        return {static_cast<ElemT*>(mxGetData(m)), sz[0], sz[1], sz[2], sz[3]};
     }
-    return Hypercube<ElemT>(static_cast<ElemT*>(mxGetData(mxdata)),size[0],size[1],size[2],size[3]);
 }
 
-/* Template specializations for various element types */
-inline Hypercube<uint16_t> MexIFace::getU16HyperStack(const mxArray *mxdata) {return getHyperStack<uint16_t>(mxdata);}
-inline Hypercube<uint32_t> MexIFace::getUHyperStack(const mxArray *mxdata) {return getHyperStack<uint32_t>(mxdata);}
-inline Hypercube<int32_t> MexIFace::getIHyperStack(const mxArray *mxdata) {return getHyperStack<int32_t>(mxdata);}
-inline Hypercube<float> MexIFace::getFHyperStack(const mxArray *mxdata) {return getHyperStack<float>(mxdata);}
-inline Hypercube<double> MexIFace::getDHyperStack(const mxArray *mxdata) {return getHyperStack<double>(mxdata);}
 
-
-
-
-
-template<class ElemT> 
-MexIFace::VecField<ElemT> 
-MexIFace::getVecField(const mxArray *mxdata)
+template<class SrcIntT,class DestIntT, typename, typename>
+DestIntT MexIFace::checkedIntegerToIntegerConversion(const mxArray *m)
 {
-    if(mxdata==nullptr) mxdata=rhs[rhs_idx++];  //Default to first unhandled rhs argument
-    std::ostringstream msg;
-    mwSize nfields = mxGetNumberOfElements(mxdata);
-    int ndims = mxGetNumberOfDimensions(mxdata);
-    int M = mxGetM(mxdata);
-    int N = mxGetN(mxdata);
-    if (mxGetClassID(mxdata)!=mxCELL_CLASS) {
-        msg<<"getVecField: Expected Type Cell array, but Got:"<<get_mx_class_name(mxdata);
-        error("InputType",msg.str());
-    } else if (ndims!=2) {
-        msg<<"getVecField: Expected #dims==2.  Got:"<<ndims;
-        error("InputShape",msg.str());
-    } else if (M>1 && N>1) {
-        msg<<"getVecField: Expected 1D vector Got:("<<M<<" X "<<N<<")";
-        error("InputShape",msg.str());
-    }
-    
-    VecField<ElemT> field(nfields); //Make new vector field
-    mxClassID classid=get_mx_class<ElemT>();
-    for(mwSize n=0; n<nfields; n++){
-        const mxArray *arr = mxGetCell(mxdata,n);
-        ndims = mxGetNumberOfDimensions(arr);
-        M = mxGetM(arr);
-        N = mxGetN(arr);
-        if (mxGetClassID(arr)!=classid) {
-            msg<<"getVecField: Element:"<<n+1<<" Expected Type: "<<get_mx_class_name(classid)<<" Got:"<<get_mx_class_name(arr);
-            error("InputType",msg.str());
-        } else if (ndims!=2) {
-            msg<<"getVecField: Expected #dims==2.  Got:"<<ndims;
-            error("InputShape",msg.str());
-        } else if (M>1 && N>1) {
-            msg<<"getVecField: Expected 1D cell-array Got:("<<M<<" X "<<N<<")";
-            error("InputShape",msg.str());
+    if(std::is_same<SrcIntT,DestIntT>::value) return *static_cast<SrcIntT*>(mxGetData(m));
+    auto src_max = std::numeric_limits<SrcIntT>::max();
+    auto src_min = std::numeric_limits<SrcIntT>::min();
+    auto dest_max = std::numeric_limits<DestIntT>::max();
+    auto dest_min = std::numeric_limits<DestIntT>::min();
+    if (dest_max < src_max) {
+        auto val = *static_cast<SrcIntT*>(mxGetData(m));
+        if (dest_max < val || dest_min > val) {
+            std::ostringstream msg;
+            msg<<"Conversion from:"<<get_mx_class_name(m)<<"("<<val<<") to:"<<get_mx_class_name(get_mx_class<DestIntT>)<<" Forbidden. Will cause loss of data.";
+            throw MexIFaceError("BadTypeConversion",msg);
         }
-        field(n) = arma::Col<ElemT>(static_cast<ElemT*>(mxGetData(arr)), mxGetNumberOfElements(arr), false);
+        return val;
+    } else if (dest_min > src_min) {
+        auto val = *static_cast<SrcIntT*>(mxGetData(m));
+        if (dest_min > val) {
+            std::ostringstream msg;
+            msg<<"Conversion from:"<<get_mx_class_name(m)<<"("<<val<<") to:"<<get_mx_class_name(get_mx_class<DestIntT>)<<" Forbidden. Will cause loss of data.";
+            throw MexIFaceError("BadTypeConversion",msg);
+        }        
+        return val;
     }
-    return field;
+    return *static_cast<SrcIntT*>(mxGetData(m));
 }
 
-template<class ElemT> 
-MexIFace::MatField<ElemT> 
-MexIFace::getMatField(const mxArray *mxdata)
+
+template<class SrcFloatT,class DestIntT, typename, typename>
+DestIntT MexIFace::checkedFloatToIntegerConversion(const mxArray *m)
 {
-    if(mxdata==nullptr) mxdata=rhs[rhs_idx++];  //Default to first unhandled rhs argument
-    std::ostringstream msg;
-    mwSize nfields = mxGetNumberOfElements(mxdata);
-    int ndims = mxGetNumberOfDimensions(mxdata);
-    int M = mxGetM(mxdata);
-    int N = mxGetN(mxdata);
-    if (mxGetClassID(mxdata)!=mxCELL_CLASS) {
-        msg<<"getMatField: Expected Type Cell array, but Got:"<<get_mx_class_name(mxdata);
-        error("InputType",msg.str());
-    } else if (ndims!=2) {
-        msg<<"getMatField: Expected #dims==2.  Got:"<<ndims;
-        error("InputShape",msg.str());
-    } else if (M>1 && N>1) {
-        msg<<"getMatField: Expected 1D cell-array Got:("<<M<<" X "<<N<<")";
-        error("InputShape",msg.str());
+    auto dest_max = std::numeric_limits<DestIntT>::max();
+    auto dest_min = std::numeric_limits<DestIntT>::min();
+    auto val = *static_cast<SrcFloatT*>(mxGetData(m));
+    if (dest_max < val || dest_min > val || !std::isfinite(val)) {
+        std::ostringstream msg;
+        msg<<"Conversion from:"<<get_mx_class_name(m)<<"("<<val<<") to:"<<get_mx_class_name(get_mx_class<DestIntT>)<<" Forbidden. Will cause loss of data.";
+        throw MexIFaceError("BadTypeConversion",msg);
     }
-    
-    VecField<ElemT> field(nfields); //Make new vector field
-    mxClassID classid=get_mx_class<ElemT>();
-    for(mwSize n=0; n<nfields; n++){
-        const mxArray *arr = mxGetCell(mxdata,n);
-        ndims = mxGetNumberOfDimensions(arr);
-        M = mxGetM(arr);
-        N = mxGetN(arr);
-        if (mxGetClassID(arr)!=classid) {
-            msg<<"getMatField: Expected Type:"<<get_mx_class_name(classid)<<" Got:"<<get_mx_class_name(arr);
-            error("InputType",msg.str());
-        } else if (ndims!=2) {
-            msg<<"getMatField: Expected #dims==2. Got:"<<ndims;
-            error("InputShape",msg.str());
-        }
-        field(n) = arma::Mat<ElemT>(static_cast<ElemT*>(mxGetData(arr)), M, N,false);
-    }
-    return field;
+    return val;    
 }
 
-template<class ElemT> 
-MexIFace::CubeField<ElemT> 
-MexIFace::getCubeField(const mxArray *mxdata)
+template<class SrcIntT,class DestFloatT, typename, typename>
+DestFloatT MexIFace::checkedIntegerToFloatConversion(const mxArray *m)
 {
-    if(mxdata==nullptr) mxdata=rhs[rhs_idx++];  //Default to first unhandled rhs argument
-    std::ostringstream msg;
-    mwSize nfields = mxGetNumberOfElements(mxdata);
-    int ndims = mxGetNumberOfDimensions(mxdata);
-    int M = mxGetM(mxdata);
-    int N = mxGetN(mxdata);
-    if (mxGetClassID(mxdata)!=mxCELL_CLASS) {
-        msg<<"getCubeField: Expected Type Cell array, but Got:"<<get_mx_class_name(mxdata);
-        error("InputType",msg.str());
-    } else if (ndims!=2) {
-        msg<<"getCubeField: Expected #dims==2.  Got:"<<ndims;
-        error("InputShape",msg.str());
-    } else if (M>1 && N>1) {
-        msg<<"getCubeField: Expected 1D cell-array Got:("<<M<<" X "<<N<<")";
-        error("InputShape",msg.str());
+    int64_t dest_max_int= 1ull << (std::numeric_limits<DestFloatT>::digits()+1);//maximum representable integer
+    int64_t dest_min_int = -dest_max_int;
+    auto val = *static_cast<SrcIntT*>(mxGetData(m));
+    if (dest_max_int < val || dest_min_int > val) {
+        std::ostringstream msg;
+        msg<<"Conversion from:"<<get_mx_class_name(m)<<"("<<val<<") to:"<<get_mx_class_name(get_mx_class<DestFloatT>)<<" Forbidden. Will cause loss of data.";
+        throw MexIFaceError("BadTypeConversion",msg);
     }
-    
-    VecField<ElemT> field(nfields); //Make new vector field
-    mxClassID classid=get_mx_class<ElemT>();
-    for(mwSize n=0; n<nfields; n++){
-        const mxArray *arr = mxGetCell(mxdata,n);
-        ndims = mxGetNumberOfDimensions(arr);
-        M = mxGetM(arr);
-        N = mxGetN(arr);
-        if (mxGetClassID(arr)!=classid) {
-            msg<<"getCubeField: Expected Type:"<<get_mx_class_name(classid)<<"  Got:"<<get_mx_class_name(arr);
-            error("InputType",msg.str());
-        } else if (ndims>3) {
-            msg<<"getCubeField: Expected #dims==3.  Got:"<<ndims;
-            error("InputShape",msg.str());
-        } else if (M<=1 || N<=1) {
-            msg<<"getCubeField: Expected 3D stack Got:("<<M<<" X "<<N<<")";
-            error("InputShape",msg.str());
-        } else if (ndims==2) {
-            //This is effectively a 1slice-stack.
-            //Matlab automatically removes extra dims of size 1.
-            field(n) = arma::Cube<ElemT>(static_cast<ElemT*>(mxGetData(arr)),M,N,1,false);
-        } else {
-            const mwSize *size = mxGetDimensions(arr);
-            field(n) = arma::Cube<ElemT>(static_cast<ElemT*>(mxGetData(arr)),size[0],size[1],size[2], false);
-        }
-    }
-    return field;
+    return val;    
 }
 
-template<class ElemT> 
-MexIFace::VecVector<ElemT> 
-MexIFace::getVecVector(const mxArray *mxdata)
+template<class SrcFloatT,class DestFloatT,typename,typename>
+DestFloatT MexIFace::checkedFloatToFloatConversion(const mxArray *m)
 {
-    if(mxdata==nullptr) mxdata=rhs[rhs_idx++];  //Default to first unhandled rhs argument
-    std::ostringstream msg;
-    mwSize nfields = mxGetNumberOfElements(mxdata);
-    int ndims = mxGetNumberOfDimensions(mxdata);
-    int M = mxGetM(mxdata);
-    int N = mxGetN(mxdata);
-    if (mxGetClassID(mxdata)!=mxCELL_CLASS) {
-        msg<<"getVecVector: Expected Type Cell array, but Got:"<<get_mx_class_name(mxdata);
-        error("InputType",msg.str());
-    } else if (ndims!=2) {
-        msg<<"getVecVector: Expected #dims==2.  Got:"<<ndims;
-        error("InputShape",msg.str());
-    } else if (M>1 && N>1) {
-        msg<<"getVecVector: Expected 1D vector Got:("<<M<<" X "<<N<<")";
-        error("InputShape",msg.str());
+    auto val = *static_cast<SrcFloatT*>(mxGetData(m));
+    if(std::is_same<SrcFloatT,DestFloatT>::value) return val;
+    if(std::is_same<double,DestFloatT>::value) return val;
+    auto dest_max = std::numeric_limits<DestFloatT>::max();
+    auto dest_min = std::numeric_limits<DestFloatT>::min();
+    if (dest_max < val || (dest_min!=0 && dest_min > std::fabs(val))) {
+        std::ostringstream msg;
+        msg<<"Conversion from:"<<get_mx_class_name(m)<<"("<<val<<") to:"<<get_mx_class_name(get_mx_class<DestFloatT>())<<" Forbidden. Will cause loss of data.";
+        throw MexIFaceError("BadTypeConversion",msg);
     }
-    
-    VecVector<ElemT> vec; //Make new vector 
-    mxClassID classid=get_mx_class<ElemT>();
-    for(mwSize n=0; n<nfields; n++){
-        const mxArray *arr = mxGetCell(mxdata,n);
-        ndims = mxGetNumberOfDimensions(arr);
-        M = mxGetM(arr);
-        N = mxGetN(arr);
-        if (mxGetClassID(arr)!=classid) {
-            msg<<"getVecVector: Element:"<<n+1<<" Expected Type: "<<get_mx_class_name(classid)<<" Got:"<<get_mx_class_name(arr);
-            error("InputType",msg.str());
-        } else if (ndims!=2) {
-            msg<<"getVecVector: Expected #dims==2.  Got:"<<ndims;
-            error("InputShape",msg.str());
-        } else if (M>1 && N>1) {
-            msg<<"getVecVector: Expected 1D cell-array Got:("<<M<<" X "<<N<<")";
-            error("InputShape",msg.str());
-        }
-        vec.emplace_back(static_cast<ElemT*>(mxGetData(arr)), mxGetNumberOfElements(arr), false);
-    }
-    return vec;
+    return val;    
 }
 
-template<class ElemT> 
-MexIFace::MatVector<ElemT> 
-MexIFace::getMatVector(const mxArray *mxdata)
-{
-    if(mxdata==nullptr) mxdata=rhs[rhs_idx++];  //Default to first unhandled rhs argument
-    std::ostringstream msg;
-    mwSize nfields = mxGetNumberOfElements(mxdata);
-    int ndims = mxGetNumberOfDimensions(mxdata);
-    int M = mxGetM(mxdata);
-    int N = mxGetN(mxdata);
-    if (mxGetClassID(mxdata)!=mxCELL_CLASS) {
-        msg<<"getMatVector: Expected Type Cell array, but Got:"<<get_mx_class_name(mxdata);
-        error("InputType",msg.str());
-    } else if (ndims!=2) {
-        msg<<"getMatVector: Expected #dims==2.  Got:"<<ndims;
-        error("InputShape",msg.str());
-    } else if (M>1 && N>1) {
-        msg<<"getMatVector: Expected 1D cell-array Got:("<<M<<" X "<<N<<")";
-        error("InputShape",msg.str());
-    }
-    
-    MatVector<ElemT> vec; //Make new vector field
-    mxClassID classid=get_mx_class<ElemT>();
-    for(mwSize n=0; n<nfields; n++){
-        const mxArray *arr = mxGetCell(mxdata,n);
-        ndims = mxGetNumberOfDimensions(arr);
-        M = mxGetM(arr);
-        N = mxGetN(arr);
-        if (mxGetClassID(arr)!=classid) {
-            msg<<"getMatVector: Expected Type:"<<get_mx_class_name(classid)<<" Got:"<<get_mx_class_name(arr);
-            error("InputType",msg.str());
-        } else if (ndims!=2) {
-            msg<<"getMatVector: Expected #dims==2. Got:"<<ndims;
-            error("InputShape",msg.str());
-        }
-        vec.emplace_back(static_cast<ElemT*>(mxGetData(arr)), M, N,false);
-    }
-    return vec;
-}
-
-template<class ElemT> 
-MexIFace::CubeVector<ElemT> 
-MexIFace::getCubeVector(const mxArray *mxdata)
-{
-    if(mxdata==nullptr) mxdata=rhs[rhs_idx++];  //Default to first unhandled rhs argument
-    std::ostringstream msg;
-    mwSize nfields = mxGetNumberOfElements(mxdata);
-    int ndims = mxGetNumberOfDimensions(mxdata);
-    int M = mxGetM(mxdata);
-    int N = mxGetN(mxdata);
-    if (mxGetClassID(mxdata)!=mxCELL_CLASS) {
-        msg<<"getCubeVector: Expected Type Cell array, but Got:"<<get_mx_class_name(mxdata);
-        error("InputType",msg.str());
-    } else if (ndims!=2) {
-        msg<<"getCubeVector: Expected #dims==2.  Got:"<<ndims;
-        error("InputShape",msg.str());
-    } else if (M>1 && N>1) {
-        msg<<"getCubeVector: Expected 1D cell-array Got:("<<M<<" X "<<N<<")";
-        error("InputShape",msg.str());
-    }
-    
-    CubeVector<ElemT> vec; //Make new vector field
-    mxClassID classid=get_mx_class<ElemT>();
-    for(mwSize n=0; n<nfields; n++){
-        const mxArray *arr = mxGetCell(mxdata,n);
-        ndims = mxGetNumberOfDimensions(arr);
-        M = mxGetM(arr);
-        N = mxGetN(arr);
-        if (mxGetClassID(arr)!=classid) {
-            msg<<"getCubeVector: Expected Type:"<<get_mx_class_name(classid)<<"  Got:"<<get_mx_class_name(arr);
-            error("InputType",msg.str());
-        } else if (ndims>3) {
-            msg<<"getCubeVector: Expected #dims==3.  Got:"<<ndims;
-            error("InputShape",msg.str());
-        } else if (M<=1 || N<=1) {
-            msg<<"getCubeVector: Expected 3D stack Got:("<<M<<" X "<<N<<")";
-            error("InputShape",msg.str());
-        } else if (ndims==2) {
-            //This is effectively a 1slice-stack.
-            //Matlab automatically removes extra dims of size 1.
-            vec.emplace_back(static_cast<ElemT*>(mxGetData(arr)),M,N,1,false);
-        } else {
-            const mwSize *size = mxGetDimensions(arr);
-            vec.emplace_back(static_cast<ElemT*>(mxGetData(arr)),size[0],size[1],size[2], false);
-        }
-    }
-    return vec;
-}
-
-
-/**
- * @brief Helper function to set the internal copies of the left-hand-side and right-hand-side parameters
- *  as they were passed to the mexFunction.
- */
 inline
-void MexIFace::setArguments(unsigned _nlhs, mxArray *_lhs[], unsigned _nrhs, const mxArray *_rhs[])
+mxArray* MexIFace::toMXArray(bool val)
 {
-    nlhs=_nlhs;
-    lhs=_lhs;
-    nrhs=_nrhs;
-    rhs=_rhs;
-}
-
-/**
- * @brief Remove the first right-hand-side (input) argument as it has already been used to find the correct command
- */
-inline
-void MexIFace::popRhs()
-{
-    nrhs--; 
-    rhs+=1;
-}
-
-
-/* Inline functions and function templates */
-
-template<class ElemT>
-inline
-arma::Col<ElemT>
-MexIFace::makeVec(unsigned nelem)
-{
-    mxArray *arr=mxCreateNumericMatrix(nelem, 1,get_mx_class<ElemT>(), mxREAL);
-    lhs[lhs_idx++]=arr;
-    return getVec<ElemT>(arr);
-}
-
-
-template<class ElemT>
-inline
-arma::Mat<ElemT>
-MexIFace::makeMat(unsigned rows, unsigned cols)
-{
-    mxArray *arr=mxCreateNumericMatrix(rows, cols, get_mx_class<ElemT>(), mxREAL);
-    lhs[lhs_idx++]=arr;
-    return getMat<ElemT>(arr);
-}
-
-template<class ElemT>
-inline
-arma::Cube<ElemT>
-MexIFace::makeStack(unsigned rows, unsigned cols, unsigned slices)
-{
-    const mwSize size[3]={rows,cols,slices};
-    mxArray *arr=mxCreateNumericArray(3,size,get_mx_class<ElemT>(), mxREAL);
-    lhs[lhs_idx++]=arr;
-    return getStack<ElemT>(arr);
-}
-
-
-template<class ElemT>
-inline
-Hypercube<ElemT>
-MexIFace::makeHyperStack(unsigned rows, unsigned cols, unsigned slices, unsigned hyperslices)
-{
-    const mwSize size[4]={rows,cols,slices,hyperslices};
-    mxArray *arr=mxCreateNumericArray(4,size,get_mx_class<ElemT>(), mxREAL);
-    lhs[lhs_idx++]=arr;
-    return getHyperStack<ElemT>(arr);
-}
-
-/* Template specializations for various element types */
-inline arma::Col<uint32_t> MexIFace::makeUVec(unsigned nelem) {return makeVec<uint32_t>(nelem);}
-inline arma::Col<int32_t> MexIFace::makeIVec(unsigned nelem) {return makeVec<int32_t>(nelem);}
-inline arma::Col<float> MexIFace::makeFVec(unsigned nelem) {return makeVec<float>(nelem);}
-inline arma::Col<double> MexIFace::makeDVec(unsigned nelem) {return makeVec<double>(nelem);}
-
-inline arma::Mat<uint32_t> MexIFace::makeUMat(unsigned rows, unsigned cols) {return makeMat<uint32_t>(rows, cols);}
-inline arma::Mat<int32_t> MexIFace::makeIMat(unsigned rows, unsigned cols) {return makeMat<int32_t>(rows, cols);}
-inline arma::Mat<float> MexIFace::makeFMat(unsigned rows, unsigned cols) {return makeMat<float>(rows, cols);}
-inline arma::Mat<double> MexIFace::makeDMat(unsigned rows, unsigned cols) {return makeMat<double>(rows, cols);}
-
-inline arma::Cube<uint32_t> MexIFace::makeUStack(unsigned rows, unsigned cols, unsigned slices) {return makeStack<uint32_t>(rows, cols, slices);}
-inline arma::Cube<int32_t> MexIFace::makeIStack(unsigned rows, unsigned cols, unsigned slices) {return makeStack<int32_t>(rows, cols, slices);}
-inline arma::Cube<float> MexIFace::makeFStack(unsigned rows, unsigned cols, unsigned slices) {return makeStack<float>(rows, cols, slices);}
-inline arma::Cube<double> MexIFace::makeDStack(unsigned rows, unsigned cols, unsigned slices) {return makeStack<double>(rows, cols, slices);}
-
-inline Hypercube<uint16_t> MexIFace::makeU16HyperStack(unsigned rows, unsigned cols, unsigned slices, unsigned hyperslices) {return makeHyperStack<uint16_t>(rows, cols, slices, hyperslices);}
-inline Hypercube<uint32_t> MexIFace::makeUHyperStack(unsigned rows, unsigned cols, unsigned slices, unsigned hyperslices) {return makeHyperStack<uint32_t>(rows, cols, slices, hyperslices);}
-inline Hypercube<int32_t> MexIFace::makeIHyperStack(unsigned rows, unsigned cols, unsigned slices, unsigned hyperslices) {return makeHyperStack<int32_t>(rows, cols, slices, hyperslices);}
-inline Hypercube<float> MexIFace::makeFHyperStack(unsigned rows, unsigned cols, unsigned slices, unsigned hyperslices) {return makeHyperStack<float>(rows, cols, slices, hyperslices);}
-inline Hypercube<double> MexIFace::makeDHyperStack(unsigned rows, unsigned cols, unsigned slices, unsigned hyperslices) {return makeHyperStack<double>(rows, cols, slices, hyperslices);}
-
-
-inline 
-mxArray* MexIFace::makeDouble(double val) const
-{
-    mxArray *m=mxCreateNumericMatrix(1,1,mxDOUBLE_CLASS, mxREAL);
-    double *dptr=mxGetPr(m);
-    *dptr=val;
+    auto m = mxCreateLogicalMatrix(1,1);
+    *static_cast<mxLogical*>(mxGetData(m)) = static_cast<mxLogical>(val);
     return m;
 }
 
-template<class ElemT>
-void MexIFace::outputVec(const arma::Col<ElemT> &arr)
+inline
+mxArray* MexIFace::toMXArray(const char* val)
 {
-    mxArray *out_arr=mxCreateNumericMatrix(arr.n_elem, 1, get_mx_class<ElemT>(), mxREAL);
-    lhs[lhs_idx++]=out_arr;
-    auto out_vec=getVec<ElemT>(out_arr);
-    out_vec=arr; //copy
-}
-
-inline 
-void MexIFace::outputFVec(const arma::Col<float> &arr)
-{
-    mxArray *out_arr=mxCreateNumericMatrix(arr.n_elem, 1, mxSINGLE_CLASS, mxREAL);
-    lhs[lhs_idx++]=out_arr;
-    auto out_vec=getFVec(out_arr);
-    out_vec=arr; //copy
-}
-
-
-template<int N>
-inline 
-void MexIFace::outputDVec(const arma::Col<double>::fixed<N> &arr)
-{
-    mxArray *out_arr=mxCreateNumericMatrix(N, 1, mxDOUBLE_CLASS, mxREAL);
-    lhs[lhs_idx++]=out_arr;
-    auto out_vec=getDVec(out_arr);
-    out_vec=arr; //copy
-}
-
-inline 
-void MexIFace::outputDVec(const arma::Col<double> &arr)
-{
-    mxArray *out_arr=mxCreateNumericMatrix(arr.n_elem, 1, mxDOUBLE_CLASS, mxREAL);
-    lhs[lhs_idx++]=out_arr;
-    auto out_vec=getDVec(out_arr);
-    out_vec=arr; //copy
-}
-
-template<class ElemT>
-void MexIFace::outputMat(const arma::Mat<ElemT> &arr)
-{
-    mxArray *out_arr=mxCreateNumericMatrix(arr.n_rows, arr.n_cols, get_mx_class<ElemT>(), mxREAL);
-    lhs[lhs_idx++]=out_arr;
-    auto out_vec=getMat<ElemT>(out_arr);
-    out_vec=arr; //copy
-}
-
-
-inline 
-void MexIFace::outputIMat(const arma::Mat<int32_t> &arr)
-{
-    mxArray *out_arr=mxCreateNumericMatrix(arr.n_rows, arr.n_cols, mxINT32_CLASS, mxREAL);
-    lhs[lhs_idx++]=out_arr;
-    auto out_mat=getIMat(out_arr);
-    out_mat=arr; //copy
-}
-
-
-inline 
-void MexIFace::outputDMat(const arma::Mat<double> &arr)
-{
-    mxArray *out_arr=mxCreateNumericMatrix(arr.n_rows, arr.n_cols, mxDOUBLE_CLASS, mxREAL);
-    lhs[lhs_idx++]=out_arr;
-    auto out_mat=getDMat(out_arr);
-    out_mat=arr; //copy
-}
-
-
-template<class ElemT>
-void MexIFace::outputStack(const arma::Cube<ElemT> &arr)
-{
-    const mwSize size[3]={arr.n_rows,arr.n_cols,arr.n_slices};
-    mxArray *out_arr=mxCreateNumericArray(3,size,get_mx_class<ElemT>(), mxREAL);
-    lhs[lhs_idx++]=out_arr;
-    auto out_vec=getStack<ElemT>(out_arr);
-    out_vec=arr; //copy
+    return mxCreateString(val);
 }
 
 inline
-void MexIFace::outputMXArray(mxArray *m)
+mxArray* MexIFace::toMXArray(std::string val)
 {
-    lhs[lhs_idx++]=m;
-}
-
-inline 
-void MexIFace::outputDouble(double val)
-{
-    mxArray *m=mxCreateNumericMatrix(1,1,mxDOUBLE_CLASS, mxREAL);
-    double *dptr=static_cast<double*>(mxGetData(m));
-    *dptr=val;
-    lhs[lhs_idx++]=m;
-}
-
-inline 
-void MexIFace::outputInt(int32_t val)
-{
-    mxArray *m=mxCreateNumericMatrix(1,1,mxINT32_CLASS, mxREAL);
-    int32_t *dptr=static_cast<int32_t*>(mxGetData(m));
-    *dptr=val;
-    lhs[lhs_idx++]=m;
-}
-
-inline 
-void MexIFace::outputBool(bool val)
-{
-    const mwSize size[2] = {1,1};
-    mxArray *m = mxCreateLogicalArray(2,size);
-    mxLogical *dptr = static_cast<mxLogical*>(mxGetData(m));
-    dptr[0] = static_cast<mxLogical>(val);
-    lhs[lhs_idx++] = m;
+    return mxCreateString(val.c_str());
 }
 
 
-template<class ElemT>
-void MexIFace::outputSparse(const arma::SpMat<ElemT> &arr)
+template<class ElemT, typename> 
+mxArray* MexIFace::toMXArray(ElemT val)
 {
-    int nnz = static_cast<int>(arr.n_nonzero);
+    auto m = mxCreateNumericMatrix(1,1,get_mx_class<ElemT>(), mxREAL);
+    *static_cast<ElemT*>(mxGetData(m)) = val; //copy
+    return m;
+}
+
+template<class ElemT, typename> 
+mxArray* MexIFace::toMXArray(const Vec<ElemT> &in_arr)
+{
+    auto m = mxCreateNumericMatrix(in_arr.n_elem, 1, get_mx_class<ElemT>(), mxREAL);
+    auto out_arr = toVec<ElemT>(m);
+    out_arr = in_arr; //copy
+    return m;
+}
+
+template<class ElemT, typename> 
+mxArray* MexIFace::toMXArray(const Mat<ElemT> &in_arr)
+{
+    auto m = mxCreateNumericMatrix(in_arr.n_rows, in_arr.n_cols, get_mx_class<ElemT>(), mxREAL);
+    auto out_arr = toMat<ElemT>(m);
+    out_arr = in_arr; //copy
+    return m;
+}
+
+template<class ElemT, typename> 
+mxArray* MexIFace::toMXArray(const Cube<ElemT> &in_arr)
+{
+    const mwSize size[3] = {in_arr.n_rows, in_arr.n_cols, in_arr.n_slices};
+    auto m = mxCreateNumericArray(3,size,get_mx_class<ElemT>(), mxREAL);
+    auto out_arr = toCube<ElemT>(m);
+    out_arr = in_arr; //copy
+    return m;
+}
+
+template<class ElemT, typename> 
+mxArray* MexIFace::toMXArray(const Hypercube<ElemT> &in_arr)
+{
+    const mwSize size[4] = {in_arr.n_rows, in_arr.n_cols, in_arr.n_slices, in_arr.n_hyperslices};
+    auto m = mxCreateNumericArray(4,size,get_mx_class<ElemT>(), mxREAL);
+    auto out_arr = toHypercube<ElemT>(m);
+    out_arr = in_arr; //copy
+    return m;
+}
+
+template<class ElemT, typename> 
+mxArray* MexIFace::toMXArray(const arma::SpMat<ElemT> &arr)
+{
+    auto nnz = arr.n_nonzero;
     mxArray *out_arr=mxCreateSparse(arr.n_rows, arr.n_cols, arr.n_nonzero, mxREAL);
     double  *out_values  = mxGetPr(out_arr);
     mwIndex *out_row_ind = mxGetIr(out_arr);
@@ -960,130 +702,449 @@ void MexIFace::outputSparse(const arma::SpMat<ElemT> &arr)
     //Copy column pointers
     int nrows = static_cast<int>(arr.n_rows);
     for(int n=0; n<=nrows; n++) out_col_ptr[n] = static_cast<mwIndex>(col_ptr[n]);
-    lhs[lhs_idx++]=out_arr; //Save as output
+    return out_arr;
 }
 
-/*
- * This is for a std::vector<std::vector<ElemT>> to be output as a cell-array of matlab column arrays.
+template<class ConvertableT> 
+mxArray* MexIFace::toMXArray(const Dict<ConvertableT> &dict)
+{
+    auto nfields = dict.size();
+    const char **fnames = new const char*[nfields];
+    IdxT i=0;
+    for(auto &entry: dict) fnames[i++] = entry.first.c_str();
+    
+    auto m = mxCreateStructMatrix(1,1,nfields,fnames);
+    delete[] fnames;
+    for(auto &entry: dict) mxSetField(m, 0, entry.first.c_str(), toMXArray(entry.second));
+    return m;
+}
+
+template<template<typename> class Array, class ConvertableT> 
+mxArray* MexIFace::toMXArray(const Array<ConvertableT> &arr)
+{
+    auto nCells = arr.size();
+    auto m = mxCreateCellMatrix(nCells, 1);
+    for(int i=0;i<nCells;i++) mxSetCell(m, i, toMXArray(arr[i]));
+    return m;
+}
+
+
+/************ getAs methods **************/
+    
+
+template<class ElemT> 
+ElemT MexIFace::getAsScalar(const mxArray *m)
+{
+    if(std::is_same<ElemT,bool>::value) return getAsBool(m);
+    else if(std::is_integral<ElemT>::value) return getAsInt<ElemT>(m);
+    else if(std::is_floating_point<ElemT>::value) return getAsFloat<ElemT>(m);
+    else {
+        std::ostringstream msg;
+        msg<<"Expected numeric or bool C++ type | Got type:"<<boost::typeindex::type_id<ElemT>().pretty_name();
+        throw MexIFaceError("BadType",msg.str());
+        return {};
+    }
+}
+
+
+bool MexIFace::getAsBool(const mxArray *m)
+{
+    if(m == nullptr) m = rhs[rhs_idx++];
+    switch (mxGetClassID(m)) {
+        case mxINT8_CLASS:    return !!(*static_cast<int8_t *>(mxGetData(m)));
+        case mxUINT8_CLASS:   return !!(*static_cast<uint8_t *>(mxGetData(m)));
+        case mxINT16_CLASS:   return !!(*static_cast<int16_t *>(mxGetData(m)));
+        case mxUINT16_CLASS:  return !!(*static_cast<uint16_t *>(mxGetData(m)));
+        case mxINT32_CLASS:   return !!(*static_cast<int32_t *>(mxGetData(m)));
+        case mxUINT32_CLASS:  return !!(*static_cast<uint32_t *>(mxGetData(m)));
+        case mxINT64_CLASS:   return !!(*static_cast<int64_t *>(mxGetData(m)));
+        case mxUINT64_CLASS:  return !!(*static_cast<uint64_t *>(mxGetData(m)));
+        case mxSINGLE_CLASS:  return !!(*static_cast<float *>(mxGetData(m)));
+        case mxDOUBLE_CLASS:  return !!(*static_cast<double *>(mxGetData(m)));
+        case mxLOGICAL_CLASS: return !!(*static_cast<mxLogical *>(mxGetData(m)));
+        default: break;
+    }
+    std::ostringstream msg;
+    msg<<"Expected numeric or logical class. | Got class:"<<get_mx_class_name(m);
+    throw MexIFaceError("BadType",msg.str());
+    return 0; //never get here
+}
+
+/** @brief Reads a mxArray as a scalar C++ int32_t type.
+ *
+ * @param m The pointer to the mxArray to interpret.
+ *
+ * The mxArray must be a signed 32 or 64 bit integer type.
+ *
+ * Throws an error if the conversion cannot be made.
+ */
+template<class IntT, typename>
+IntT MexIFace::getAsInt(const mxArray *m)
+{
+    if(m == nullptr) m = rhs[rhs_idx++];
+    switch (mxGetClassID(m)) {
+        case mxINT8_CLASS:   return checkedIntegerToIntegerConversion<int8_t,IntT>(m);
+        case mxUINT8_CLASS:  return checkedIntegerToIntegerConversion<uint8_t,IntT>(m);
+        case mxINT16_CLASS:  return checkedIntegerToIntegerConversion<int16_t,IntT>(m);
+        case mxUINT16_CLASS: return checkedIntegerToIntegerConversion<uint16_t,IntT>(m);
+        case mxINT32_CLASS:  return checkedIntegerToIntegerConversion<int32_t,IntT>(m);
+        case mxUINT32_CLASS: return checkedIntegerToIntegerConversion<uint32_t,IntT>(m);
+        case mxINT64_CLASS:  return checkedIntegerToIntegerConversion<int64_t,IntT>(m);
+        case mxUINT64_CLASS: return checkedIntegerToIntegerConversion<uint64_t,IntT>(m);
+        case mxSINGLE_CLASS: return checkedFloatToIntegerConversion<float,IntT>(m);
+        case mxDOUBLE_CLASS: return checkedFloatToIntegerConversion<double,IntT>(m);
+        default: break;
+    }
+    std::ostringstream msg;
+    msg<<"Expected numeric class. | Got class:"<<get_mx_class_name(m);
+    throw MexIFaceError("BadType",msg.str());
+    return 0; //never get here
+}
+
+template<class UnsignedT, typename>
+UnsignedT MexIFace::getAsUnsigned(const mxArray *m)
+{
+    return getAsInt<UnsignedT>(m);
+}
+
+template<class FloatT, typename>
+FloatT MexIFace::getAsFloat(const mxArray *m)
+{
+    if(m == nullptr) m = rhs[rhs_idx++];
+    switch (mxGetClassID(m)) {
+        case mxINT8_CLASS:   return checkedIntegerToFloatConversion<int8_t,FloatT>(m);
+        case mxUINT8_CLASS:  return checkedIntegerToFloatConversion<uint8_t,FloatT>(m);
+        case mxINT16_CLASS:  return checkedIntegerToFloatConversion<int16_t,FloatT>(m);
+        case mxUINT16_CLASS: return checkedIntegerToFloatConversion<uint16_t,FloatT>(m);
+        case mxINT32_CLASS:  return checkedIntegerToFloatConversion<int32_t,FloatT>(m);
+        case mxUINT32_CLASS: return checkedIntegerToFloatConversion<uint32_t,FloatT>(m);
+        case mxINT64_CLASS:  return checkedIntegerToFloatConversion<int64_t,FloatT>(m);
+        case mxUINT64_CLASS: return checkedIntegerToFloatConversion<uint64_t,FloatT>(m);
+        case mxSINGLE_CLASS: return checkedFloatToFloatConversion<float,FloatT>(m);
+        case mxDOUBLE_CLASS: return checkedFloatToFloatConversion<double,FloatT>(m);
+        default: break;
+    }
+    std::ostringstream msg;
+    msg<<"Expected numeric class. | Got class:"<<get_mx_class_name(m);
+    throw MexIFaceError("BadType",msg.str());
+    return 0; //never get here
+}
+
+template<template<typename> class Array, class ElemT, typename> 
+Array<ElemT> MexIFace::getAsScalarArray(const mxArray *m)
+{
+    if(m == nullptr) m = rhs[rhs_idx++];
+    checkType(m,mxCELL_CLASS); //Only accept cell arrays
+    checkVectorSize(m);
+    auto nfields = mxGetNumberOfElements(m);
+    Array<ElemT> array(nfields);
+    for(mwSize n=0; n<nfields; n++) array[n] = getAsScalar<ElemT>(mxGetCell(m,n));
+    return array;
+}
+
+template<class ElemT, typename>
+MexIFace::Dict<ElemT> MexIFace::getAsScalarDict(const mxArray *m)
+{
+    if(m == nullptr) m = rhs[rhs_idx++];
+    checkType(m,mxSTRUCT_CLASS); //Only accept structs arrays
+    checkScalarSize(m); //Should be a scalar struct not a struct array
+    Dict<ElemT> dict;
+    for(mwSize i=0; i<mxGetNumberOfFields(m); i++)
+        dict[mxGetFieldNameByNumber(m,i)] = getAsScalar<ElemT>(mxGetFieldByNumber(m,0,i));
+    return dict;
+    
+}
+
+/** @brief Reads a mxArray as a string.
+ *
+ * @param m Pointer to the mxArray to interpret.
+ *
+ * Throws an error if the conversion cannot be made.
+ */
+std::string MexIFace::getString(const mxArray *m)
+{
+    if(m == nullptr) m = rhs[rhs_idx++];
+    checkType(m,mxCHAR_CLASS); //Only accept char arrays as strings
+    checkVectorSize(m); //Should be 1D
+    auto cstr = mxArrayToString(m);
+    std::string str(cstr);
+    mxFree(cstr);
+    return str;
+}
+
+/** @breif Get exact type.  No conversions.
  * 
  */
-template<class ElemT> 
-void MexIFace::outputVecCellArray(const VectorVector<ElemT> &list)
+template<class ElemT, typename> 
+ElemT MexIFace::getScalar(const mxArray *m)
 {
-    int nCells = list.size();
-    mxArray* arr=mxCreateCellMatrix(nCells, 1);
-    for(int i=0;i<nCells;i++){
-        mxArray *vec=mxCreateNumericMatrix(list[i].size(), 1, get_mx_class<ElemT>(), mxREAL);
-        std::copy(list[i].cbegin(), list[i].cend(), getVec<ElemT>(vec).begin());
-        mxSetCell(arr, i, vec);
-    }
-    lhs[lhs_idx++]=arr; //Save as output
+    if(m == nullptr) m = rhs[rhs_idx++];
+    checkType<ElemT>(m);
+    checkScalarSize(m);
+    return toScalar<ElemT>(m);    
 }
 
-/*
- * This is for a std::vector<std::vector<ElemT>> to be output as a cell-array of matlab column arrays.
- * 
+/** @brief Create a armadillo Column vector to directly use the Matlab data for a 1D array of
+ *   arbitrary element type.
+ *
+ * @param m Pointer to the mxArray to be interpreted.  (Default=nullptr).  If nullptr then use next rhs param.
+ * @returns New armadillo array that re-uses the same data stored in the m pointer.
  */
-template<class ElemT> 
-void MexIFace::outputVecCellArray(const VectorList<ElemT> &list)
+template<class ElemT, typename> 
+MexIFace::Vec<ElemT> MexIFace::getVec(const mxArray *m)
 {
-    int nCells = list.size();
-    mxArray* arr=mxCreateCellMatrix(nCells, 1);
-    for(int i=0;i<nCells;i++){
-        mxArray *vec=mxCreateNumericMatrix(list[i].size(), 1, get_mx_class<ElemT>(), mxREAL);
-        std::copy(list[i].cbegin(), list[i].cend(), getVec<ElemT>(vec).begin());
-        mxSetCell(arr, i, vec);
-    }
-    lhs[lhs_idx++]=arr; //Save as output
+    if(m == nullptr) m = rhs[rhs_idx++];
+    checkType<ElemT>(m);
+    checkVectorSize(m);
+    return toVec<ElemT>(m);
 }
 
-/* std::vector of arma::Col vectors to matlab cell-array of 1D column arrays */
-template<class ElemT> 
-void MexIFace::outputVecCellArray(const VecVector<ElemT> &list)
+
+/** @brief Create an armadillo Mat object to directly work with the Matlab data for a 2D array of
+ *   arbitrary element type.
+ *
+ * @param m The pointer to the mxArray that is to be interpreted as an armadillo array.
+ * @returns A new armadillo array that interprets the data stored in the m pointer.
+ */
+template<class ElemT, typename> 
+MexIFace::Mat<ElemT> MexIFace::getMat(const mxArray *m)
 {
-    int nCells = list.size();
-    mxArray* arr = mxCreateCellMatrix(nCells, 1);
-    for(int i=0;i<nCells;i++){
-        mxArray *vec = mxCreateNumericMatrix(list[i].n_elem, 1, get_mx_class<ElemT>(), mxREAL);
-        auto out_vec = getVec<ElemT>(vec); //Interpret output array as armadillo array
-        out_vec = list[i]; //copy
-        mxSetCell(arr, i, vec); //save in cell array
-    }
-    lhs[lhs_idx++] = arr; //Save cell-array as output
+    if(m == nullptr) m = rhs[rhs_idx++];
+    checkType<ElemT>(m);
+    checkNdim(m,2);
+    return toMat<ElemT>(m);
 }
 
-/* arma::field of arma::Col vectors to matlab cell-array of 1D column arrays */
-template<class ElemT> 
-void MexIFace::outputVecCellArray(const VecField<ElemT> &field)
+/** @brief Create an armadillo Cube object to directly work with the Matlab data for a 3D array of
+*   arbitrary element type.
+*
+* @param m The pointer to the mxArray that is to be interpreted as an armadillo array.
+* @returns A new armadillo array that interprets the data stored in the m pointer.
+*/
+template<class ElemT, typename> 
+MexIFace::Cube<ElemT> MexIFace::getCube(const mxArray *m)
 {
-    int nCells = static_cast<int>(field.n_elem);
-    mxArray* arr = mxCreateCellMatrix(nCells, 1);
-    for(int i=0;i<nCells;i++){
-        mxArray *vec = mxCreateNumericMatrix(field(i).n_elem, 1, get_mx_class<ElemT>(), mxREAL);
-        auto out_vec = getVec<ElemT>(vec); //Interpret output array as armadillo array
-        out_vec = field(i); //copy
-        mxSetCell(arr, i, vec); //save in cell array
-    }
-    lhs[lhs_idx++] = arr; //Save cell-array as output
+    if(m == nullptr) m = rhs[rhs_idx++];
+    checkType<ElemT>(m);
+    checkMaxNdim(m,3);
+    return toCube<ElemT>(m);
 }
 
-template<class ElemT> 
-void MexIFace::outputMatCellArray(const MatVector<ElemT> &list)
+
+/** @brief Create an Hypercube object to directly work with the Matlab data for a 4D array of
+*   arbitrary element type.
+*
+* Uses the ability of the armadillo arrays to interpret raw data passed to it as preallocated
+* column major format.   This allows us to open the array data in C++ using Matlab's memory
+* directly instead of having to allocate a separate space and copy.
+*
+* @param m The pointer to the mxArray that is to be interpreted as an armadillo array.
+* @returns A new Hypercube that interprets the data stored in the m pointer.
+*/
+template<class ElemT, typename> 
+Hypercube<ElemT> MexIFace::getHypercube(const mxArray *m)
 {
-    int nCells = list.size();
-    mxArray* arr = mxCreateCellMatrix(nCells, 1);
-    for(int i=0;i<nCells;i++){
-        mxArray *mat = mxCreateNumericMatrix(list[i].n_rows, list[i].n_cols, get_mx_class<ElemT>(), mxREAL);
-        auto out_mat = getMat<ElemT>(mat); //Interpret output array as armadillo array
-        out_mat = list[i]; //copy
-        mxSetCell(arr, i, mat); //save in cell array
-    }
-    lhs[lhs_idx++] = arr; //Save cell-array as output
+    if(m == nullptr) m = rhs[rhs_idx++];
+    checkType<ElemT>(m);
+    checkMaxNdim(m,4);
+    return toHypercube<ElemT>(m);
 }
 
-template<class ElemT> 
-void MexIFace::outputMatCellArray(const MatField<ElemT> &field)
+template<template<typename> class Array, class ElemT, typename> 
+Array<ElemT> MexIFace::getScalarArray(const mxArray *m)
 {
-    int nCells = static_cast<int>(field.n_elem);
-    mxArray* arr = mxCreateCellMatrix(nCells, 1);
-    for(int i=0;i<nCells;i++){
-        mxArray *mat = mxCreateNumericMatrix(field(i).n_rows, field(i).n_cols, get_mx_class<ElemT>(), mxREAL);
-        auto out_mat = getMat<ElemT>(mat); //Interpret output array as armadillo array
-        out_mat = field(i); //copy
-        mxSetCell(arr, i, mat); //save in cell array
-    }
-    lhs[lhs_idx++] = arr; //Save cell-array as output
+    if(m == nullptr) m = rhs[rhs_idx++];  //Default to first unhandled rhs argument
+    checkType(m,mxCELL_CLASS);
+    checkVectorSize(m); //Should be 1D
+    auto nfields = mxGetNumberOfElements(m);
+    Array<ElemT> array(nfields);
+    for(auto n=0; n<nfields; n++) array[n] = getScalar<ElemT>(mxGetCell(m,n));
+    return array;
 }
 
-template<class ElemT> 
-void MexIFace::outputCubeCellArray(const CubeVector<ElemT> &list)
+
+template<template<typename> class Array, class ElemT, typename> 
+Array<MexIFace::Vec<ElemT>> MexIFace::getVecArray(const mxArray *m)
 {
-    int nCells = list.size();
-    mxArray* arr = mxCreateCellMatrix(nCells, 1);
-    for(int i=0;i<nCells;i++){
-        const mwSize size[3] = {list[i].n_rows,list[i].n_cols,list[i].n_slices};
-        mxArray *cube = mxCreateNumericArray(3, size, get_mx_class<ElemT>(), mxREAL);
-        auto out_cube = getStack<ElemT>(cube); //Interpret output array as armadillo array
-        out_cube = list[i]; //copy
-        mxSetCell(arr, i, cube); //save in cell array
-    }
-    lhs[lhs_idx++] = arr; //Save cell-array as output
+    if(m == nullptr) m = rhs[rhs_idx++];  //Default to first unhandled rhs argument    
+    checkType(m, mxCELL_CLASS);
+    checkVectorSize(m); //Should be 1D
+    auto nfields = mxGetNumberOfElements(m);
+    Array<ElemT> array(nfields);
+    for(mwSize n=0; n<nfields; n++) array[n] = getVec<ElemT>(mxGetCell(m,n));
+    return array;
 }
 
-template<class ElemT> 
-void MexIFace::outputCubeCellArray(const CubeField<ElemT> &field)
+template<template<typename> class Array, class ElemT, typename> 
+Array<MexIFace::Mat<ElemT>> MexIFace::getMatArray(const mxArray *m)
 {
-    int nCells = static_cast<int>(field.n_elem);
-    mxArray* arr = mxCreateCellMatrix(nCells, 1);
-    for(int i=0;i<nCells;i++){
-        const mwSize size[3] = {field(i).n_rows,field(i).n_cols,field(i).n_slices};
-        mxArray *cube = mxCreateNumericArray(3, size, get_mx_class<ElemT>(), mxREAL);
-        auto out_cube = getStack<ElemT>(cube); //Interpret output array as armadillo array
-        out_cube = field(i); //copy
-        mxSetCell(arr, i, cube); //save in cell array
-    }
-    lhs[lhs_idx++] = arr; //Save cell-array as output
+    if(m == nullptr) m = rhs[rhs_idx++];  //Default to first unhandled rhs argument    
+    checkType(m, mxCELL_CLASS);
+    checkVectorSize(m); //Should be 1D
+    auto nfields = mxGetNumberOfElements(m);
+    Array<ElemT> array(nfields);
+    for(mwSize n=0; n<nfields; n++) array[n] = getMat<ElemT>(mxGetCell(m,n));
+    return array;
 }
+
+template<template<typename> class Array, class ElemT, typename> 
+Array<MexIFace::Cube<ElemT>> MexIFace::getCubeArray(const mxArray *m)
+{
+    if(m == nullptr) m = rhs[rhs_idx++];  //Default to first unhandled rhs argument    
+    checkType(m, mxCELL_CLASS);
+    checkVectorSize(m); //Should be 1D
+    auto nfields = mxGetNumberOfElements(m);
+    Array<ElemT> array(nfields);
+    for(mwSize n=0; n<nfields; n++) array[n] = getCube<ElemT>(mxGetCell(m,n));
+    return array;
+}
+
+
+template<template<typename> class Array, class ElemT, typename> 
+Array<Hypercube<ElemT>> MexIFace::getHypercubeArray(const mxArray *m)
+{
+    if(m == nullptr) m = rhs[rhs_idx++];  //Default to first unhandled rhs argument    
+    checkType(m, mxCELL_CLASS);
+    checkVectorSize(m); //Should be 1D
+    auto nfields = mxGetNumberOfElements(m);
+    Array<ElemT> array(nfields);
+    for(mwSize n=0; n<nfields; n++) array[n] = getHypercube<ElemT>(mxGetCell(m,n));
+    return array;
+}
+
+template<class ElemT, typename>
+MexIFace::Dict<ElemT> MexIFace::getScalarDict(const mxArray *m)
+{
+    if(m == nullptr) m = rhs[rhs_idx++];
+    checkType(m, mxSTRUCT_CLASS); //Only accept structs arrays
+    checkScalarSize(m); //Should be a scalar struct not a struct array
+    Dict<ElemT> dict;
+    for(auto i=0; i<mxGetNumberOfFields(m); i++)
+        dict[mxGetFieldNameByNumber(m,i)] = getScalar<ElemT>(mxGetFieldByNumber(m,0,i));
+    return dict;
+}
+
+template<class ElemT, typename>
+MexIFace::Dict<MexIFace::Vec<ElemT>> MexIFace::getVecDict(const mxArray *m)
+{
+    if(m == nullptr) m = rhs[rhs_idx++];
+    checkType(m, mxSTRUCT_CLASS); //Only accept structs arrays
+    checkScalarSize(m); //Should be a scalar struct not a struct array
+    Dict<Vec<ElemT>> dict;
+    for(auto i=0; i<mxGetNumberOfFields(m); i++)
+        dict[mxGetFieldNameByNumber(m,i)] = getVec<ElemT>(mxGetFieldByNumber(m,0,i));
+    return dict;
+}
+
+template<class ElemT, typename>
+MexIFace::Dict<MexIFace::Mat<ElemT>> MexIFace::getMatDict(const mxArray *m)
+{
+    if(m == nullptr) m = rhs[rhs_idx++];
+    checkType(m, mxSTRUCT_CLASS); //Only accept structs arrays
+    checkScalarSize(m); //Should be a scalar struct not a struct array
+    Dict<Mat<ElemT>> dict;
+    for(auto i=0; i<mxGetNumberOfFields(m); i++)
+        dict[mxGetFieldNameByNumber(m,i)] = getMat<ElemT>(mxGetFieldByNumber(m,0,i));
+    return dict;
+}
+
+template<class ElemT, typename>
+MexIFace::Dict<MexIFace::Cube<ElemT>> MexIFace::getCubeDict(const mxArray *m)
+{
+    if(m == nullptr) m = rhs[rhs_idx++];
+    checkType(m, mxSTRUCT_CLASS); //Only accept structs arrays
+    checkScalarSize(m); //Should be a scalar struct not a struct array
+    Dict<Cube<ElemT>> dict;
+    for(auto i=0; i<mxGetNumberOfFields(m); i++)
+        dict[mxGetFieldNameByNumber(m,i)] = getCube<ElemT>(mxGetFieldByNumber(m,0,i));
+    return dict;
+}
+
+template<class ElemT, typename>
+MexIFace::Dict<Hypercube<ElemT>> MexIFace::getHypercubeDict(const mxArray *m)
+{
+    if(m == nullptr) m = rhs[rhs_idx++];
+    checkType(m, mxSTRUCT_CLASS); //Only accept structs arrays
+    checkScalarSize(m); //Should be a scalar struct not a struct array
+    Dict<Hypercube<ElemT>> dict;
+    for(auto i=0; i<mxGetNumberOfFields(m); i++)
+        dict[mxGetFieldNameByNumber(m,i)] = getHypercube<ElemT>(mxGetFieldByNumber(m,0,i));
+    return dict;
+}
+
+/* make methods use matlab to allocate the data as mxArrays and then
+ * share the pointer access through a armadillo object for maximum speed */
+
+template<class ElemT, typename> 
+MexIFace::Vec<ElemT> MexIFace::makeOutputArray(IdxT nelem)
+{
+    auto m = mxCreateNumericMatrix(nelem, 1,get_mx_class<ElemT>(), mxREAL);
+    lhs[lhs_idx++] = m;
+    return Vec<ElemT>(static_cast<ElemT*>(mxGetData(m)), nelem, false);
+}
+
+template<class ElemT, typename> 
+MexIFace::Mat<ElemT> MexIFace::makeOutputArray(IdxT rows, IdxT cols)
+{
+    auto m = mxCreateNumericMatrix(rows, cols, get_mx_class<ElemT>(), mxREAL);
+    lhs[lhs_idx++] = m;
+    return Mat<ElemT>(static_cast<ElemT*>(mxGetData(m)), rows, cols, false);
+}
+
+template<class ElemT, typename> 
+MexIFace::Cube<ElemT> MexIFace::makeOutputArray(IdxT rows, IdxT cols, IdxT slices)
+{
+    const mwSize size[3] = {rows,cols,slices};
+    auto m = mxCreateNumericArray(3,size,get_mx_class<ElemT>(), mxREAL);
+    lhs[lhs_idx++] = m;
+    return Cube<ElemT>(static_cast<ElemT*>(mxGetData(m)),rows,cols,slices, false);
+}
+
+template<class ElemT, typename> 
+Hypercube<ElemT> MexIFace::makeOutputArray(IdxT rows, IdxT cols, IdxT slices, IdxT hyperslices)
+{
+    const mwSize size[4] = {rows,cols,slices,hyperslices};
+    auto m = mxCreateNumericArray(4,size,get_mx_class<ElemT>(), mxREAL);
+    lhs[lhs_idx++] = m;
+    return Hypercube<ElemT>(static_cast<ElemT*>(mxGetData(m)),rows,cols,slices,hyperslices);
+}
+
+/* ouptput methods make a new matlab object copying in data from arguments
+ */
+
+inline
+void MexIFace::output(mxArray *m)
+{ lhs[lhs_idx++] = m; }
+
+template<class ConvertableT>
+void output(ConvertableT&& val)
+{
+    output(toMXArray(std::forward<ConvertableT>(val)));
+}
+
+
+/** @brief Helper function to set the internal copies of the left-hand-side and right-hand-side parameters
+ *  as they were passed to the mexFunction.
+ */
+inline
+void MexIFace::setArguments(MXArgCountT _nlhs, mxArray *_lhs[], MXArgCountT _nrhs, const mxArray *_rhs[])
+{
+    nlhs=_nlhs;
+    lhs=_lhs;
+    nrhs=_nrhs;
+    rhs=_rhs;
+}
+
+/** @brief Remove the first right-hand-side (input) argument as it has already been used to find the correct command
+ */
+inline
+void MexIFace::popRhs()
+{
+    nrhs--; 
+    rhs+=1;
+}
+
+
 } /* namespace mexiface */
 
 

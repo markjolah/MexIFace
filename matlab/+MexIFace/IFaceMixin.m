@@ -22,10 +22,10 @@ classdef IFaceMixin < handle
     end
 
     methods (Access=protected)
-        function obj=IFaceMixin(ifaceHandle)
+        function obj = IFaceMixin(ifaceHandle)
             % Inputs:
             %  ifaceHandle - A function handle to the *_Iface mex function that implements the C++ side of the interface
-            obj.ifaceHandle=ifaceHandle;
+            obj.ifaceHandle = ifaceHandle;
         end
 
         function success=openIface(obj, varargin)
@@ -38,9 +38,9 @@ classdef IFaceMixin < handle
             if obj.objectHandle
                 error([class(obj) ':call'],'objectHandle already exists and is non 0. Cannot create new ifaceobject until current object is closed.');
             end
-            try 
+%             try 
                 obj.objectHandle = obj.ifaceHandle('@new', varargin{:});
-            end
+%             end
              
             success= obj.objectHandle>0;
         end

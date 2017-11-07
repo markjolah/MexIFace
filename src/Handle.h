@@ -7,10 +7,13 @@
 
 #ifndef _HANDLE_H
 #define _HANDLE_H
-#include "mex.h"
 #include <cstdint>
 #include <string>
-#include <typeinfo>
+#include <boost/type_index.hpp>
+
+#include "mex.h"
+
+#include "MexIFaceError.h"
 
 namespace mexiface {
 
@@ -61,11 +64,10 @@ private:
 template<class T>
 Handle<T>::Handle(T *obj)
     : signature(class_handle_signature),
-      name(typeid(T).name()),
+      name(boost::typeindex::type_id<T>().pretty_name()),
       obj(obj)
 {
 }
-
 
 /**
  * @brief Delete the object which was assumed to have been created with new.
@@ -77,7 +79,6 @@ Handle<T>::~Handle()
     delete obj;
 }
 
-
 /**
  * @brief Check that this is a valid handle to a valid C++ object
  * @returns True if valid
@@ -85,11 +86,10 @@ Handle<T>::~Handle()
 template<class T>
 bool Handle<T>::is_valid() const
 {
-    bool sig_ok= (signature == class_handle_signature);
-    bool name_ok= (name == typeid(T).name());
+    bool sig_ok = (signature == class_handle_signature);
+    bool name_ok = (name == boost::typeindex::type_id<T>().pretty_name());
     return sig_ok && name_ok;
 }
-
 
 /**
  * @brief Retrieve a pointer to the object stored by this handle
@@ -114,10 +114,10 @@ template<class T>
 mxArray* Handle<T>::makeHandle(T *obj)
 {
     mexLock(); /* Increment the lock count */
-    auto arr = mxCreateNumericMatrix(1, 1, mxUINT64_CLASS, mxREAL); //Make a new numeric array to hold the handle address
-    auto handle_data = static_cast<HandlePtrT*>(mxGetData(arr)); //Get pointer to arrays internal storage
+    auto m = mxCreateNumericMatrix(1, 1, mxUINT64_CLASS, mxREAL); //Make a new numeric array to hold the handle address
+    auto handle_data = static_cast<HandlePtrT*>(mxGetData(m)); //Get pointer to arrays internal storage
     *handle_data = reinterpret_cast<HandlePtrT>(new Handle<T>(obj)); //Save the pointer as a uint64_t
-    return arr;
+    return m;
 }
 
 /**
@@ -126,14 +126,12 @@ mxArray* Handle<T>::makeHandle(T *obj)
  * @returns A pointer to the Handle object
  */
 template<class T>
-Handle<T>* Handle<T>::getHandle(const mxArray *arr)
+Handle<T>* Handle<T>::getHandle(const mxArray *m)
 {
-    if (mxGetNumberOfElements(arr) != 1) mexErrMsgIdAndTxt("ClassHandle:covertMat2HandlePtr","Non scalar.");
-    if (mxGetClassID(arr) != mxUINT64_CLASS) mexErrMsgIdAndTxt("ClassHandle:covertMat2HandlePtr","not UINT64");
-    if (mxIsComplex(arr)) mexErrMsgIdAndTxt("ClassHandle:covertMat2HandlePtr","is complex");
-    auto handle_data=static_cast<HandlePtrT*>(mxGetData(arr));
+    if (mxGetClassID(m) != mxUINT64_CLASS) throw MexIFaceError("Handle","getHandle","Handle must be UINT64");
+    auto handle_data = static_cast<HandlePtrT*>(mxGetData(m));
     auto handle = reinterpret_cast<Handle<T>*>( *handle_data );
-    if (!handle->is_valid()) mexErrMsgIdAndTxt("ClassHandle:covertMat2HandlePtr","Handle not valid.");
+    if (!handle->is_valid()) throw MexIFaceError("Handle","getHandle","Handle not valid.");
     return handle;
 }
 

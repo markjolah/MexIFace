@@ -7,6 +7,10 @@ _install
 _win64.*
 _maci64.*
 
+.kdev4*
+*.kdev4
+_kdev_build
+
 # Prerequisites
 *.d
 

@@ -1,9 +1,9 @@
 # MexIFace: src/CMakeLists.txt
 
 ## Source Files ##
-set(MexIFace_SRCS MexIFace.cpp MexUtils.cpp explore.cpp)
+set(MexIFace_SRCS MexIFace.cpp MexIFaceError.cpp MexUtils.cpp explore.cpp)
 ## Include Files ##
-set(MexIFace_HEADERS MexIFace.h MexUtils.h hypercube.h Handle.h explore.h)
+set(MexIFace_HEADERS MexIFace.h MexUtils.h MexIFaceError.h hypercube.h Handle.h explore.h)
 
 ## Iface Core Object library. ##
 set(MexIFace_LIB MexIFace)

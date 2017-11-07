@@ -58,6 +58,13 @@ template<class T> mxClassID get_mx_class(){return mxUNKNOWN_CLASS;}
  */
 void exploreMexArgs(int nargs, const mxArray *args[] );
 
+
+inline
+const char* get_mx_class_name(const mxArray *array)
+{
+    return get_mx_class_name(mxGetClassID(array));
+}
+
 } /* namespace mexiface */
 
 #endif /* _MEXUTILS_H */

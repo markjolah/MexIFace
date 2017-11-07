@@ -10,6 +10,7 @@ message(STATUS "[MexIFace]: Configure Libraries")
 find_package(Armadillo REQUIRED)
 add_definitions(-DARMA_USE_CXX11 -DARMA_DONT_USE_WRAPPER -DARMA_BLAS_LONG)
 add_definitions(-DARMA_DONT_USE_OPENMP) #Want to explicitly use openMP when required
+add_definitions(-DARMA_DONT_USE_HDF5) #Causes problems and not necessary
 if(${CMAKE_BUILD_TYPE} MATCHES Debug)
     add_definitions(-DARMA_PRINT_ERRORS)
 endif()
@@ -83,13 +84,19 @@ endif()
 # Compiler Definitions
 if (WIN32)
     add_definitions( -DWIN32 )
+elseif(UNIX AND NOT APPLE)
+    add_definitions( -DLINUX )
 endif()
 
 ## CFLAGS ##
 set(GCC_WARN_FLAGS "-W -Wall -Wextra -Werror -Wno-unused-parameter")
-set(GCC_STD_FLAGS "-std=c++11")
+set(GCC_STD_FLAGS "-std=c++1y")
 set(GCC_ARCH_FLAGS "-mtune=native")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_WARN_FLAGS} ${GCC_STD_FLAGS} ${GCC_ARCH_FLAGS}")
+if(${CMAKE_BUILD_TYPE} MATCHES Debug)
+    add_definitions(-fmax-errors=5)
+    add_definitions(-DDEBUG)
+endif()
 
 #Debug compiler options
 set(CMAKE_DEBUG_POSTFIX ".debug" CACHE STRING "Debug file extension")

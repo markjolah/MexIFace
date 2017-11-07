@@ -314,7 +314,7 @@ classdef GUIBuilder < handle
             % [IN]
             %   H - cellarray of handles
             %   [Align args] - All other argurments are passed directly to align.  In general you need to
-            %   use the same agruments here as you would calling matlab's 'align' function
+            %   use the same agruments here as you would calling matlab's 'align' function.
             % [OUT]
             %   bbox - [x y w h]: a bounding box in Matlab position format for the outer edge of the
             %                     aliged uicontrol elements.

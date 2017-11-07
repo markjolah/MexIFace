@@ -7,11 +7,10 @@
 
 #ifndef _HYPERCUBE_H
 #define _HYPERCUBE_H
-
 #include <armadillo>
 #include <memory>
 #include <vector>
-#include <stdexcept>
+#include "MexIFaceError.h"
 
 namespace mexiface {
 
@@ -29,10 +28,11 @@ namespace mexiface {
  */
 template <class ElemT>
 class Hypercube {
-    typedef arma::Cube<ElemT> CubeT;
-    typedef std::vector<std::shared_ptr<CubeT>> CubeVecT;
+    using Cube = arma::Cube<ElemT> ;
+    using CubeVecT = std::vector<std::unique_ptr<Cube>> ;
 
 public:
+    using IdxT=arma::uword;
     /**
      * @brief Create an empty hypercube of specified size
      * @param sX The x coordinate (1st dim).
@@ -40,11 +40,11 @@ public:
      * @param sZ The z coordinate (3rd dim).
      * @param sN The n (hyperslice) coordinate (4th dim).
      */
-    Hypercube(int sX, int sY, int sZ, int sN)
+    Hypercube(IdxT sX, IdxT sY, IdxT sZ, IdxT sN)
         : sX(sX),sY(sY),sZ(sZ),sN(sN), n_slices(sN),
           hcube(CubeVecT(sN))
     {
-        for(int i=0;i<sN;i++) hcube[i]=std::make_shared<CubeT>(sX,sY,sZ);
+        for(IdxT i=0;i<sN;i++) hcube[i]=std::make_unique<Cube>(sX,sY,sZ);
     }
 
     /**
@@ -57,13 +57,13 @@ public:
      * @param sZ The z coordinate (3rd dim).
      * @param sN The n (hyperslice) coordinate (4th dim).
      */
-    Hypercube(void *mem, int sX, int sY, int sZ, int sN)
+    Hypercube(void *mem, IdxT sX, IdxT sY, IdxT sZ, IdxT sN)
         : sX(sX),sY(sY),sZ(sZ),sN(sN), n_slices(sN)
     {
-        int sz=subcube_size();
-        ElemT *dmem=static_cast<ElemT*>(mem);
-        for(int i=0;i<sN;i++) {
-            hcube.push_back(std::make_shared<CubeT>(dmem,sX,sY,sZ, false));
+        IdxT sz = subcube_size();
+        auto dmem = static_cast<ElemT*>(mem);
+        for(IdxT i=0;i<sN;i++) {
+            hcube.push_back(std::make_unique<Cube>(dmem,sX,sY,sZ, false));
             dmem+=sz;
         }
     }
@@ -78,9 +78,9 @@ public:
      * @param i the sub-cube index, in the 4-th dim.
      * @returns A constant reference to the subcube
      */
-    const CubeT& slice(int i) const
+    const Cube& slice(IdxT i) const
     {
-        if( (i<0) || (i>=sN) ) throw std::out_of_range("Hypercube: hyperslice out of bounds");
+        if(i >= sN) throw MexIFaceError("Hypercube","hyperslice out of bounds");
         return *hcube[i];
     }
 
@@ -89,9 +89,9 @@ public:
      * @param i the sub-cube index, in the 4-th dim.
      * @returns A reference to the subcube
      */
-    CubeT& slice(int i)
+    Cube& slice(IdxT i)
     {
-        if( (i<0) || (i>=sN) ) throw std::out_of_range("Hypercube: hyperslice out of bounds");
+        if(i >= sN) throw MexIFaceError("Hypercube","hyperslice out of bounds");
         return *hcube[i];
     }
 
@@ -103,16 +103,16 @@ public:
      * @param iN The n (hyperslice) coordinate (4th dim).
      * @returns A reference to the element
      */
-    ElemT& operator()(int iX, int iY, int iZ, int iN) const
+    ElemT& operator()(IdxT iX, IdxT iY, IdxT iZ, IdxT iN) const
     {
-        if( (iN<0) || (iN>=sN) ) throw std::out_of_range("Hypercube: hyperslice out of bounds");
+        if(iN >= sN) throw MexIFaceError("Hypercube","hyperslice out of bounds");
         return (*hcube[iN])(iX,iY,iZ);
     }
 
     /**
      * @brief Get the number of elements in each subcube
      */
-    int subcube_size() const
+    IdxT subcube_size() const
     {
         return sX*sY*sZ;
     }
@@ -120,20 +120,20 @@ public:
     /**
      * @brief Get the number of elements in this hypercube
      */
-    int size() const
+    IdxT size() const
     {
         return sX*sY*sZ*sN;
     }
 
     /* Member variables */
 
-    const int sX,sY,sZ,sN;
+    const IdxT sX,sY,sZ,sN;
     /**
      * @brief This member variable matches the n_slices member of arma::Cube's and
      * allows us to have a hypercube stand in for a cube in templated code that can
      * work on 2D or 3D sub-slices
      */
-    const unsigned n_slices;
+    const IdxT n_slices;
 private:
     CubeVecT hcube; /**< The vector of cubes that stores the data */
 };
