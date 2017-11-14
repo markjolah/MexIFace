@@ -6,11 +6,12 @@
  */
 
 #include "MexIFace.h"
+#include "explore.h"
 
 
 namespace mexiface {
 
-MexIFace::MexIFace(std::string name) : mex_name(name) 
+MexIFace::MexIFace()
 {
 //     #ifndef WIN32
 //     //This sets the openmp thread count to the same as the hardware concurrency
@@ -25,7 +26,7 @@ MexIFace::MexIFace(std::string name) : mex_name(name)
  */
 void MexIFace::error(std::string condition, std::string message) const
 {
-    mexErrMsgIdAndTxt((remove_alphanumeric(mex_name)+":"+remove_alphanumeric(condition)).c_str(), 
+    mexErrMsgIdAndTxt((remove_alphanumeric(obj_name())+":"+remove_alphanumeric(condition)).c_str(), 
                       message.c_str());
 }
 
@@ -37,7 +38,7 @@ void MexIFace::error(std::string condition, std::string message) const
  */
 void MexIFace::error(std::string component, std::string condition, std::string message) const
 {
-    mexErrMsgIdAndTxt((remove_alphanumeric(mex_name)+":"+remove_alphanumeric(component)+":"+remove_alphanumeric(condition)).c_str(), 
+    mexErrMsgIdAndTxt((remove_alphanumeric(obj_name())+":"+remove_alphanumeric(component)+":"+remove_alphanumeric(condition)).c_str(), 
                       message.c_str());
 }
 
@@ -62,7 +63,7 @@ std::string MexIFace::remove_alphanumeric(std::string name)
  * to be the second argument.
  *
  */
-void MexIFace::mexFunction(int _nlhs, mxArray *_lhs[], int _nrhs, const mxArray *_rhs[])
+void MexIFace::mexFunction(MXArgCountT _nlhs, mxArray *_lhs[], MXArgCountT _nrhs, const mxArray *_rhs[])
 {
     setArguments(_nlhs,_lhs,_nrhs,_rhs);
     checkMinNumArgs(0,1);
@@ -99,7 +100,7 @@ void MexIFace::callMethod(std::string name,const MethodMap &map) noexcept
     if (it == methodmap.end()){
         #if defined(DEBUG)            
         mexPrintf("[MexIFace::callMethod] --- Unknown Method Name\n");
-        mexPrintf("  MexName: %s\n",mex_name.c_str());
+        mexPrintf("  MexName: %s\n",obj_name().c_str());
         mexPrintf("  MethodName: %s\n",name.c_str());
         mexPrintf("  MappedMethods: [\n");
         for(auto& methods : map) mexPrintf(methods.first.c_str(),",");
@@ -113,7 +114,17 @@ void MexIFace::callMethod(std::string name,const MethodMap &map) noexcept
         } catch (MexIFaceError &e) {
             #if defined(DEBUG)            
             mexPrintf("[MexIFace::callMethod] --- MexIFaceError Caught\n");
-            mexPrintf("  MexName: %s\n",mex_name.c_str());
+            mexPrintf("  MexName: %s\n",obj_name().c_str());
+            mexPrintf("  MethodName: %s\n",name.c_str());
+            mexPrintf("  Exception.condition: %s\n",e.condition());
+            mexPrintf("  Exception.what: %s\n",e.what());
+            mexPrintf("  Exception.Backtrace:\n%s\n\n",e.backtrace());
+            #endif
+            error(name,e.condition(),e.what());
+        } catch (backtrace_exception::BacktraceException &e) {
+            #if defined(DEBUG)            
+            mexPrintf("[MexIFace::callMethod] --- BacktraceException Caught\n");
+            mexPrintf("  MexName: %s\n",obj_name().c_str());
             mexPrintf("  MethodName: %s\n",name.c_str());
             mexPrintf("  Exception.condition: %s\n",e.condition());
             mexPrintf("  Exception.what: %s\n",e.what());
@@ -123,7 +134,7 @@ void MexIFace::callMethod(std::string name,const MethodMap &map) noexcept
         } catch (std::exception &e) {
             #if defined(DEBUG)            
             mexPrintf("[MexIFace::callMethod] --- std::exception Caught\n");
-            mexPrintf("  MexName: %s\n",mex_name.c_str());
+            mexPrintf("  MexName: %s\n",obj_name().c_str());
             mexPrintf("  MethodName: %s\n",name.c_str());
             mexPrintf("  Exception.what: %s\n",e.what());
             #endif
@@ -131,7 +142,7 @@ void MexIFace::callMethod(std::string name,const MethodMap &map) noexcept
         } catch (...) {
             #if defined(DEBUG)            
             mexPrintf("[MexIFace::callMethod] --- Unknown Exception Caught\n");
-            mexPrintf("  MexName: %s\n",mex_name.c_str());
+            mexPrintf("  MexName: %s\n",obj_name().c_str());
             mexPrintf("  MethodName: %s\n",name.c_str());
             #endif
             error(name,"UnknownException");

@@ -20,7 +20,7 @@ set(MexIFace_CMAKE_TOOLCHAINS_DIR ${MexIFace_CMAKE_DIR}/Toolchains)
 set(MexIFace_CMAKE_FUNCTIONS_DIR ${MexIFace_CMAKE_DIR}/Functions)
 set(MexIFace_CMAKE_EXECUTABLE_DIR ${MexIFace_CMAKE_DIR}/Executables)
 set(MexIFace_CMAKE_TEMPLATES_DIR ${MexIFace_CMAKE_DIR}/Templates)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${MexIFace_CMAKE_MODULES_DIR})
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${MexIFace_CMAKE_MODULES_DIR} ${MexIFace_CMAKE_FUNCTIONS_DIR})
 
 include(MexIFace) #Configure necessary libraries
 include(MexIFace-Doxygen) #Add Doxygen documentation targets

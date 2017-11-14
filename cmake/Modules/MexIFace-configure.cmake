@@ -6,22 +6,31 @@
 
 ## Find and Configure Required Libraries ##
 message(STATUS "[MexIFace]: Configure Libraries")
+
+#External dependencies
+include(AddExternalDependency)
+#BacktraceException allows for exceptions that encode a backtrace for debugging
+set(BacktraceExceptionURL https://github.com/markjolah/BacktraceException.git)
+AddExternalDependency(BacktraceException ${BacktraceExceptionURL} SHARED)
+
 # Armadillo
 find_package(Armadillo REQUIRED)
 add_definitions(-DARMA_USE_CXX11 -DARMA_DONT_USE_WRAPPER -DARMA_BLAS_LONG)
-add_definitions(-DARMA_DONT_USE_OPENMP) #Want to explicitly use openMP when required
-add_definitions(-DARMA_DONT_USE_HDF5) #Causes problems and not necessary
+add_definitions(-DARMA_DONT_USE_OPENMP)
+add_definitions(-DARMA_DONT_USE_HDF5)
 if(${CMAKE_BUILD_TYPE} MATCHES Debug)
     add_definitions(-DARMA_PRINT_ERRORS)
+else()
+    add_definitions(-DARMA_NO_DEBUG)
 endif()
 # Optionally enable extra debugging from armadillo to log every call.
-if(MexIFace_EXTRA_DEBUG)
+if( (${CMAKE_BUILD_TYPE} MATCHES Debug) AND MexIFace_EXTRA_DEBUG)
     add_definitions(-DARMA_EXTRA_DEBUG)
 endif()
 
 # OpenMP
 find_package(OpenMP REQUIRED)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+add_compile_options(${OpenMP_CXX_FLAGS})
 # if(WIN32)
 #     find_library(OPENMP_LIBRARY libgomp-1.dll REQUIRED)
 # endif()
@@ -89,27 +98,16 @@ elseif(UNIX AND NOT APPLE)
 endif()
 
 ## CFLAGS ##
-set(GCC_WARN_FLAGS "-W -Wall -Wextra -Werror -Wno-unused-parameter")
-set(GCC_STD_FLAGS "-std=c++1y")
-set(GCC_ARCH_FLAGS "-mtune=native")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_WARN_FLAGS} ${GCC_STD_FLAGS} ${GCC_ARCH_FLAGS}")
+add_compile_options(-W -Wall -Wextra -Werror -Wno-unused-parameter)
 if(${CMAKE_BUILD_TYPE} MATCHES Debug)
-    add_definitions(-fmax-errors=5)
     add_definitions(-DDEBUG)
+elseif()
+    add_definitions(-DNDEBUG)
 endif()
-
-#Debug compiler options
 set(CMAKE_DEBUG_POSTFIX ".debug" CACHE STRING "Debug file extension")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -O")
-#Release compiler options
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DARMA_NO_DEBUG -DNDEBUG")
-#Detect if we are a debug build at configure time which is cannot be done with a gererator expression
-if(${CMAKE_BUILD_TYPE} MATCHES Debug)
-    set(MexIFace_DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
-else()
-    set(MexIFace_DEBUG_POSTFIX "")
-endif()
-message(STATUS "[MexIFace] DebugPostfix: ${MexIFace_DEBUG_POSTFIX}")
+set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O2")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-ggdb -O3")
 
 ## MAC OS X Config ##
 set(CMAKE_MACOSX_RPATH 1) #Enable rpaths on OS X

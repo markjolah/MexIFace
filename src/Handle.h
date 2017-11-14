@@ -5,8 +5,8 @@
  * @brief Helper class and templated functions to represent and manipulate Handles to C++ objects as Matlab mxArrays
  */
 
-#ifndef _HANDLE_H
-#define _HANDLE_H
+#ifndef _MEXIFACE_HANDLE_H
+#define _MEXIFACE_HANDLE_H
 #include <cstdint>
 #include <string>
 #include <boost/type_index.hpp>
@@ -30,7 +30,7 @@ public:
      * @brief The C++ datatype of corresponding to the array type a Handle pointer will be stored
      *  in for the Matlab side of things
      */
-    typedef uint64_t HandlePtrT;
+    using HandlePtrT=uint64_t;
 
     Handle(T *obj);
     ~Handle();
@@ -40,7 +40,7 @@ public:
 
     static mxArray* makeHandle(T *obj);
     static Handle<T>* getHandle(const mxArray *arr);
-    static inline T* getObject(const mxArray *in);
+    static T* getObject(const mxArray *in);
     static void destroyObject(const mxArray *in);
 
 private:
@@ -116,7 +116,7 @@ mxArray* Handle<T>::makeHandle(T *obj)
     mexLock(); /* Increment the lock count */
     auto m = mxCreateNumericMatrix(1, 1, mxUINT64_CLASS, mxREAL); //Make a new numeric array to hold the handle address
     auto handle_data = static_cast<HandlePtrT*>(mxGetData(m)); //Get pointer to arrays internal storage
-    *handle_data = reinterpret_cast<HandlePtrT>(new Handle<T>(obj)); //Save the pointer as a uint64_t
+    *handle_data = reinterpret_cast<HandlePtrT>(new Handle<T>(obj)); //Save the pointer to the handle in the mxarray returned
     return m;
 }
 
@@ -131,7 +131,7 @@ Handle<T>* Handle<T>::getHandle(const mxArray *m)
     if (mxGetClassID(m) != mxUINT64_CLASS) throw MexIFaceError("Handle","getHandle","Handle must be UINT64");
     auto handle_data = static_cast<HandlePtrT*>(mxGetData(m));
     auto handle = reinterpret_cast<Handle<T>*>( *handle_data );
-    if (!handle->is_valid()) throw MexIFaceError("Handle","getHandle","Handle not valid.");
+    if (!handle->is_valid()) throw MexIFaceError("Handle","getHandle","Handle not valid for this type.");
     return handle;
 }
 
@@ -165,4 +165,4 @@ void Handle<T>::destroyObject(const mxArray *arr)
 
 } /* namespace mexiface */
 
-#endif // _HANDLE_H
+#endif // _MEXIFACE_HANDLE_H

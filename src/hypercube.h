@@ -5,8 +5,8 @@
  * @brief The class declaration and inline and templated functions for hypercube.
  */
 
-#ifndef _HYPERCUBE_H
-#define _HYPERCUBE_H
+#ifndef _MEXIFACE_HYPERCUBE_H
+#define _MEXIFACE_HYPERCUBE_H
 #include <armadillo>
 #include <memory>
 #include <vector>
@@ -14,6 +14,14 @@
 
 namespace mexiface {
 
+/** @brief a make_unique implementation for use when compiling with C++11 
+ * std::make_unique is availible in C++14
+ */
+template<typename T, typename ...Args>
+std::unique_ptr<T> make_unique( Args&& ...args )
+{
+    return std::unique_ptr<T>( new T( std::forward<Args>(args)... ) );
+}
 
 /**
  * @brief A class to create a 4D armadillo array that can use externally allocated memory.
@@ -44,7 +52,7 @@ public:
         : sX(sX),sY(sY),sZ(sZ),sN(sN), n_slices(sN),
           hcube(CubeVecT(sN))
     {
-        for(IdxT i=0;i<sN;i++) hcube[i]=std::make_unique<Cube>(sX,sY,sZ);
+        for(IdxT i=0;i<sN;i++) hcube[i]=make_unique<Cube>(sX,sY,sZ);
     }
 
     /**
@@ -63,7 +71,7 @@ public:
         IdxT sz = subcube_size();
         auto dmem = static_cast<ElemT*>(mem);
         for(IdxT i=0;i<sN;i++) {
-            hcube.push_back(std::make_unique<Cube>(dmem,sX,sY,sZ, false));
+            hcube.push_back(make_unique<Cube>(dmem,sX,sY,sZ, false));
             dmem+=sz;
         }
     }
@@ -144,4 +152,4 @@ typedef Hypercube<float>  fhypercube;
 
 } /* namespace mexiface */
 
-#endif /* _HYPERCUBE_H */
+#endif /* _MEXIFACE_HYPERCUBE_H */

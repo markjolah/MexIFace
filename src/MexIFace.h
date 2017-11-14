@@ -5,8 +5,8 @@
  * @brief The class declaration and inline and templated functions for MexIFace.
  */
 
-#ifndef _MEXIFACE_H
-#define _MEXIFACE_H
+#ifndef _MEXIFACE_MEXIFACE_H
+#define _MEXIFACE_MEXIFACE_H
 
 #include <sstream>
 #include <map>
@@ -20,13 +20,13 @@
 
 #include "mex.h"
 
-#include "hypercube.h"
-#include "Handle.h"
-#include "explore.h"
-#include "MexUtils.h"
 #include "MexIFaceError.h"
+#include "hypercube.h"
+#include "MexUtils.h"
+#include "MexIFaceBase.h"
+#include "MexIFaceHandler.h"
 
-namespace mexiface {
+namespace mexiface  {
 
 /** @class MexIFace 
  * @brief Acts as a base class for implementing a C++ class <--> Matlab class interface.
@@ -67,15 +67,15 @@ namespace mexiface {
  * These methods are part of what makes this interface efficient as we don't need to create new storage and copy data, instead we just use
  * the matlab memory directly, and matlab does all the memory management of parameters passed in and out.
  */
-class MexIFace {
+class MexIFace : public virtual MexIFaceBase {
 public:
     using MXArgCountT = int; /**< Type for the mexFunction arg counts and associated nrhs and nlhs data members  */
     using IdxT = arma::uword; /**< A logical type for an IdxT integer index */
-    using BoolT = uint16_t;
     
     template<class T> using Vec = arma::Col<T>;
     template<class T> using Mat = arma::Mat<T>;
     template<class T> using Cube = arma::Cube<T>;
+    template<class T> using Hypercube = Hypercube<T>;
     
     template<class T> using Dict = std::map<std::string,T>; /**< A convenient form for reporting dictionaries of named FP data to matlab */
     
@@ -84,10 +84,7 @@ public:
     template<class T> using IsUnsignedIntegralT = typename std::enable_if< std::is_integral<T>::value && std::is_same<T, typename std::make_unsigned<T>::type>::value >::type;
     template<class T> using IsFloatingPointT = typename std::enable_if< std::is_floating_point<T>::value >::type;
     
-    template<template<typename> class Container,class ElemT> using IsNotVecT = typename std::enable_if< !std::is_same<Vec<ElemT>, Container<ElemT>>::value >::type;
-    
-
-    MexIFace(std::string name);
+    MexIFace();
     void mexFunction(MXArgCountT _nlhs, mxArray *_lhs[], MXArgCountT _nrhs, const mxArray *_rhs[]);
     
     /* Public Static methods */
@@ -118,6 +115,20 @@ public:
     template<class ElemT, typename=IsArithmeticT<ElemT>> 
     static Hypercube<ElemT> toHypercube(const mxArray *m);
     
+    template<class ElemT=double, typename=IsArithmeticT<ElemT>> 
+    static ElemT checkedToScalar(const mxArray *m);
+    
+    template<class ElemT, typename=IsArithmeticT<ElemT>> 
+    static Vec<ElemT> checkedToVec(const mxArray *m);
+    
+    template<class ElemT, typename=IsArithmeticT<ElemT>> 
+    static Mat<ElemT> checkedToMat(const mxArray *m);
+    
+    template<class ElemT, typename=IsArithmeticT<ElemT>> 
+    static Cube<ElemT> checkedToCube(const mxArray *m);
+    
+    template<class ElemT, typename=IsArithmeticT<ElemT>> 
+    static Hypercube<ElemT> checkedToHypercube(const mxArray *m);
     
     
     static mxArray* toMXArray(bool val);
@@ -165,8 +176,6 @@ public:
 protected:
     using MethodMap = std::map<std::string, boost::function<void()>>; /**< The type of mapping for mapping names to member functions to call */    
     
-    std::string mex_name; /**< A name to use when reporting errors to Matlab */
-
     MethodMap methodmap; /**< A map from names to wrapped member functions to be called */
     MethodMap staticmethodmap; /**< A map from names to wrapped static member functions to be called */
 
@@ -179,30 +188,10 @@ protected:
 
     /* Methods to be overloaded by subclass */
 
-    /**
-     * @brief Called when the mexFunction gets the \@new command, passing on the remaining input arguments.
-     *
-     * The rhs should have a single output argument which is the handle (number) which corresponds to the
-     * wrapped object.
-     *
-     * This pure virtual function must be overloaded by the Iface subclass.
-     */
+    
     virtual void objConstruct() =0;
-
-    /**
-     * @brief Called when the mexFunction gets the \@delete command
-     *
-     * This pure virtual function must be overloaded by the Iface subclass.
-     * @param mxhandle mxArray where the handle is stored
-     */
     virtual void objDestroy(const mxArray *mxhandle)=0;
 
-    /**
-     * @brief This is a helper method which saves a pointer to the wrapped class's object in an internal member variable called obj.
-     *
-     * This is not templated on the wrapped class type, so it must be implemented by the IFace subclass.
-     * @param mxhandle The mxArray where the handle is stored.
-     */
     virtual void getObjectFromHandle(const mxArray *mxhandle) =0;
 
     
@@ -245,6 +234,10 @@ protected:
     template<class ElemT=double, typename=IsArithmeticT<ElemT>> 
     Hypercube<ElemT> getHypercube(const mxArray *mxdata=nullptr);
     
+    template<template<typename> class Array, class ElemT>
+    Array<ElemT> get(const mxArray *m);
+
+        
     template<template<typename> class Array = std::vector, class ElemT=double, typename=IsArithmeticT<ElemT>> 
     Array<ElemT> getScalarArray(const mxArray *mxdata=nullptr);
     template<template<typename> class Array = std::vector, class ElemT=double, typename=IsArithmeticT<ElemT>> 
@@ -281,7 +274,7 @@ protected:
 
     /* ouptput methods make a new matlab object copying in data from arguments
      */
-    void output(mxArray *m);
+    void output(mxArray *m) override;
     template<class ConvertableT>
     void output(ConvertableT&& val);
     
@@ -296,6 +289,33 @@ private:
     
     /* Private Static */
     static std::string remove_alphanumeric(std::string name);
+    
+    template<template<typename> class Array, class ElemT>
+    struct GetFunctor;
+
+    template<class ElemT>
+    struct GetFunctor<Vec,ElemT>
+    {
+        Vec<ElemT> operator()(const mxArray *m) const;
+    };
+    
+    template<class ElemT>
+    struct GetFunctor<Mat,ElemT>
+    {
+        Mat<ElemT> operator()(const mxArray *m) const;
+    };
+
+    template<class ElemT>
+    struct GetFunctor<arma::Cube,ElemT>
+    {
+        arma::Cube<ElemT> operator()(const mxArray *m) const;
+    };
+
+    template<class ElemT>
+    struct GetFunctor<Hypercube,ElemT>
+    {
+        Hypercube<ElemT> operator()(const mxArray *m) const;
+    };
 };
 
 template<class ElemT>
@@ -542,6 +562,45 @@ Hypercube<ElemT> MexIFace::toHypercube(const mxArray *m)
     }
 }
 
+template<class ElemT, typename> 
+ElemT MexIFace::checkedToScalar(const mxArray *m)
+{
+    checkType<ElemT>(m);
+    checkScalarSize(m);
+    return toScalar<ElemT>(m);    
+}
+
+template<class ElemT, typename> 
+MexIFace::Vec<ElemT> MexIFace::checkedToVec(const mxArray *m)
+{
+    checkType<ElemT>(m);
+    checkVectorSize(m);
+    return toVec<ElemT>(m);
+}
+
+template<class ElemT, typename> 
+MexIFace::Mat<ElemT> MexIFace::checkedToMat(const mxArray *m)
+{
+    checkType<ElemT>(m);
+    checkNdim(m,2);
+    return toMat<ElemT>(m);
+}
+
+template<class ElemT, typename> 
+MexIFace::Cube<ElemT> MexIFace::checkedToCube(const mxArray *m)
+{
+    checkType<ElemT>(m);
+    checkMaxNdim(m,3);
+    return toCube<ElemT>(m);
+}
+
+template<class ElemT, typename> 
+MexIFace::Hypercube<ElemT> MexIFace::checkedToHypercube(const mxArray *m)
+{
+    checkType<ElemT>(m);
+    checkMaxNdim(m,4);
+    return toHypercube<ElemT>(m);
+}
 
 template<class SrcIntT,class DestIntT, typename, typename>
 DestIntT MexIFace::checkedIntegerToIntegerConversion(const mxArray *m)
@@ -879,9 +938,7 @@ template<class ElemT, typename>
 ElemT MexIFace::getScalar(const mxArray *m)
 {
     if(m == nullptr) m = rhs[rhs_idx++];
-    checkType<ElemT>(m);
-    checkScalarSize(m);
-    return toScalar<ElemT>(m);    
+    return checkedToScalar<ElemT>(m);
 }
 
 /** @brief Create a armadillo Column vector to directly use the Matlab data for a 1D array of
@@ -894,9 +951,7 @@ template<class ElemT, typename>
 MexIFace::Vec<ElemT> MexIFace::getVec(const mxArray *m)
 {
     if(m == nullptr) m = rhs[rhs_idx++];
-    checkType<ElemT>(m);
-    checkVectorSize(m);
-    return toVec<ElemT>(m);
+    return checkedToVec<ElemT>(m);
 }
 
 
@@ -910,9 +965,7 @@ template<class ElemT, typename>
 MexIFace::Mat<ElemT> MexIFace::getMat(const mxArray *m)
 {
     if(m == nullptr) m = rhs[rhs_idx++];
-    checkType<ElemT>(m);
-    checkNdim(m,2);
-    return toMat<ElemT>(m);
+    return checkedToMat<ElemT>(m);
 }
 
 /** @brief Create an armadillo Cube object to directly work with the Matlab data for a 3D array of
@@ -925,9 +978,7 @@ template<class ElemT, typename>
 MexIFace::Cube<ElemT> MexIFace::getCube(const mxArray *m)
 {
     if(m == nullptr) m = rhs[rhs_idx++];
-    checkType<ElemT>(m);
-    checkMaxNdim(m,3);
-    return toCube<ElemT>(m);
+    return checkedToCube<ElemT>(m);
 }
 
 
@@ -945,10 +996,39 @@ template<class ElemT, typename>
 Hypercube<ElemT> MexIFace::getHypercube(const mxArray *m)
 {
     if(m == nullptr) m = rhs[rhs_idx++];
-    checkType<ElemT>(m);
-    checkMaxNdim(m,4);
-    return toHypercube<ElemT>(m);
+    return checkedToHypercube<ElemT>(m);
 }
+
+template<template<typename> class Array, class ElemT>
+Array<ElemT> MexIFace::get(const mxArray *m)
+{
+    return GetFunctor<Array,ElemT>(*this,m);
+}
+
+template<class ElemT>
+MexIFace::Vec<ElemT> MexIFace::GetFunctor<MexIFace::Vec,ElemT>::operator()(const mxArray *m) const
+{
+    return MexIFace::getVec<ElemT>(m);
+}
+
+template<class ElemT>
+MexIFace::Mat<ElemT> MexIFace::GetFunctor<MexIFace::Mat,ElemT>::operator()(const mxArray *m) const
+{
+    return MexIFace::getMat<ElemT>(m);
+}
+
+template<class ElemT>
+MexIFace::Cube<ElemT> MexIFace::GetFunctor<MexIFace::Cube,ElemT>::operator()(const mxArray *m) const
+{
+    return MexIFace::getCube<ElemT>(m);
+}
+
+template<class ElemT>
+MexIFace::Hypercube<ElemT> MexIFace::GetFunctor<MexIFace::Hypercube,ElemT>::operator()(const mxArray *m) const
+{
+    return MexIFace::getHypercube<ElemT>(m);    
+}
+
 
 template<template<typename> class Array, class ElemT, typename> 
 Array<ElemT> MexIFace::getScalarArray(const mxArray *m)
@@ -1148,4 +1228,4 @@ void MexIFace::popRhs()
 } /* namespace mexiface */
 
 
-#endif /* _MEXIFACE_H */
+#endif /* _MEXIFACE_MEXIFACE_H */

@@ -5,8 +5,8 @@
  */
 
 
-#ifndef _EXPLORE_H
-#define _EXPLORE_H
+#ifndef _MEXIFACE_EXPLORE_H
+#define _MEXIFACE_EXPLORE_H
 
 #include "mex.h"
 namespace mexiface{
@@ -33,4 +33,4 @@ namespace mexiface{
     } /* namespace mexiface::explore */
 } /* namespace mexiface */
 
-#endif /* _EXPLORE_H */
+#endif /* _MEXIFACE_EXPLORE_H */
