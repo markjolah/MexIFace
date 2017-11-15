@@ -22,6 +22,11 @@ set(MexIFace_CMAKE_EXECUTABLE_DIR ${MexIFace_CMAKE_DIR}/Executables)
 set(MexIFace_CMAKE_TEMPLATES_DIR ${MexIFace_CMAKE_DIR}/Templates)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${MexIFace_CMAKE_MODULES_DIR} ${MexIFace_CMAKE_FUNCTIONS_DIR})
 
+include(AddExternalDependency)
+#BacktraceException allows for exceptions that encode a backtrace for debugging
+set(BacktraceExceptionURL https://github.com/markjolah/BacktraceException.git)
+AddExternalDependency(BacktraceException ${BacktraceExceptionURL} SHARED)
+
 include(MexIFace) #Configure necessary libraries
 include(MexIFace-Doxygen) #Add Doxygen documentation targets
 include(MexIFace-PackageConfig) #Configure Package-Config and associated files for cmake exports

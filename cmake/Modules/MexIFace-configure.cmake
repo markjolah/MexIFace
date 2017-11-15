@@ -7,11 +7,8 @@
 ## Find and Configure Required Libraries ##
 message(STATUS "[MexIFace]: Configure Libraries")
 
-#External dependencies
-include(AddExternalDependency)
 #BacktraceException allows for exceptions that encode a backtrace for debugging
-set(BacktraceExceptionURL https://github.com/markjolah/BacktraceException.git)
-AddExternalDependency(BacktraceException ${BacktraceExceptionURL} SHARED)
+find_package(BacktraceException CONFIG)
 
 # Armadillo
 find_package(Armadillo REQUIRED)
@@ -101,6 +98,7 @@ endif()
 add_compile_options(-W -Wall -Wextra -Werror -Wno-unused-parameter)
 if(${CMAKE_BUILD_TYPE} MATCHES Debug)
     add_definitions(-DDEBUG)
+    add_compile_options(-fmax-errors=5) #Limit number of reported errors
 elseif()
     add_definitions(-DNDEBUG)
 endif()

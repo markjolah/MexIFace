@@ -13,11 +13,13 @@
 
 #Make warnings from MXE cmake wrapper go away
 if(CMAKE_CROSSCOMPILING)
-    set(CMAKE_POLICY_DEFAULT_CMP0017 NEW)
-    set(CMAKE_POLICY_DEFAULT_CMP0020 NEW)
+    cmake_policy(SET CMP0017 NEW)
+    cmake_policy(SET CMP0020 NEW)
 endif()
 
+
 cmake_policy(SET CMP0054 NEW) #Don't derrefernce in if() statements
+cmake_policy(SET CMP0022 NEW) #LINK_INTERFACE_LIBRARIES fix
 
 #Fixup library search paths
 if(UNIX)

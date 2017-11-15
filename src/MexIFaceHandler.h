@@ -30,16 +30,16 @@ protected:
      * This pure virtual function is implemented in the MexIFaceHandler class template.
      * @param mxhandle scalar array where the handle is stored
      */
-    void objDestroy(const mxArray *mxhandle) override;
+    void objDestroy(const mxArray *mxhandle) override final;
 
     /** @brief Helper method which saves a pointer to the wrapped class's object in an internal member variable called obj.
      *
      * This pure virtual function is implemented in the MexIFaceHandler class template.
      * @param mxhandle scalar array where the handle is stored
      */
-    void getObjectFromHandle(const mxArray *mxhandle) override;
+    void getObjectFromHandle(const mxArray *mxhandle) override final;
     
-    std::string obj_name() const override;
+    std::string obj_name() const override final;
     
     /** @brief Should be called from all and only from objConstructor() implementations.
      *

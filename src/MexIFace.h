@@ -186,15 +186,6 @@ protected:
     const mxArray **rhs; /**< The rhs (input) arguments given */
     IdxT rhs_idx=0; /**< The index of the next rhs argument to read as input */
 
-    /* Methods to be overloaded by subclass */
-
-    
-    virtual void objConstruct() =0;
-    virtual void objDestroy(const mxArray *mxhandle)=0;
-
-    virtual void getObjectFromHandle(const mxArray *mxhandle) =0;
-
-    
     /* methods to check the number and shape of arguments */
     void checkNumArgs(MXArgCountT expected_nlhs, MXArgCountT expected_nrhs) const;
     void checkMinNumArgs(MXArgCountT min_nlhs, MXArgCountT min_nrhs) const;
@@ -235,7 +226,7 @@ protected:
     Hypercube<ElemT> getHypercube(const mxArray *mxdata=nullptr);
     
     template<template<typename> class Array, class ElemT>
-    Array<ElemT> get(const mxArray *m);
+    Array<ElemT> get(const mxArray *m=nullptr);
 
         
     template<template<typename> class Array = std::vector, class ElemT=double, typename=IsArithmeticT<ElemT>> 
@@ -274,7 +265,7 @@ protected:
 
     /* ouptput methods make a new matlab object copying in data from arguments
      */
-    void output(mxArray *m) override;
+    void output(mxArray *m) override final;
     template<class ConvertableT>
     void output(ConvertableT&& val);
     
@@ -296,25 +287,25 @@ private:
     template<class ElemT>
     struct GetFunctor<Vec,ElemT>
     {
-        Vec<ElemT> operator()(const mxArray *m) const;
+        Vec<ElemT> operator()(MexIFace *obj, const mxArray *m) const;
     };
     
     template<class ElemT>
     struct GetFunctor<Mat,ElemT>
     {
-        Mat<ElemT> operator()(const mxArray *m) const;
+        Mat<ElemT> operator()(MexIFace *obj, const mxArray *m) const;
     };
 
     template<class ElemT>
     struct GetFunctor<arma::Cube,ElemT>
     {
-        arma::Cube<ElemT> operator()(const mxArray *m) const;
+        arma::Cube<ElemT> operator()(MexIFace *obj, const mxArray *m) const;
     };
 
     template<class ElemT>
     struct GetFunctor<Hypercube,ElemT>
     {
-        Hypercube<ElemT> operator()(const mxArray *m) const;
+        Hypercube<ElemT> operator()(MexIFace *obj, const mxArray *m) const;
     };
 };
 
@@ -1006,27 +997,27 @@ Array<ElemT> MexIFace::get(const mxArray *m)
 }
 
 template<class ElemT>
-MexIFace::Vec<ElemT> MexIFace::GetFunctor<MexIFace::Vec,ElemT>::operator()(const mxArray *m) const
+MexIFace::Vec<ElemT> MexIFace::GetFunctor<MexIFace::Vec,ElemT>::operator()(MexIFace *obj, const mxArray *m) const
 {
-    return MexIFace::getVec<ElemT>(m);
+    return obj->getVec<ElemT>(m);
 }
 
 template<class ElemT>
-MexIFace::Mat<ElemT> MexIFace::GetFunctor<MexIFace::Mat,ElemT>::operator()(const mxArray *m) const
+MexIFace::Mat<ElemT> MexIFace::GetFunctor<MexIFace::Mat,ElemT>::operator()(MexIFace *obj, const mxArray *m) const
 {
-    return MexIFace::getMat<ElemT>(m);
+    return obj->getMat<ElemT>(m);
 }
 
 template<class ElemT>
-MexIFace::Cube<ElemT> MexIFace::GetFunctor<MexIFace::Cube,ElemT>::operator()(const mxArray *m) const
+MexIFace::Cube<ElemT> MexIFace::GetFunctor<MexIFace::Cube,ElemT>::operator()(MexIFace *obj, const mxArray *m) const
 {
-    return MexIFace::getCube<ElemT>(m);
+    return obj->getCube<ElemT>(m);
 }
 
 template<class ElemT>
-MexIFace::Hypercube<ElemT> MexIFace::GetFunctor<MexIFace::Hypercube,ElemT>::operator()(const mxArray *m) const
+MexIFace::Hypercube<ElemT> MexIFace::GetFunctor<MexIFace::Hypercube,ElemT>::operator()(MexIFace *obj, const mxArray *m) const
 {
-    return MexIFace::getHypercube<ElemT>(m);    
+    return obj->getHypercube<ElemT>(m);    
 }
 
 

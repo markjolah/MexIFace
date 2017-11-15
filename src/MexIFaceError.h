@@ -9,7 +9,7 @@
 #ifndef _MEXIFACE_MEXIFACEERROR_H
 #define _MEXIFACE_MEXIFACEERROR_H
 
-#include <BacktraceException.h>
+#include <BacktraceException/BacktraceException.h>
 
 namespace mexiface {
 
