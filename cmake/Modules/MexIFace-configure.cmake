@@ -27,10 +27,18 @@ endif()
 
 # OpenMP
 find_package(OpenMP REQUIRED)
-add_compile_options(${OpenMP_CXX_FLAGS})
-# if(WIN32)
-#     find_library(OPENMP_LIBRARY libgomp-1.dll REQUIRED)
-# endif()
+# LAPACK & BLAS
+find_package(LAPACK REQUIRED)
+find_package(BLAS REQUIRED)
+
+#Boost configure
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_LIBS OFF)
+if(WIN32)
+    find_library(Boost_THREAD_LIBRARY_RELEASE libboost_thread_win32-mt.dll )
+endif()
+find_package(Boost REQUIRED COMPONENTS system chrono thread iostreams)
+add_definitions( -DBOOST_THREAD_USE_LIB )
 
 # Pthreads
 if (WIN32)
@@ -39,9 +47,7 @@ elseif(UNIX)
     find_library(PTHREAD_LIBRARY libpthread.so REQUIRED)
 endif()
 message(STATUS "Found Pthread Libarary: ${PTHREAD_LIBRARY}")
-# LAPACK & BLAS
-find_package(LAPACK REQUIRED)
-find_package(BLAS REQUIRED)
+
 # Matlab
 # User must set environment/cmake variable: MATLAB_ROOT
 if(WIN32)

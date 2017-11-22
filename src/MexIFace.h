@@ -225,8 +225,8 @@ protected:
     template<class ElemT=double, typename=IsArithmeticT<ElemT>> 
     Hypercube<ElemT> getHypercube(const mxArray *mxdata=nullptr);
     
-    template<template<typename> class Array, class ElemT>
-    Array<ElemT> get(const mxArray *m=nullptr);
+    template<template<typename> class NumericArrayT, class ElemT=double>
+    NumericArrayT<ElemT> getNumeric(const mxArray *m=nullptr);
 
         
     template<template<typename> class Array = std::vector, class ElemT=double, typename=IsArithmeticT<ElemT>> 
@@ -282,28 +282,28 @@ private:
     static std::string remove_alphanumeric(std::string name);
     
     template<template<typename> class Array, class ElemT>
-    struct GetFunctor;
+    struct GetNumericFunctor;
 
     template<class ElemT>
-    struct GetFunctor<Vec,ElemT>
+    struct GetNumericFunctor<Vec,ElemT>
     {
         Vec<ElemT> operator()(MexIFace *obj, const mxArray *m) const;
     };
     
     template<class ElemT>
-    struct GetFunctor<Mat,ElemT>
+    struct GetNumericFunctor<Mat,ElemT>
     {
         Mat<ElemT> operator()(MexIFace *obj, const mxArray *m) const;
     };
 
     template<class ElemT>
-    struct GetFunctor<arma::Cube,ElemT>
+    struct GetNumericFunctor<Cube,ElemT>
     {
-        arma::Cube<ElemT> operator()(MexIFace *obj, const mxArray *m) const;
+        Cube<ElemT> operator()(MexIFace *obj, const mxArray *m) const;
     };
 
     template<class ElemT>
-    struct GetFunctor<Hypercube,ElemT>
+    struct GetNumericFunctor<Hypercube,ElemT>
     {
         Hypercube<ElemT> operator()(MexIFace *obj, const mxArray *m) const;
     };
@@ -605,16 +605,16 @@ DestIntT MexIFace::checkedIntegerToIntegerConversion(const mxArray *m)
         auto val = *static_cast<SrcIntT*>(mxGetData(m));
         if (dest_max < val || dest_min > val) {
             std::ostringstream msg;
-            msg<<"Conversion from:"<<get_mx_class_name(m)<<"("<<val<<") to:"<<get_mx_class_name(get_mx_class<DestIntT>)<<" Forbidden. Will cause loss of data.";
-            throw MexIFaceError("BadTypeConversion",msg);
+            msg<<"Conversion from:"<<get_mx_class_name(m)<<"("<<val<<") to:"<<get_mx_class_name(get_mx_class<DestIntT>())<<" Forbidden. Will cause loss of data.";
+            throw MexIFaceError("BadTypeConversion",msg.str());
         }
         return val;
     } else if (dest_min > src_min) {
         auto val = *static_cast<SrcIntT*>(mxGetData(m));
         if (dest_min > val) {
             std::ostringstream msg;
-            msg<<"Conversion from:"<<get_mx_class_name(m)<<"("<<val<<") to:"<<get_mx_class_name(get_mx_class<DestIntT>)<<" Forbidden. Will cause loss of data.";
-            throw MexIFaceError("BadTypeConversion",msg);
+            msg<<"Conversion from:"<<get_mx_class_name(m)<<"("<<val<<") to:"<<get_mx_class_name(get_mx_class<DestIntT>())<<" Forbidden. Will cause loss of data.";
+            throw MexIFaceError("BadTypeConversion",msg.str());
         }        
         return val;
     }
@@ -630,8 +630,8 @@ DestIntT MexIFace::checkedFloatToIntegerConversion(const mxArray *m)
     auto val = *static_cast<SrcFloatT*>(mxGetData(m));
     if (dest_max < val || dest_min > val || !std::isfinite(val)) {
         std::ostringstream msg;
-        msg<<"Conversion from:"<<get_mx_class_name(m)<<"("<<val<<") to:"<<get_mx_class_name(get_mx_class<DestIntT>)<<" Forbidden. Will cause loss of data.";
-        throw MexIFaceError("BadTypeConversion",msg);
+        msg<<"Conversion from:"<<get_mx_class_name(m)<<"("<<val<<") to:"<<get_mx_class_name(get_mx_class<DestIntT>())<<" Forbidden. Will cause loss of data.";
+        throw MexIFaceError("BadTypeConversion",msg.str());
     }
     return val;    
 }
@@ -644,8 +644,8 @@ DestFloatT MexIFace::checkedIntegerToFloatConversion(const mxArray *m)
     auto val = *static_cast<SrcIntT*>(mxGetData(m));
     if (dest_max_int < val || dest_min_int > val) {
         std::ostringstream msg;
-        msg<<"Conversion from:"<<get_mx_class_name(m)<<"("<<val<<") to:"<<get_mx_class_name(get_mx_class<DestFloatT>)<<" Forbidden. Will cause loss of data.";
-        throw MexIFaceError("BadTypeConversion",msg);
+        msg<<"Conversion from:"<<get_mx_class_name(m)<<"("<<val<<") to:"<<get_mx_class_name(get_mx_class<DestFloatT>())<<" Forbidden. Will cause loss of data.";
+        throw MexIFaceError("BadTypeConversion",msg.str());
     }
     return val;    
 }
@@ -661,7 +661,7 @@ DestFloatT MexIFace::checkedFloatToFloatConversion(const mxArray *m)
     if (dest_max < val || (dest_min!=0 && dest_min > std::fabs(val))) {
         std::ostringstream msg;
         msg<<"Conversion from:"<<get_mx_class_name(m)<<"("<<val<<") to:"<<get_mx_class_name(get_mx_class<DestFloatT>())<<" Forbidden. Will cause loss of data.";
-        throw MexIFaceError("BadTypeConversion",msg);
+        throw MexIFaceError("BadTypeConversion",msg.str());
     }
     return val;    
 }
@@ -990,34 +990,35 @@ Hypercube<ElemT> MexIFace::getHypercube(const mxArray *m)
     return checkedToHypercube<ElemT>(m);
 }
 
-template<template<typename> class Array, class ElemT>
-Array<ElemT> MexIFace::get(const mxArray *m)
+template<template<typename> class NumericArrayT, class ElemT>
+NumericArrayT<ElemT> MexIFace::getNumeric(const mxArray *m)
 {
-    return GetFunctor<Array,ElemT>(*this,m);
+    auto func=GetNumericFunctor<NumericArrayT,ElemT>();
+    return func(this,m);
 }
 
 template<class ElemT>
-MexIFace::Vec<ElemT> MexIFace::GetFunctor<MexIFace::Vec,ElemT>::operator()(MexIFace *obj, const mxArray *m) const
+MexIFace::Vec<ElemT> MexIFace::GetNumericFunctor<MexIFace::template Vec,ElemT>::operator()(MexIFace *obj, const mxArray *m) const
 {
-    return obj->getVec<ElemT>(m);
+    return obj->template getVec<ElemT>(m);
 }
 
 template<class ElemT>
-MexIFace::Mat<ElemT> MexIFace::GetFunctor<MexIFace::Mat,ElemT>::operator()(MexIFace *obj, const mxArray *m) const
+MexIFace::Mat<ElemT> MexIFace::GetNumericFunctor<MexIFace::template Mat,ElemT>::operator()(MexIFace *obj, const mxArray *m) const
 {
-    return obj->getMat<ElemT>(m);
+    return obj->template getMat<ElemT>(m);
 }
 
 template<class ElemT>
-MexIFace::Cube<ElemT> MexIFace::GetFunctor<MexIFace::Cube,ElemT>::operator()(MexIFace *obj, const mxArray *m) const
+MexIFace::Cube<ElemT> MexIFace::GetNumericFunctor<MexIFace::template Cube,ElemT>::operator()(MexIFace *obj, const mxArray *m) const
 {
-    return obj->getCube<ElemT>(m);
+    return obj->template getCube<ElemT>(m);
 }
 
 template<class ElemT>
-MexIFace::Hypercube<ElemT> MexIFace::GetFunctor<MexIFace::Hypercube,ElemT>::operator()(MexIFace *obj, const mxArray *m) const
+MexIFace::Hypercube<ElemT> MexIFace::GetNumericFunctor<MexIFace::template Hypercube,ElemT>::operator()(MexIFace *obj, const mxArray *m) const
 {
-    return obj->getHypercube<ElemT>(m);    
+    return obj->template getHypercube<ElemT>(m);    
 }
 
 
@@ -1188,7 +1189,7 @@ void MexIFace::output(mxArray *m)
 { lhs[lhs_idx++] = m; }
 
 template<class ConvertableT>
-void output(ConvertableT&& val)
+void MexIFace::output(ConvertableT&& val)
 {
     output(toMXArray(std::forward<ConvertableT>(val)));
 }

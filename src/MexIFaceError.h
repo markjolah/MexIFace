@@ -18,6 +18,7 @@ class MexIFaceError : public backtrace_exception::BacktraceException
 {
 public:
     MexIFaceError(std::string condition, std::string what) : BacktraceException(condition, what) {}
+    MexIFaceError(std::string component, std::string condition, std::string what) : BacktraceException(component+":"+condition, what) {}
 };
 
 
