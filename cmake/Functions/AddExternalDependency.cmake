@@ -1,6 +1,6 @@
 #
 # File: AddExternalDependency.cmake
-# Mark J. Olah (mjo AT cs.unm.edu)
+# Mark J. Olah (mjo AT cs.unm DOT edu)
 # copyright: Licensed under the Apache License, Version 2.0.  See LICENSE file.
 # date: 2017
 #
