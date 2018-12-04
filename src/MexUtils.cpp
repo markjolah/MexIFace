@@ -10,10 +10,6 @@
 
 namespace mexiface {
 
-
-    
-    
-
 const char* get_mx_class_name(mxClassID id)
 {
     switch (id)  {

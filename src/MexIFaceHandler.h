@@ -8,7 +8,6 @@
 #ifndef _MEXIFACE_MEXIFACEHANDLER_H
 #define _MEXIFACE_MEXIFACEHANDLER_H
 
-#include <boost/type_index.hpp>
 #include "Handle.h"
 #include "MexIFaceBase.h"
 
@@ -55,7 +54,7 @@ private:
 
 template<class ObjT>
 MexIFaceHandler<ObjT>::MexIFaceHandler() : 
-    _obj_name(boost::typeindex::type_id<ObjT>().pretty_name())
+    _obj_name(std::type_index(typeid(ObjT)).name())
 { }
 
 template<class ObjT>

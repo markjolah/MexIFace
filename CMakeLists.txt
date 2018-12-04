@@ -27,6 +27,29 @@ include(AddExternalDependency)
 set(BacktraceExceptionURL https://github.com/markjolah/BacktraceException.git)
 AddExternalDependency(BacktraceException ${BacktraceExceptionURL} SHARED)
 
+# Armadillo
+find_package(Armadillo REQUIRED)
+add_definitions(-DARMA_USE_CXX11 -DARMA_DONT_USE_WRAPPER -DARMA_BLAS_LONG)
+add_definitions(-DARMA_DONT_USE_OPENMP)
+add_definitions(-DARMA_DONT_USE_HDF5)
+if(${CMAKE_BUILD_TYPE} MATCHES Debug)
+    add_definitions(-DARMA_PRINT_ERRORS)
+else()
+    add_definitions(-DARMA_NO_DEBUG)
+endif()
+# Optionally enable extra debugging from armadillo to log every call.
+if( (${CMAKE_BUILD_TYPE} MATCHES Debug) AND MexIFace_EXTRA_DEBUG)
+    add_definitions(-DARMA_EXTRA_DEBUG)
+endif()
+
+#Debugging configuration
+add_compile_options($<$<AND:$<CONFIG:Debug>,$<CXX_COMPILER_ID:GNU>>:-O0>) #No optimization for debugging
+add_compile_options($<$<CONFIG:Debug>:-W -Wall -Wextra>) #Add warnings in debug configurations
+set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS $<$<CONFIG:Debug>:DEBUG>) 
+set(CMAKE_DEBUG_POSTFIX ".debug" CACHE STRING "Debug file extension")
+#Limit # of errors reported by gcc
+set_property(DIRECTORY APPEND PROPERTY COMPILE_OPTIONS $<$<AND:$<CONFIG:Debug>,$<CXX_COMPILER_ID:GNU>>:-fmax-errors=5>)
+
 include(MexIFace) #Configure necessary libraries
 include(MexIFace-Doxygen) #Add Doxygen documentation targets
 include(MexIFace-PackageConfig) #Configure Package-Config and associated files for cmake exports

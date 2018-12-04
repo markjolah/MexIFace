@@ -9,7 +9,7 @@
 #define _MEXIFACE_HANDLE_H
 #include <cstdint>
 #include <string>
-#include <boost/type_index.hpp>
+#include <typeindex>
 
 #include "mex.h"
 
@@ -64,7 +64,7 @@ private:
 template<class T>
 Handle<T>::Handle(T *obj)
     : signature(class_handle_signature),
-      name(boost::typeindex::type_id<T>().pretty_name()),
+      name(std::type_index(typeid(T)).name()),
       obj(obj)
 {
 }
@@ -87,7 +87,7 @@ template<class T>
 bool Handle<T>::is_valid() const
 {
     bool sig_ok = (signature == class_handle_signature);
-    bool name_ok = (name == boost::typeindex::type_id<T>().pretty_name());
+    bool name_ok = (name == std::type_index(typeid(T)).name());
     return sig_ok && name_ok;
 }
 

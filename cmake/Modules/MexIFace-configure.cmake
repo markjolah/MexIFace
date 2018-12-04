@@ -10,43 +10,29 @@ message(STATUS "[MexIFace]: Configure Libraries")
 #BacktraceException allows for exceptions that encode a backtrace for debugging
 find_package(BacktraceException CONFIG)
 
-# Armadillo
-find_package(Armadillo REQUIRED)
-add_definitions(-DARMA_USE_CXX11 -DARMA_DONT_USE_WRAPPER -DARMA_BLAS_LONG)
-add_definitions(-DARMA_DONT_USE_OPENMP)
-add_definitions(-DARMA_DONT_USE_HDF5)
-if(${CMAKE_BUILD_TYPE} MATCHES Debug)
-    add_definitions(-DARMA_PRINT_ERRORS)
-else()
-    add_definitions(-DARMA_NO_DEBUG)
-endif()
-# Optionally enable extra debugging from armadillo to log every call.
-if( (${CMAKE_BUILD_TYPE} MATCHES Debug) AND MexIFace_EXTRA_DEBUG)
-    add_definitions(-DARMA_EXTRA_DEBUG)
-endif()
 
-# OpenMP
-find_package(OpenMP REQUIRED)
-# LAPACK & BLAS
-find_package(LAPACK REQUIRED)
-find_package(BLAS REQUIRED)
+# # OpenMP
+# find_package(OpenMP REQUIRED)
+# # LAPACK & BLAS
+# find_package(LAPACK REQUIRED)
+# find_package(BLAS REQUIRED)
 
 #Boost configure
-set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_LIBS OFF)
-if(WIN32)
-    find_library(Boost_THREAD_LIBRARY_RELEASE libboost_thread_win32-mt.dll )
-endif()
-find_package(Boost REQUIRED COMPONENTS system chrono thread iostreams)
-add_definitions( -DBOOST_THREAD_USE_LIB )
+# set(Boost_USE_MULTITHREADED ON)
+# set(Boost_USE_STATIC_LIBS OFF)
+# if(WIN32)
+#     find_library(Boost_THREAD_LIBRARY_RELEASE libboost_thread_win32-mt.dll )
+# endif()
+# find_package(Boost REQUIRED COMPONENTS system chrono thread iostreams)
+# add_definitions( -DBOOST_THREAD_USE_LIB )
 
 # Pthreads
-if (WIN32)
-    find_library(PTHREAD_LIBRARY libwinpthread.dll REQUIRED)
-elseif(UNIX)
-    find_library(PTHREAD_LIBRARY libpthread.so REQUIRED)
-endif()
-message(STATUS "Found Pthread Libarary: ${PTHREAD_LIBRARY}")
+# if (WIN32)
+#     find_library(PTHREAD_LIBRARY libwinpthread.dll REQUIRED)
+# elseif(UNIX)
+#     find_library(PTHREAD_LIBRARY libpthread.so REQUIRED)
+# endif()
+message(STATUS "Found Pthread Libarary!!!: ${PTHREAD_LIBRARY}")
 
 # Matlab
 # User must set environment/cmake variable: MATLAB_ROOT
@@ -62,8 +48,9 @@ elseif(APPLE)
 endif()
 message(STATUS "[MexIFace] MATLAB arch: ${MATLAB_ARCH}")
 message(STATUS "[MexIFace] MATLAB MEX ext: ${MEX_EXT}")
+
 #Find MATLAB_ROOT environment variable
-#If cross_compiling we'll look for MATLAB_ROOT_W64 or MATLAB_ROOT_MACI64
+#  If cross_compiling we'll look for MATLAB_ROOT_W64 or MATLAB_ROOT_MACI64
 if(NOT MATLAB_ROOT)
     string(TOUPPER ${MATLAB_ARCH} MATLAB_ARCH_UP)
     set(MATLAB_ROOT $ENV{MATLAB_ROOT_${MATLAB_ARCH_UP}})
@@ -87,31 +74,30 @@ find_library(MATLAB_MX_LIBRARY mx PATHS ${MATLAB_LIB_DIR} NO_CMAKE_FIND_ROOT_PAT
 find_library(MATLAB_ENG_LIBRARY eng PATHS ${MATLAB_LIB_DIR} NO_CMAKE_FIND_ROOT_PATH)
 find_library(MATLAB_MAT_LIBRARY mat PATHS ${MATLAB_LIB_DIR} NO_CMAKE_FIND_ROOT_PATH)
 set(MATLAB_LIBRARIES ${MATLAB_MWLAPACK_LIBRARY} ${MATLAB_MWBLAS_LIBRARY} ${MATLAB_MEX_LIBRARY} ${MATLAB_MX_LIBRARY} ${MATLAB_ENG_LIBRARY} ${MATLAB_MAT_LIBRARY})
-#set(MATLAB_LIBRARIES ${MATLAB_MEX_LIBRARY} ${MATLAB_MX_LIBRARY} ${MATLAB_ENG_LIBRARY} ${MATLAB_MAT_LIBRARY})
 set(MATLAB_INCLUDE ${MATLAB_ROOT}/extern/include ) #Matlab include dir
 if(UNIX)
     set(MATLAB_LINK_MAPFILE ${MATLAB_ROOT}/extern/lib/${MATLAB_ARCH}/mexFunction.map)
 endif()
 
 # Compiler Definitions
-if (WIN32)
-    add_definitions( -DWIN32 )
-elseif(UNIX AND NOT APPLE)
-    add_definitions( -DLINUX )
-endif()
+# if (WIN32)
+#     add_definitions( -DWIN32 )
+# elseif(UNIX AND NOT APPLE)
+#     add_definitions( -DLINUX )
+# endif()
 
-## CFLAGS ##
-add_compile_options(-W -Wall -Wextra -Werror -Wno-unused-parameter)
-if(${CMAKE_BUILD_TYPE} MATCHES Debug)
-    add_definitions(-DDEBUG)
-    add_compile_options(-fmax-errors=5) #Limit number of reported errors
-elseif()
-    add_definitions(-DNDEBUG)
-endif()
-set(CMAKE_DEBUG_POSTFIX ".debug" CACHE STRING "Debug file extension")
-set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O2")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-ggdb -O3")
+# ## CFLAGS ##
+# add_compile_options(-W -Wall -Wextra -Werror -Wno-unused-parameter)
+# if(${CMAKE_BUILD_TYPE} MATCHES Debug)
+#     add_definitions(-DDEBUG)
+#     add_compile_options(-fmax-errors=5) #Limit number of reported errors
+# elseif()
+#     add_definitions(-DNDEBUG)
+# endif()
+# set(CMAKE_DEBUG_POSTFIX ".debug" CACHE STRING "Debug file extension")
+# set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O2")
+# set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+# set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-ggdb -O3")
 
 ## MAC OS X Config ##
 set(CMAKE_MACOSX_RPATH 1) #Enable rpaths on OS X

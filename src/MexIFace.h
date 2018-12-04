@@ -12,11 +12,8 @@
 #include <map>
 #include <vector>
 #include <algorithm>
-
+#include <functional>
 #include <armadillo>
-
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
 
 #include "mex.h"
 
@@ -174,7 +171,7 @@ public:
     
     
 protected:
-    using MethodMap = std::map<std::string, boost::function<void()>>; /**< The type of mapping for mapping names to member functions to call */    
+    using MethodMap = std::map<std::string, std::function<void()>>; /**< The type of mapping for mapping names to member functions to call */    
     
     MethodMap methodmap; /**< A map from names to wrapped member functions to be called */
     MethodMap staticmethodmap; /**< A map from names to wrapped static member functions to be called */
@@ -790,7 +787,7 @@ ElemT MexIFace::getAsScalar(const mxArray *m)
     else if(std::is_floating_point<ElemT>::value) return getAsFloat<ElemT>(m);
     else {
         std::ostringstream msg;
-        msg<<"Expected numeric or bool C++ type | Got type:"<<boost::typeindex::type_id<ElemT>().pretty_name();
+        msg<<"Expected numeric or bool C++ type | Got type:"<<std::type_index(typeid(ElemT)).name();
         throw MexIFaceError("BadType",msg.str());
         return {};
     }
