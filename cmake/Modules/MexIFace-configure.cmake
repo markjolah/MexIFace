@@ -32,7 +32,7 @@ find_package(BacktraceException CONFIG)
 # elseif(UNIX)
 #     find_library(PTHREAD_LIBRARY libpthread.so REQUIRED)
 # endif()
-message(STATUS "Found Pthread Libarary!!!: ${PTHREAD_LIBRARY}")
+# message(STATUS "Found Pthread Libarary!!!: ${PTHREAD_LIBRARY}")
 
 # Matlab
 # User must set environment/cmake variable: MATLAB_ROOT

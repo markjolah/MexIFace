@@ -44,7 +44,10 @@ endif()
 
 #Debugging configuration
 add_compile_options($<$<AND:$<CONFIG:Debug>,$<CXX_COMPILER_ID:GNU>>:-O0>) #No optimization for debugging
-add_compile_options($<$<CONFIG:Debug>:-W -Wall -Wextra>) #Add warnings in debug configurations
+#Add warnings in debug configurations
+add_compile_options($<$<CONFIG:Debug>:-W>)
+add_compile_options($<$<CONFIG:Debug>:-Wall>)
+add_compile_options($<$<CONFIG:Debug>:-Wextra>)
 set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS $<$<CONFIG:Debug>:DEBUG>) 
 set(CMAKE_DEBUG_POSTFIX ".debug" CACHE STRING "Debug file extension")
 #Limit # of errors reported by gcc
