@@ -8,7 +8,8 @@ set(PUBLIC_HEADER_SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/../include)
 
 ## Iface Core Object library. ##
 set(MexIFace_LIB MexIFace)
-add_library( ${MexIFace_LIB} SHARED ${MexIFace_SRCS})
+add_library(${MexIFace_LIB} SHARED ${MexIFace_SRCS})
+add_library(${MexIFace_LIB}::${MexIFace_LIB} ALIAS ${MexIFace_LIB})
 message(STATUS "BacktraceException_LIBRARIES=${BacktraceException_LIBRARIES}")
 message(STATUS "BacktraceException_STATIC_LIBRARIES=${BacktraceException_STATIC_LIBRARIES}")
 message(STATUS "BacktraceException_SHARED_LIBRARIES=${BacktraceException_SHARED_LIBRARIES}")
