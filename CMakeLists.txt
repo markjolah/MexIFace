@@ -8,7 +8,7 @@
 # https://www.apache.org/licenses/LICENSE-2.0
 # See: LICENCE file
 
-cmake_minimum_required( VERSION 3.5 )
+cmake_minimum_required( VERSION 3.9 )
 
 project(MexIFace VERSION 0.1.0 LANGUAGES CXX)
 
@@ -22,10 +22,15 @@ set(MexIFace_CMAKE_EXECUTABLE_DIR ${MexIFace_CMAKE_DIR}/Executables)
 set(MexIFace_CMAKE_TEMPLATES_DIR ${MexIFace_CMAKE_DIR}/Templates)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${MexIFace_CMAKE_MODULES_DIR} ${MexIFace_CMAKE_FUNCTIONS_DIR})
 
+list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_CURRENT_LIST_DIR}/cmake/UncommonCmakeModules)
+
 include(AddExternalDependency)
 #BacktraceException allows for exceptions that encode a backtrace for debugging
 set(BacktraceExceptionURL https://github.com/markjolah/BacktraceException.git)
-AddExternalDependency(BacktraceException ${BacktraceExceptionURL} SHARED)
+add_external_dependency(NAME BacktraceException URL ${BacktraceExceptionURL} SHARED)
+
+#Debugging configuration
+include(ConfigureIPO)
 
 # Armadillo
 find_package(Armadillo REQUIRED)
@@ -43,19 +48,15 @@ if( (${CMAKE_BUILD_TYPE} MATCHES Debug) AND MexIFace_EXTRA_DEBUG)
 endif()
 
 #Debugging configuration
-add_compile_options($<$<AND:$<CONFIG:Debug>,$<CXX_COMPILER_ID:GNU>>:-O0>) #No optimization for debugging
-#Add warnings in debug configurations
-add_compile_options($<$<CONFIG:Debug>:-W>)
-add_compile_options($<$<CONFIG:Debug>:-Wall>)
-add_compile_options($<$<CONFIG:Debug>:-Wextra>)
-set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS $<$<CONFIG:Debug>:DEBUG>) 
-set(CMAKE_DEBUG_POSTFIX ".debug" CACHE STRING "Debug file extension")
-#Limit # of errors reported by gcc
-set_property(DIRECTORY APPEND PROPERTY COMPILE_OPTIONS $<$<AND:$<CONFIG:Debug>,$<CXX_COMPILER_ID:GNU>>:-fmax-errors=5>)
+include(ConfigureDebugBuilds)
 
 include(MexIFace) #Configure necessary libraries
 include(MexIFace-Doxygen) #Add Doxygen documentation targets
-include(MexIFace-PackageConfig) #Configure Package-Config and associated files for cmake exports
+
+include(ExportPackageWizzard)
+export_package_wizzard()
+
+set(SHARED_CMAKE_INSTALL_DIR share/${PROJECT_NAME}/cmake) #Where to install shared .cmake build scripts for downstream
 
 add_subdirectory(src)
 

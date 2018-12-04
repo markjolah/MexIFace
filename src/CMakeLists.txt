@@ -25,12 +25,11 @@ target_compile_features(${MexIFace_LIB} PUBLIC cxx_std_11) #Declare C++11 requir
 
 set_property(GLOBAL APPEND PROPERTY FIXUP_LIBRARY_TARGETS ${MexIFace_LIB})
 
-install(TARGETS ${MexIFace_LIB} EXPORT ${EXPORT_TARGETS_NAME}
+install(TARGETS ${MexIFace_LIB} EXPORT ${PROJECT_NAME}Targets
     RUNTIME DESTINATION lib COMPONENT Runtime
     ARCHIVE DESTINATION lib COMPONENT Development
     LIBRARY DESTINATION lib COMPONENT Runtime)
 
 install(DIRECTORY ${PUBLIC_HEADER_SRC_DIR}/ DESTINATION include COMPONENT Development)
 #Install Cmake modules and helper files for development
-install(DIRECTORY ${MexIFace_CMAKE_DIR}/
-        DESTINATION ${SHARED_CMAKE_INSTALL_DIR} COMPONENT Development)
+install(DIRECTORY ${MexIFace_CMAKE_DIR}/ DESTINATION ${SHARED_CMAKE_INSTALL_DIR} COMPONENT Development)
