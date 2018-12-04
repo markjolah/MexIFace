@@ -5,15 +5,15 @@
  * @brief Helper class and templated functions to represent and manipulate Handles to C++ objects as Matlab mxArrays
  */
 
-#ifndef _MEXIFACE_HANDLE_H
-#define _MEXIFACE_HANDLE_H
+#ifndef MEXIFACE_HANDLE_H
+#define MEXIFACE_HANDLE_H
 #include <cstdint>
 #include <string>
 #include <typeindex>
 
 #include "mex.h"
 
-#include "MexIFaceError.h"
+#include "MexIFace/MexIFaceError.h"
 
 namespace mexiface {
 
@@ -165,4 +165,4 @@ void Handle<T>::destroyObject(const mxArray *arr)
 
 } /* namespace mexiface */
 
-#endif // _MEXIFACE_HANDLE_H
+#endif // MEXIFACE_HANDLE_H

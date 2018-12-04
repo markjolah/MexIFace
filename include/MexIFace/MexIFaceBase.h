@@ -5,11 +5,12 @@
  * @brief class MexIFaceBase declaration.
  */
 
-#ifndef _MEXIFACE_MEXIFACEBASE_H
-#define _MEXIFACE_MEXIFACEBASE_H
+#ifndef MEXIFACE_MEXIFACEBASE_H
+#define MEXIFACE_MEXIFACEBASE_H
+
+#include <string>
 
 #include "mex.h"
-#include <string>
 
 namespace mexiface 
 {
@@ -59,4 +60,4 @@ protected:
     
 } /* namespace mexiface */
 
-#endif // _MEXIFACE_MEXIFACEBASE_H
+#endif // MEXIFACE_MEXIFACEBASE_H

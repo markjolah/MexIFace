@@ -6,8 +6,8 @@
  *
  */
 
-#ifndef _MEXIFACE_MEXIFACEERROR_H
-#define _MEXIFACE_MEXIFACEERROR_H
+#ifndef MEXIFACE_MEXIFACEERROR_H
+#define MEXIFACE_MEXIFACEERROR_H
 
 #include <BacktraceException/BacktraceException.h>
 
@@ -24,4 +24,4 @@ public:
 
 } /* namespace mexiface */
 
-#endif /* _MEXIFACE_MEXIFACEERROR_H */
+#endif /* MEXIFACE_MEXIFACEERROR_H */

@@ -6,10 +6,11 @@
  *
  */
 
-#ifndef _MEXIFACE_MEXUTILS_H
-#define _MEXIFACE_MEXUTILS_H
+#ifndef MEXIFACE_MEXUTILS_H
+#define MEXIFACE_MEXUTILS_H
 
 #include <cstdint>
+
 #include "mex.h"
 
 namespace mexiface {
@@ -67,4 +68,4 @@ const char* get_mx_class_name(const mxArray *array)
 
 } /* namespace mexiface */
 
-#endif /* _MEXIFACE_MEXUTILS_H */
+#endif /* MEXIFACE_MEXUTILS_H */

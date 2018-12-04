@@ -18,7 +18,7 @@
 
 #include <cstdio>
 #include <cstring>
-#include "explore.h"
+#include "MexIFace/explore.h"
 
 namespace mexiface{
 namespace explore{

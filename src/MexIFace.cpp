@@ -5,8 +5,8 @@
  * @brief The class definition for MexIFace.
  */
 
-#include "MexIFace.h"
-#include "explore.h"
+#include "MexIFace/MexIFace.h"
+#include "MexIFace/explore.h"
 
 
 namespace mexiface {

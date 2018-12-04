@@ -5,12 +5,12 @@
  * @brief The class declaration and inline and templated functions for hypercube.
  */
 
-#ifndef _MEXIFACE_HYPERCUBE_H
-#define _MEXIFACE_HYPERCUBE_H
+#ifndef MEXIFACE_HYPERCUBE_H
+#define MEXIFACE_HYPERCUBE_H
 #include <armadillo>
 #include <memory>
 #include <vector>
-#include "MexIFaceError.h"
+#include "MexIFace/MexIFaceError.h"
 
 namespace mexiface {
 
@@ -152,4 +152,4 @@ typedef Hypercube<float>  fhypercube;
 
 } /* namespace mexiface */
 
-#endif /* _MEXIFACE_HYPERCUBE_H */
+#endif /* MEXIFACE_HYPERCUBE_H */

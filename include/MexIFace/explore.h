@@ -5,10 +5,11 @@
  */
 
 
-#ifndef _MEXIFACE_EXPLORE_H
-#define _MEXIFACE_EXPLORE_H
+#ifndef MEXIFACE_EXPLORE_H
+#define MEXIFACE_EXPLORE_H
 
 #include "mex.h"
+
 namespace mexiface{
     namespace explore{
         void analyze_cell(const mxArray *cell_array_ptr);
@@ -33,4 +34,4 @@ namespace mexiface{
     } /* namespace mexiface::explore */
 } /* namespace mexiface */
 
-#endif /* _MEXIFACE_EXPLORE_H */
+#endif /* MEXIFACE_EXPLORE_H */

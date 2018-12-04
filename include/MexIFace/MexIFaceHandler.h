@@ -5,11 +5,11 @@
  * @brief class MexIFaceBase declaration.
  */
 
-#ifndef _MEXIFACE_MEXIFACEHANDLER_H
-#define _MEXIFACE_MEXIFACEHANDLER_H
+#ifndef MEXIFACE_MEXIFACEHANDLER_H
+#define MEXIFACE_MEXIFACEHANDLER_H
 
-#include "Handle.h"
-#include "MexIFaceBase.h"
+#include "MexIFace/Handle.h"
+#include "MexIFace/MexIFaceBase.h"
 
 namespace mexiface 
 {
@@ -85,4 +85,4 @@ void MexIFaceHandler<ObjT>::outputHandle(ObjT* obj)
     
 } /* namespace mexiface */
 
-#endif // _MEXIFACE_MEXIFACEHANDLER_H
+#endif // MEXIFACE_MEXIFACEHANDLER_H

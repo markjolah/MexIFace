@@ -5,8 +5,8 @@
  * @brief The class declaration and inline and templated functions for MexIFace.
  */
 
-#ifndef _MEXIFACE_MEXIFACE_H
-#define _MEXIFACE_MEXIFACE_H
+#ifndef MEXIFACE_MEXIFACE_H
+#define MEXIFACE_MEXIFACE_H
 
 #include <sstream>
 #include <map>
@@ -17,11 +17,11 @@
 
 #include "mex.h"
 
-#include "MexIFaceError.h"
-#include "hypercube.h"
-#include "MexUtils.h"
-#include "MexIFaceBase.h"
-#include "MexIFaceHandler.h"
+#include "MexIFace/MexIFaceError.h"
+#include "MexIFace/hypercube.h"
+#include "MexIFace/MexUtils.h"
+#include "MexIFace/MexIFaceBase.h"
+#include "MexIFace/MexIFaceHandler.h"
 
 namespace mexiface  {
 
@@ -1217,4 +1217,4 @@ void MexIFace::popRhs()
 } /* namespace mexiface */
 
 
-#endif /* _MEXIFACE_MEXIFACE_H */
+#endif /* MEXIFACE_MEXIFACE_H */

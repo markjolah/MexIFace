@@ -5,8 +5,8 @@
  * @brief Helper functions for working with Matlab mxArrays and mxClassIDs
  */
 
-#include "MexUtils.h"
-#include "explore.h"
+#include "MexIFace/MexUtils.h"
+#include "MexIFace/explore.h"
 
 namespace mexiface {
 
