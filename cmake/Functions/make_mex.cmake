@@ -22,7 +22,7 @@ function(make_mex mexfile)
     endif()
 
     add_library(${mexfile} SHARED ${mexfile}.cpp)
-    target_link_libraries(${mexfile} MexIFace) #This does most of the magic.
+    target_link_libraries(${mexfile} MexIFace::MexIFace) #This does most of the magic.
     target_link_libraries(${mexfile} ${MEX_LINK_FLAGS}) #Set link-time flags
     target_include_directories(${mexfile} PRIVATE ${MATLAB_INCLUDE}) #Matlab headers
     set_target_properties(${mexfile} PROPERTIES PREFIX "" DEBUG_POSTFIX "" SUFFIX .${MEX_EXT})
