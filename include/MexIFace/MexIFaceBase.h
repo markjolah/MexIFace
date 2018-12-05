@@ -16,6 +16,12 @@ namespace mexiface
 {
 /** @brief Base class defining the virtual functions that will be implemented by MexIFaceHandler and the concrete subclasses of MexIFace.
  * 
+ * The coordination of this base class together with the MexIFace and MexIFaceHandler<T> classes allows the end user to ignore most of the
+ * particulars of error-prone object  destruction and handle manipulation, but a objConstruct is still required to be overloaded in the
+ * users class.
+ * 
+ * User classes should inherit: public MexIFace, public MexIFaceHandler<T>
+ * 
  */
 class MexIFaceBase
 {
