@@ -10,14 +10,38 @@ message(STATUS "[MexIFace]: Configure Libraries")
 #BacktraceException allows for exceptions that encode a backtrace for debugging
 find_package(BacktraceException CONFIG)
 
+#Enable Inter-proceedural optimization
+include(ConfigureIPO)
 
-# # OpenMP
-# find_package(OpenMP REQUIRED)
-# # LAPACK & BLAS
-# find_package(LAPACK REQUIRED)
-# find_package(BLAS REQUIRED)
+# Armadillo
+find_package(Armadillo REQUIRED)
+add_definitions(-DARMA_USE_CXX11)
+add_definitions(-DARMA_DONT_USE_WRAPPER)
+add_definitions(-DARMA_BLAS_LONG)
+add_definitions(-DARMA_DONT_USE_OPENMP) #We want to control the use of openMP at a higher-grained level
+add_definitions(-DARMA_DONT_USE_HDF5)
+set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS $<$<CONFIG:Debug>:ARMA_PRINT_ERRORS>)
+set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS $<$<NOT:$<CONFIG:Debug>>:ARMA_NO_DEBUG>)
+if(OPT_EXTRA_DEBUG)
+    set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS $<$<CONFIG:Debug>:ARMA_EXTRA_DEBUG>)
+endif()
 
-#Boost configure
+# OpenMP
+find_package(OpenMP REQUIRED)
+
+# LAPACK & BLAS
+find_package(LAPACK REQUIRED)
+find_package(BLAS REQUIRED)
+
+# Pthreads
+if (WIN32)
+    find_library(PTHREAD_LIBRARY libwinpthread.dll REQUIRED)
+elseif(UNIX)
+    find_library(PTHREAD_LIBRARY libpthread.so REQUIRED)
+endif()
+message(STATUS "Found Pthread Libarary: ${PTHREAD_LIBRARY}")
+
+# #Boost configure
 # set(Boost_USE_MULTITHREADED ON)
 # set(Boost_USE_STATIC_LIBS OFF)
 # if(WIN32)
@@ -25,14 +49,6 @@ find_package(BacktraceException CONFIG)
 # endif()
 # find_package(Boost REQUIRED COMPONENTS system chrono thread iostreams)
 # add_definitions( -DBOOST_THREAD_USE_LIB )
-
-# Pthreads
-# if (WIN32)
-#     find_library(PTHREAD_LIBRARY libwinpthread.dll REQUIRED)
-# elseif(UNIX)
-#     find_library(PTHREAD_LIBRARY libpthread.so REQUIRED)
-# endif()
-# message(STATUS "Found Pthread Libarary!!!: ${PTHREAD_LIBRARY}")
 
 # Matlab
 # User must set environment/cmake variable: MATLAB_ROOT
@@ -87,6 +103,7 @@ endif()
 # endif()
 
 # ## CFLAGS ##
+
 # add_compile_options(-W -Wall -Wextra -Werror -Wno-unused-parameter)
 # if(${CMAKE_BUILD_TYPE} MATCHES Debug)
 #     add_definitions(-DDEBUG)
@@ -100,5 +117,5 @@ endif()
 # set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-ggdb -O3")
 
 ## MAC OS X Config ##
-set(CMAKE_MACOSX_RPATH 1) #Enable rpaths on OS X
+#set(CMAKE_MACOSX_RPATH 1) #Enable rpaths on OS X
 

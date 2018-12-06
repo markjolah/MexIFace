@@ -44,3 +44,5 @@ _kdev_build
 *.out
 *.app
 *.kate-swp
+
+*.nfs*

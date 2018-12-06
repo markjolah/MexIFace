@@ -12,14 +12,16 @@
 #
 
 #Make warnings from MXE cmake wrapper go away
-if(CMAKE_CROSSCOMPILING)
-    cmake_policy(SET CMP0017 NEW)
-    cmake_policy(SET CMP0020 NEW)
-endif()
+# if(CMAKE_CROSSCOMPILING)
+#     cmake_policy(SET CMP0017 NEW)
+#     cmake_policy(SET CMP0020 NEW)
+# endif()
 
 
-cmake_policy(SET CMP0054 NEW) #Don't derrefernce in if() statements
-cmake_policy(SET CMP0022 NEW) #LINK_INTERFACE_LIBRARIES fix
+# cmake_policy(SET CMP0054 NEW) #Don't derrefernce in if() statements
+# cmake_policy(SET CMP0022 NEW) #LINK_INTERFACE_LIBRARIES fix
+message(STATUS "[MexIFace]: Inititialize")
+include(MexIFace-configure) #Configure libraries and compile flags
 
 #Fixup library search paths
 if(UNIX)
@@ -31,9 +33,6 @@ elseif(WIN32)
     set(FIXUP_LIB_SEARCH_PATH ${MXE_W64_ROOT} ${MXE_W64_ROOT}/bin ${CMAKE_INSTALL_PREFIX}/lib)
 else()
 endif()
-
-include(MexIFace-configure) #Configure libraries and compile flags
-
 message(STATUS "[MexIFace] FIXUP_LIB_SEARCH_PATH:${FIXUP_LIB_SEARCH_PATH}")
 message(STATUS "[MexIFace] FIXUP_LIB_SYSTEM_PATH:${FIXUP_LIB_SYSTEM_PATH}")
 include(${MexIFace_CMAKE_FUNCTIONS_DIR}/fixup_dependencies.cmake)
@@ -41,13 +40,14 @@ include(${MexIFace_CMAKE_FUNCTIONS_DIR}/fixup_dependencies.cmake)
 #Directory relative to CMAKE_INSTALL_PREFIX that the compiled mex files will be stored
 set(MEX_ARCH_DIR lib/${PROJECT_NAME}/mex/mex.${MATLAB_ARCH}${MexIFace_DEBUG_POSTFIX}/+${PROJECT_NAME}) #Install dir for mex files
 message(STATUS "[MexIFace] MEX_ARCH_DIR:${MEX_ARCH_DIR}")
+
 include(${MexIFace_CMAKE_FUNCTIONS_DIR}/make_mex.cmake) 
 
-#Install matlab code
+#Install project's matlab code
 set(MATLAB_CODE_INSTALL_DIR lib/${PROJECT_NAME})
 install(DIRECTORY matlab DESTINATION ${MATLAB_CODE_INSTALL_DIR} COMPONENT Runtime)
 
-#Configure and install matlab startup file named share/<PROJECT_NAME>/matlab/startuo<PROJECT_NAME>.m
+#Configure and install matlab startup file named share/<PROJECT_NAME>/matlab/startup<PROJECT_NAME>.m
 set(MATLAB_STARTUP_FILE_NAME startup${PROJECT_NAME}.m)
 set(MATLAB_STARTUP_FILE_INSTALL_DIR share/${PROJECT_NAME}/matlab)
 configure_file(${MexIFace_CMAKE_TEMPLATES_DIR}/startupMexIFace.m.in ${CMAKE_BINARY_DIR}/matlab/${MATLAB_STARTUP_FILE_NAME} @ONLY)
