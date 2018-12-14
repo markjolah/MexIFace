@@ -3,15 +3,14 @@
 % Automatically setup paths for the @PROJECT_NAME@ package using the MexIFace package structure.  This adds the necessary matlab code and mex modules
 % to the Matlab path.  The modules directory is set for the arch of the system and the 'debug' parameter controls the useage of the debug mex files.
 %
-% This file must be correctly named 'setup<PKGName>.m' where PKGName is the package name correctly capitalized.
-% Furthermore this script must reside in the ./share subdirectory of the same install prefix as the package ./lib/<PKGName>
+% This file must be correctly named 'setup@PROJECT_NAME@.m' and reside in the ./share subdirectory of the same install prefix as the package ./lib/<PKGName>
 % library directory which contains the matlab code and mex modules.
 %
 % Structure of relative locations of this file and the package matlab code and mex modules that is assumed for the startup script to work.
 %
-% <install_prefix>/setup/<PKGName>/matlab/setup<PKGName>.m  --- This file
-% <install_prefix>/lib/<PKGName>/matlab  --- Packge matlab code.  [Added to path]
-% <install_prefix>/lib/mex/mex<ARCH><DEBUG>/  --- Packge mex modules for given arch and debug mode.  [Added to path]
+% <install_prefix>/lib/<PKGName>/matlab/setup<PKGName>.m  --- This file
+% <install_prefix>/lib/<PKGName>/matlab/+@PROJECT_NAME@  --- Packge matlab code.  [Added to path]
+% <install_prefix>/lib/<PKGName>/mex/<MatlabVers>/mex<ARCH><DEBUG>/  --- Packge mex modules for given arch and debug mode.  [Added to path]
 %
 % [in] debug [optional] - boolean.  True for debug configuration. [Default=false]
 % [in] install_prefix [optional] - The installation prefix directory where @PROJECT_NAME@ is installed. [Default = determine prefix relative to this file]
@@ -48,16 +47,16 @@ function startup@PROJECT_NAME@(debug, install_prefix)
     if ~exist(package_matlab_code_path,'dir')
         error([func_name, ':InvalidPackageLayout'],['Package ', package_name,' cannot find matlab code lib directory: ',package_matlab_code_path]);
     end
-    % MexIFace library path <install_prefix>/lib/MexIFace
-    mexiface_lib_path = fullfile(package_install_prefix,'lib','MexIFace');
-    if ~exist(mexiface_lib_path,'dir')
-        error([func_name, ':InvalidPackageLayout'],['Package ', package_name,' cannot find mexiface lib directory: ',mexiface_lib_path]);
-    end
-    % mex code <install_prefix>/lib/MexIFace/matlab/*
-    mexiface_matlab_code_path = fullfile(mexiface_lib_path,'matlab');
-    if ~exist(mexiface_matlab_code_path,'dir')
-        error([func_name, ':InvalidPackageLayout'],['Package ', package_name,' cannot find MexIFace matlab code lib directory: ',strrep(mexiface_matlab_code_path,'\','/')]);
-    end
+%      % MexIFace library path <install_prefix>/lib/MexIFace
+%      mexiface_lib_path = fullfile(package_install_prefix,'lib','MexIFace');
+%      if ~exist(mexiface_lib_path,'dir')
+%          error([func_name, ':InvalidPackageLayout'],['Package ', package_name,' cannot find mexiface lib directory: ',mexiface_lib_path]);
+%      end
+%      % mex code <install_prefix>/lib/MexIFace/matlab/*
+%      mexiface_matlab_code_path = fullfile(mexiface_lib_path,'matlab');
+%      if ~exist(mexiface_matlab_code_path,'dir')
+%          error([func_name, ':InvalidPackageLayout'],['Package ', package_name,' cannot find MexIFace matlab code lib directory: ',strrep(mexiface_matlab_code_path,'\','/')]);
+%      end
     
     % package mex modules path <install_prefix>/lib/mex/mex<Arch><Debug>
     if ispc()
@@ -75,9 +74,17 @@ function startup@PROJECT_NAME@(debug, install_prefix)
     else
         error('func_name:InvalidArch','Arch not supported');
     end
-    package_mex_arch_path = fullfile(package_lib_path,'mex',mex_sub_dir);
+    %Get matlab major.minor version
+    version_re = '^(?<major>\d+)\.(?<minor>\d+)\.'
+    tokens = regexp(version(),version_re,'tokens');
+    if isempty(tokens) || (numel(tokens{1} ~= 2)
+        error([func_name, ':LogicalError'],['Package ', package_name,' cannot determin matlab numeric version from version string:', version()]);
+    end
+    version_str = sprintf('%d.%d',tokens{1}{1},tokens{1}{2});
+
+    package_mex_arch_path = fullfile(package_lib_path,'mex',version_str,mex_sub_dir);
     if(~exist(package_mex_arch_path,'dir'))
-        error('func_name:InvalidPackageLayout',['Package ', package_name,' cannot find matlab mex directory: ',strrep(package_mex_arch_path,'\','/')]);
+        error('func_name:InvalidPackageLayout',['Package ', package_name,' cannot find mex directory: ',strrep(package_mex_arch_path,'\','/')]);
     end
     
     addpath(genpath(mexiface_matlab_code_path));

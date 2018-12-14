@@ -1,20 +1,18 @@
 @PACKAGE_INIT@
 
 #MexIFaceConfig.cmake
-
-#Include targets file.  This will create IMPORTED target @PROJECT_NAME@
-include("${CMAKE_CURRENT_LIST_DIR}/@EXPORT_TARGETS_NAME@.cmake")
-check_required_components("@PROJECT_NAME@")
+#
+# COMPONENTS:
+#   LIBCXX - Import versions compiled against libc++.so
+#
 
 include(CMakeFindDependencyMacro)
 find_dependency(BacktraceException)
 find_dependency(Armadillo)
-find_dependency(Boost)
+add_definitions(-DARMA_USE_CXX11)
+
 
 #Sets:
-# @PROJECT_NAME@_LIBRARIES
-# @PROJECT_NAME@_SHARED_LIBRARIES
-# @PROJECT_NAME@_STATIC_LIBRARIES - empty
 # @PROJECT_NAME@_BUILD_TYPES
 # @PROJECT_NAME@_CMAKE_DIR
 # @PROJECT_NAME@_CMAKE_MODULES_DIR
@@ -22,31 +20,45 @@ find_dependency(Boost)
 # @PROJECT_NAME@_CMAKE_FUNCTIONS_DIR
 # @PROJECT_NAME@_CMAKE_EXECUTABLE_DIR
 # @PROJECT_NAME@_CMAKE_TEMPLATES_DIR
+# Mex
 #
+# Only one of these variables can be set
+# MEXIFACE_LIBSTDCXX - Version of LIBSTDCXX this set of Mexiface targets is built against
+# MEXIFACE_LIBCXX - Version of LIBCXX his set of Mexiface targets is built against
+
 # Modifies:
 #  CMAKE_MODULE_PATH
 
-#Setup paths to CMAKE utilities
-set(@PROJECT_NAME@_CMAKE_DIR @PACKAGE__WIZ_SHARED_CMAKE_INSTALL_DIR@) #Relative to this file's install location
-set(@PROJECT_NAME@_CMAKE_MODULES_DIR ${@PROJECT_NAME@_CMAKE_DIR}/Modules)
-set(@PROJECT_NAME@_CMAKE_TOOLCHAINS_DIR ${@PROJECT_NAME@_CMAKE_DIR}/Toolchains)
-set(@PROJECT_NAME@_CMAKE_FUNCTIONS_DIR ${@PROJECT_NAME@_CMAKE_DIR}/Functions)
-set(@PROJECT_NAME@_CMAKE_EXECUTABLE_DIR ${@PROJECT_NAME@_CMAKE_DIR}/Executables)
-set(@PROJECT_NAME@_CMAKE_TEMPLATES_DIR ${@PROJECT_NAME@_CMAKE_DIR}/Templates)
-# Only add MODULES_DIR to path as this is needed to call include(MexIFace)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${@PROJECT_NAME@_CMAKE_MODULES_DIR} )
 
-set(@PROJECT_NAME@_LIBRARIES @PROJECT_NAME@::@PROJECT_NAME@)
-set(@PROJECT_NAME@_SHARED_LIBRARIES @PROJECT_NAME@::@PROJECT_NAME@)
-set(@PROJECT_NAME@_STATIC_LIBRARIES)
+#Setup paths to CMAKE utilities
+set_and_check(@PROJECT_NAME@_CMAKE_DIR @PACKAGE_SHARED_CMAKE_INSTALL_DIR@) #Relative to this file's install location
+set_and_check(@PROJECT_NAME@_CMAKE_MODULES_DIR ${@PROJECT_NAME@_CMAKE_DIR}/Modules)
+set_and_check(@PROJECT_NAME@_CMAKE_TOOLCHAINS_DIR ${@PROJECT_NAME@_CMAKE_DIR}/Toolchains)
+set_and_check(@PROJECT_NAME@_CMAKE_FUNCTIONS_DIR ${@PROJECT_NAME@_CMAKE_DIR}/Functions)
+set_and_check(@PROJECT_NAME@_CMAKE_EXECUTABLE_DIR ${@PROJECT_NAME@_CMAKE_DIR}/Executables)
+set_and_check(@PROJECT_NAME@_CMAKE_TEMPLATES_DIR ${@PROJECT_NAME@_CMAKE_DIR}/Templates)
+list(APPEND CMAKE_MODULE_PATH ${@PROJECT_NAME@_CMAKE_MODULES_DIR} )
+
+#Find all matlab dependecies
+
+include(MexIFace-configure-matlab)
+
+#These functions are used by clients to configure thier own mex modules with MexIFace
+include(@PROJECT_NAME@_CMAKE_FUNCTIONS_DIR/mexiface_configure_package_config.cmake)
+include(@PROJECT_NAME@_CMAKE_FUNCTIONS_DIR/mexiface_make_mex.cmake)
+include(@PROJECT_NAME@_CMAKE_FUNCTIONS_DIR/mexiface_install.cmake)
+
+#Include targets file.  This will create IMPORTED target MexIFace::MexIFaceX_Y for each version of matlab.
+#TODO: make sure this works to import a target to a matlab we don't find in MexIface-configure-matlab
+include("${CMAKE_CURRENT_LIST_DIR}/@EXPORT_TARGETS_NAME@.cmake")
+
 get_property(@PROJECT_NAME@_BUILD_TYPES TARGET @PROJECT_NAME@::@PROJECT_NAME@ PROPERTY IMPORTED_CONFIGURATIONS)
 
-message(STATUS "[@PROJECT_NAME@Config.cmake] @PROJECT_NAME@_LIBRARIES: ${@PROJECT_NAME@_LIBRARIES}")
-message(STATUS "[@PROJECT_NAME@Config.cmake] @PROJECT_NAME@_SHARED_LIBRARIES: ${@PROJECT_NAME@_SHARED_LIBRARIES}")
-message(STATUS "[@PROJECT_NAME@Config.cmake] @PROJECT_NAME@_STATIC_LIBRARIES: ${@PROJECT_NAME@_STATIC_LIBRARIES}")
 message(STATUS "[@PROJECT_NAME@Config.cmake] @PROJECT_NAME@_BUILD_TYPES: ${@PROJECT_NAME@_BUILD_TYPES}")
 message(STATUS "[@PROJECT_NAME@Config.cmake] @PROJECT_NAME@_CMAKE_DIR: ${@PROJECT_NAME@_CMAKE_DIR}")
 message(STATUS "[@PROJECT_NAME@Config.cmake] @PROJECT_NAME@_CMAKE_MODULES_DIR: ${@PROJECT_NAME@_CMAKE_MODULES_DIR}")
 message(STATUS "[@PROJECT_NAME@Config.cmake] @PROJECT_NAME@_CMAKE_TOOLCHAINS_DIR: ${@PROJECT_NAME@_CMAKE_TOOLCHAINS_DIR}")
 message(STATUS "[@PROJECT_NAME@Config.cmake] @PROJECT_NAME@_CMAKE_EXECUTABLE_DIR: ${@PROJECT_NAME@_CMAKE_EXECUTABLE_DIR}")
 message(STATUS "[@PROJECT_NAME@Config.cmake] @PROJECT_NAME@_CMAKE_TEMPLATES_DIR: ${@PROJECT_NAME@_CMAKE_TEMPLATES_DIR}")
+
+check_required_components("@PROJECT_NAME@")

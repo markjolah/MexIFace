@@ -10,10 +10,11 @@
 
 cmake_minimum_required( VERSION 3.9 )
 
-project(MexIFace VERSION 0.1.0 LANGUAGES CXX)
+project(MexIFace VERSION 0.1.1 LANGUAGES CXX)
 
 option(OPT_EXTRA_DEBUG "Support extra noisy debugging features" OFF) #Extra debug features (Armadillo)
-
+option(OPT_LIBSTDCXX "Build with normal GCC libstdc++" ON)
+option(OPT_LIBCXX "Build with libc++ as the standard library to avoid matlab conflicts with libstdc++ versions" OFF)
 
 #Locations of the MexIFace cmake build system components
 #Export all these variables in package-config also.
@@ -31,23 +32,56 @@ include(AddExternalDependency)
 set(BacktraceExceptionURL https://github.com/markjolah/BacktraceException.git)
 add_external_dependency(NAME BacktraceException URL ${BacktraceExceptionURL} SHARED)
 
-include(MexIFace-configure)
-
-# Optionally enable extra debugging from armadillo to log every call.
-if( (${CMAKE_BUILD_TYPE} MATCHES Debug) AND MexIFace_EXTRA_DEBUG)
-    add_definitions(-DARMA_EXTRA_DEBUG)
+# Armadillo
+find_package(Armadillo REQUIRED)
+add_definitions(-DARMA_USE_CXX11)
+add_definitions(-DARMA_DONT_USE_LAPACK -DARMA_DONT_USE_BLAS -DARMA_DONT_USE_OPENMP -DARMA_DONT_USE_HDF5) #disable unused dependencies
+set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS $<$<CONFIG:Debug>:ARMA_PRINT_ERRORS>)
+set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS $<$<NOT:$<CONFIG:Debug>>:ARMA_NO_DEBUG>)
+if(OPT_EXTRA_DEBUG)
+    set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS $<$<CONFIG:Debug>:ARMA_EXTRA_DEBUG>)
 endif()
+
+#libc++.so compatability
+if(OPT_LIBCXX)
+    find_package(LibCXX)
+    if(LibCXX_FOUND)
+        set(MEXIFACE_LIBCXX_VERSION ${LIBCXX_VERSION_STRING})
+    else()
+        set(MEXIFACE_LIBSTDCXX_VERSION False)
+    endif()
+else()
+    set(MEXIFACE_LIBSTDCXX_VERSION False)
+endif()
+
+include(get_libcxx_version)
+get_libcxx_version(MEXIFACE_LIBCXX_VERSION)
+
+#Use the MexIFace version of FindMatlab.cmake which will find multiple versions.
+#Set variables on cmake command line or in environment
+#MATLAB_ROOT - a single matlab 'e.g.: /usr/local/matlab/R2018a'
+#MATLAB_ROOTS - a ";" delimited list of matlab roots or directories containing several roots each root dir should match
+#               the RE "^[r|R]20\d\d[a|b]"
+include(MexIface-configure-matlab)
+
+#Enable Inter-proceedural optimization
+include(ConfigureIPO)
+
+
 
 #Debugging configuration
 include(ConfigureDebugBuilds)
 
-include(MexIFace-configure) #Add Doxygen documentation targets
-include(MexIFace-Doxygen) #Add Doxygen documentation targets
+#include(MexIFace-Doxygen) #Add Doxygen documentation targets
 
+### PackageConfig
 include(ExportPackageWizzard)
-export_package_wizzard()
+#Give path to FindMatlab.cmake so it can be called by PackageConfig.cmake correctly from build tree or install tree
+export_package_wizzard(FIND_MODULES "cmake/Modules/FindMatlab.cmake")
 
 #Matlab code install
+mexiface_matlab_install()
+
 set(MATLAB_CODE_INSTALL_DIR lib/${PROJECT_NAME})
 install(DIRECTORY matlab DESTINATION ${MATLAB_CODE_INSTALL_DIR} COMPONENT Runtime)
 
