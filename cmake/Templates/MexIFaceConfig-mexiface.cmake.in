@@ -1,0 +1,7 @@
+#MexIFaceConfig-mexiface.cmake.in
+#
+# Configures the matlab-related variables for MexIFace to enable build-tree and install-tree useage
+#
+
+set(@PROJECT_NAME@_MATLAB_CODE_DIR @_MATLAB_CODE_DIR@) #Should be absolute path
+set(@PROJECT_NAME@_MATLAB_STARTUP_M @_MATLAB_STARTUP_M@) #Should be absolute path

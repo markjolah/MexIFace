@@ -1,0 +1,117 @@
+% startup@PROJECT_NAME@.m
+%
+% Automatically setup paths for the @PROJECT_NAME@ package using the MexIFace package structure.  This adds the necessary matlab code and mex modules
+% to the Matlab path.  The modules directory is set for the arch of the system and the running matlab version,
+% the 'debug' parameter controls the useage of the debug mex files.
+%
+% This file must be correctly named 'setup@PROJECT_NAME@.m' and reside in the ./lib/@PROJECT_NAME@/matlab subdirectory.
+%
+% Structure of relative locations of this file and the package matlab code and mex modules that is assumed for the startup script to work.
+%
+% <install_prefix>/lib/@PROJECT_NAME@/matlab/setup@PROJECT_NAME@.m  --- This file
+% <install_prefix>/lib/@PROJECT_NAME@/matlab/+@PROJECT_NAME@  --- Packge matlab code.  [Added to path]
+% <install_prefix>/lib/@PROJECT_NAME@/mex/win64/+@PROJECT_NAME@/  --- All mex modules for release for all VERS for win64 in a single directory to make sharing dependencies easier
+% <install_prefix>/lib/@PROJECT_NAME@/mex/win64/debug/+@PROJECT_NAME@/  --- All mex modules for debug for all VERS for win64 in a single directory to make sharing  dependencies easier
+% <install_prefix>/lib/@PROJECT_NAME@/mex/glnxa64/<VERS>/+@PROJECT_NAME@ --- Mex modules for linux
+% <install_prefix>/lib/@PROJECT_NAME@/mex/glnxa64/debug/<VERS>/+@PROJECT_NAME@ --- Debug mex modules for linux
+%
+% [in] debug [optional] - boolean.  True for debug configuration. [Default=false]
+% [in] install_prefix [optional] - The installation prefix directory where @PROJECT_NAME@ is installed. [Default = determine prefix relative to this file]
+function startup@PROJECT_NAME@(debug, install_prefix)
+    if nargin==0
+        debug=false;
+    end
+    package_name = '@PROJECT_NAME@';
+
+    [startup_install_path,func_name,~] = fileparts(mfilename('fullpath'));
+    if nargin>2
+        package_install_prefix=install_prefix;
+    else
+        path_dirs = strsplit(startup_install_path,filesep);
+        k = find(strcmp('lib',path_dirs),1,'last');
+        if isempty(k)
+            error('@PACKAGE_NAME@:InvalidPackageLayout','Startup file must be located within the within the "lib" subdirectory of the install prefix.');
+        end
+        package_install_prefix = fullfile(path_dirs{1:k-1});
+    end
+    if isempty(path_dirs{1})
+        package_install_prefix = ['/', package_install_prefix]; %On unix
+    end
+    if ~exist(package_install_prefix,'dir')
+        error('@PACKAGE_NAME@:InvalidPackageLayout',['Startup file must be located within the within the "lib" subdirectory of the install prefix. Found bad install_prefix: ',package_install_prefix]);
+    end
+    disp('@PROJECT_NAME@ Found. Install prefix: ',package_install_prefix);
+
+    % package library path <install_prefix>/lib/<pgkname>
+    package_lib_path = fullfile(package_install_prefix,'lib',package_name);
+    if ~exist(package_lib_path,'dir')
+        error('@PACKAGE_NAME@:InvalidPackageLayout',['Package @PACKAGE_NAME@ cannot find lib directory: ',package_lib_path]);
+    end
+    % package matlab code <install_prefix>/lib/<pgkname>/matlab/*
+    package_matlab_code_path = fullfile(package_install_prefix,'@_MATLAB_CODE_DIR@');
+    if ~exist(package_matlab_code_path,'dir')
+        error('@PACKAGE_NAME@:InvalidPackageLayout',['Package @PACKAGE_NAME@ cannot find matlab code lib directory: ',package_matlab_code_path]);
+    end
+
+    %Get matlab major.minor version
+    version_re = '^(?<major>\d+)\.(?<minor>\d+)\.'
+    tokens = regexp(version(),version_re,'tokens');
+    if isempty(tokens) || (numel(tokens{1} ~= 2)
+        error('@PACKAGE_NAME@:LogicalError',['Package @PACKAGE_NAME@ cannot determin matlab numeric version from version string:', version()]);
+    end
+    version_str = sprintf('%d_%d',tokens{1}{1},tokens{1}{2});
+
+    %These paths are only enabled when called from the build directory.  They do not have extensions
+    relative_mex_build_paths = strsplit('@_MATLAB_BUILD_MEX_PATHS@',';');
+    mexfile_paths={};
+    if ~isempty(relative_mex_build_paths)
+        %Build tree
+        for path=relative_mex_build_paths
+            build_path = fullfile(package_install_prefix,path{1});
+            if(~exist(build_path,'dir'))
+                error('@PACKAGE_NAME@:InvalidPackageLayout',['Package @PACKAGE_NAME@ cannot find mex directory: ',strrep(build_path,'\','/')]);
+            end
+            mexfile_paths = [mexfile_paths, build_path];
+        end
+    else
+        %Install tree
+        if ispc()
+            if debug
+                mex_sub_dir = fullfile('win64','debug');
+            else
+                mex_sub_dir = fullfile('win64','debug');
+            end
+        elseif isunix()
+            if debug
+                mex_sub_dir = fullfile('glnxa64','debug',version_str);
+            else
+                mex_sub_dir = fullfile('glnxa64',version_str);
+            end
+        else
+            error('@PACKAGE_NAME@:InvalidArch','Arch not supported');
+        end
+        package_mex_arch_path = fullfile(package_install_prefix,'@_MATLAB_INSTALLED_MEX_PATH@',mex_sub_dir);
+        if(~exist(package_mex_arch_path,'dir'))
+            error('@PACKAGE_NAME@:InvalidPackageLayout',['Package ', package_name,' cannot find mex directory: ',strrep(package_mex_arch_path,'\','/')]);
+        end
+        mexfile_paths = [mexfile_paths, package_mex_arch_path];
+    end
+
+    dependent_startup_m_locations = strsplit('@_DEPENDENT_STARTUP_M_LOCATIONS@',';'); %These should be absolute
+    if ~isempty(dependent_startup_m_locations)
+        for location = dependent_startup_m_locations
+            if(~exist(location,'file'))
+                error('@PACKAGE_NAME@:BadDependentLocation',['Package ', package_name,' cannot find dependent startup.m file: ',strrep(location,'\','/')]);
+            end
+            disp('@PACKAGE_NAME@ Processing Dependency :', strrep(location,'\','/'));
+            run(location); %Process dependent startup.m file
+        end
+    end
+
+    disp('@PACKAGE_NAME@ Found matlab code path: ', package_matlab_code_path)
+    addpath(package_matlab_code_path);
+    for path = mexfile_paths
+        disp('Found mex path: ', path{1})
+        addpath(path{1});
+    end
+end
