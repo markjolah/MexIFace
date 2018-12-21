@@ -40,12 +40,12 @@ protected:
     
     std::string obj_name() const override final;
     
-    /** @brief Should be called from all and only from objConstructor() implementations.
+    /** @brief Should be called from all and only from objConstructor() overrides of MexIFace sub-classes.
      *
      * Takes over the memory management of the object for the remainder of its lifetime over multiple calls
-     * to the mex function untill the \@delete command is sent
+     * to the mex function until the \@delete command is sent
      * 
-     * @param obj pointer to newly created object of type obj.
+     * @param obj pointer to newly created object of type obj.  Takes owenership of obj.
      */
     void outputHandle(ObjT* obj);
 private:

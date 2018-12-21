@@ -12,6 +12,8 @@ cmake_minimum_required( VERSION 3.9 )
 
 project(MexIFace VERSION 0.1.1 LANGUAGES CXX)
 
+option(MexIFace_MATLAB_INTERLEAVED_COMPLEX "Enable interleaved complex API in R2018a+" OFF)
+option(MexIFace_MATLAB_LARGE_ARRAY_DIMS "Enable 64-bit array indexes in R2017a+" OFF)
 option(OPT_EXTRA_DEBUG "Support extra noisy debugging features" OFF) #Extra debug features (Armadillo)
 
 #Locations of the MexIFace cmake build system components

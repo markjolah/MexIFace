@@ -41,6 +41,10 @@ template<> mxClassID get_mx_class<uint8_t>() {return mxUINT8_CLASS;}
 template<> mxClassID get_mx_class<uint16_t>() {return mxUINT16_CLASS;}
 template<> mxClassID get_mx_class<uint32_t>() {return mxUINT32_CLASS;}
 template<> mxClassID get_mx_class<uint64_t>() {return mxUINT64_CLASS;}
+// template<> mxClassID get_mx_class<int>() {return mxINT32_CLASS;}
+// template<> mxClassID get_mx_class<unsigned>() {return mxINT64_CLASS;}
+// template<> mxClassID get_mx_class<long>() {return mxUINT32_CLASS;}
+// template<> mxClassID get_mx_class<unsigned long>() {return mxUINT64_CLASS;}
 
 /* TODO Finish this method to replace matlab .c code dependencies */
 // void get_characteristics(const mxArray *arr)

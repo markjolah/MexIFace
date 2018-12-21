@@ -25,7 +25,12 @@ classdef IFaceMixin < handle
         function obj = IFaceMixin(ifaceHandle)
             % Inputs:
             %  ifaceHandle - A function handle to the *_Iface mex function that implements the C++ side of the interface
-            obj.ifaceHandle = ifaceHandle;
+            vers = IFaceMixin.get_version_string();
+            if exist([ifaceHandle,vers]) == 3
+                obj.ifaceHandle = [ifaceHandle,vers];
+            else
+                error('IFaceMixin:BadHandle',['Unable to find a mex module named ', ifaceHandle,' for Matlab version:',vers])
+            end
         end
 
         function success=openIface(obj, varargin)
@@ -70,6 +75,16 @@ classdef IFaceMixin < handle
     end %Protected methods
 
     methods (Access=protected, Static=true)
+        function version_str = get_version_string()
+            %Get matlab major.minor version
+            version_re = '^(?<major>\d+)\.(?<minor>\d+)\.'
+            tokens = regexp(version(),version_re,'tokens');
+            if isempty(tokens) || (numel(tokens{1} ~= 2)
+                error('@PROJECT_NAME@:LogicalError',['Package @PROJECT_NAME@ cannot determine matlab numeric version from version string:', version()]);
+            end
+            version_str = sprintf('%d_%d',tokens{1}{1},tokens{1}{2});
+        end
+
         function varargout=callstatic(ifaceHandle, cmdstr, varargin)
             % callstatic   The entry point to call a static method of the underlying C++ class.  The Matlab side of the wrapped class
             % should internally call this protected method to call static member functions of the C++ class.  Because these are

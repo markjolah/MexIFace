@@ -94,15 +94,15 @@ function startup@PROJECT_NAME@(debug)
         %Install tree
         if ispc()
             if debug
-                mex_sub_dir = fullfile('win64','debug');
+                mex_sub_dir = 'win64.debug';
             else
-                mex_sub_dir = fullfile('win64','debug');
+                mex_sub_dir = 'win64';
             end
         elseif isunix()
             if debug
-                mex_sub_dir = fullfile('glnxa64','debug',version_str);
+                mex_sub_dir = 'glnxa64.debug';
             else
-                mex_sub_dir = fullfile('glnxa64',version_str);
+                mex_sub_dir = 'glnxa64';
             end
         else
             error('@PROJECT_NAME@:InvalidArch','Arch not supported');

@@ -11,6 +11,7 @@
 #include <sstream>
 #include <map>
 #include <vector>
+#include <list>
 #include <algorithm>
 #include <functional>
 #include <armadillo>
@@ -77,6 +78,7 @@ public:
     template<class T> using Dict = std::map<std::string,T>; /**< A convenient form for reporting dictionaries of named FP data to matlab */
     
     template<class T> using IsArithmeticT = typename std::enable_if<std::is_arithmetic<T>::value>::type;
+    template<class T> using IsNotArithmeticT = typename std::enable_if<!std::is_arithmetic<T>::value>::type;
     template<class T> using IsIntegralT = typename std::enable_if< std::is_integral<T>::value >::type;
     template<class T> using IsUnsignedIntegralT = typename std::enable_if< std::is_integral<T>::value && std::is_same<T, typename std::make_unsigned<T>::type>::value >::type;
     template<class T> using IsFloatingPointT = typename std::enable_if< std::is_floating_point<T>::value >::type;
@@ -150,10 +152,13 @@ public:
     template<class ElemT, typename=IsArithmeticT<ElemT>> 
     static mxArray* toMXArray(const arma::SpMat<ElemT> &arr);
     
+    template<class ElemT, typename=IsArithmeticT<ElemT>>
+    static mxArray* toMXArray(const std::list<ElemT> &arr);
+
     template<class ConvertableT> 
     static mxArray* toMXArray(const Dict<ConvertableT> &arr);
 
-    template<template<typename> class Array, class ConvertableT> 
+    template<template<typename...> class Array, class ConvertableT>
     static mxArray* toMXArray(const Array<ConvertableT> &arr);
 
     
@@ -266,11 +271,11 @@ protected:
     template<class ConvertableT>
     void output(ConvertableT&& val);
     
-private:
     /* Error reporting */    
     void error(std::string condition, std::string message) const;
     void error(std::string component,std::string condition, std::string message) const;
 
+private:
     void callMethod(std::string name, const MethodMap &map) noexcept;
     void popRhs();
     void setArguments(MXArgCountT _nlhs, mxArray *_lhs[], MXArgCountT _nrhs, const mxArray *_rhs[]);    
@@ -752,6 +757,16 @@ mxArray* MexIFace::toMXArray(const arma::SpMat<ElemT> &arr)
     return out_arr;
 }
 
+template<class ElemT, typename>
+mxArray* MexIFace::toMXArray(const std::list<ElemT> &arr)
+{
+    auto N = arr.size();
+    auto m = mxCreateNumericMatrix(N, 1, get_mx_class<ElemT>(), mxREAL);
+    auto out_arr = toVec<ElemT>(m);
+    std::copy_n(arr.cbegin(),N,out_arr.begin());  //copy
+    return m;
+}
+
 template<class ConvertableT> 
 mxArray* MexIFace::toMXArray(const Dict<ConvertableT> &dict)
 {
@@ -766,7 +781,7 @@ mxArray* MexIFace::toMXArray(const Dict<ConvertableT> &dict)
     return m;
 }
 
-template<template<typename> class Array, class ConvertableT> 
+template<template<typename...> class Array, class ConvertableT>
 mxArray* MexIFace::toMXArray(const Array<ConvertableT> &arr)
 {
     auto nCells = arr.size();
@@ -774,6 +789,7 @@ mxArray* MexIFace::toMXArray(const Array<ConvertableT> &arr)
     for(int i=0;i<nCells;i++) mxSetCell(m, i, toMXArray(arr[i]));
     return m;
 }
+
 
 
 /************ getAs methods **************/
@@ -1190,6 +1206,12 @@ void MexIFace::output(ConvertableT&& val)
 {
     output(toMXArray(std::forward<ConvertableT>(val)));
 }
+
+// template<template<typename> class ConvertableTemplateT>
+// void MexIFace::output(ConvertableT&& val)
+// {
+//     output(toMXArray(std::forward<ConvertableT>(val)));
+// }
 
 
 /** @brief Helper function to set the internal copies of the left-hand-side and right-hand-side parameters

@@ -42,7 +42,7 @@ function(mexiface_configure_install)
 
     if(NOT ARG_PACKAGE_CONFIG_TEMPLATE)
         find_file(ARG_PACKAGE_CONFIG_TEMPLATE PackageConfig-mexiface.cmake.in
-                PATHS ${_configure_mexiface_config_file_PATH}/../Templates NO_DEFAULT_PATH)
+                PATHS ${_mexiface_configure_install_PATH}/../Templates NO_DEFAULT_PATH)
         mark_as_advanced(ARG_PACKAGE_CONFIG_TEMPLATE)
         if(NOT ARG_PACKAGE_CONFIG_TEMPLATE)
             message(FATAL_ERROR "Unable to find PackageConfig-mexiface.cmake.in. Cannot configure exports.")
@@ -59,7 +59,7 @@ function(mexiface_configure_install)
 
     if(NOT ARG_STARTUP_M_TEMPLATE)
         find_file(ARG_STARTUP_M_TEMPLATE startupPackage.m.in
-                PATHS ${_configure_mexiface_config_file_PATH}/../Templates NO_DEFAULT_PATH)
+                PATHS ${_mexiface_configure_install_PATH}/../Templates NO_DEFAULT_PATH)
         mark_as_advanced(ARG_PACKAGE_CONFIG_TEMPLATE)
         if(NOT ARG_PACKAGE_CONFIG_TEMPLATE)
             message(FATAL_ERROR "Unable to find PackageConfig-mexiface.cmake.in. Cannot configure exports.")
@@ -103,7 +103,7 @@ function(mexiface_configure_install)
 
 
     #Install matlab source
-    install(DIRECTORY matlab DESTINATION ${MATLAB_CODE_INSTALL_DIR} COMPONENT Runtime)
+    install(DIRECTORY matlab DESTINATION ${ARG_MATLAB_CODE_INSTALL_DIR} COMPONENT Runtime)
 
     include(CMakePackageConfigHelpers)
     #install-tree export config @PACKAGE_NAME@Config-mexiface.cmake
@@ -113,7 +113,7 @@ function(mexiface_configure_install)
     else()
         set(ABSOLUTE_CONFIG_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/${ARG_CONFIG_INSTALL_DIR})
     endif()
-    set(_MATLAB_CODE_DIR ${MATLAB_CODE_INSTALL_DIR})
+    set(_MATLAB_CODE_DIR ${ARG_MATLAB_CODE_INSTALL_DIR})
     set(_MATLAB_STARTUP_M ${ARG_CONFIG_DIR}/${STARTUP_M_FILE})
     configure_package_config_file(${ARG_PACKAGE_CONFIG_TEMPLATE} ${ARG_CONFIG_DIR}/${ARG_PACKAGE_CONFIG_INSTALL_TREE_FILE}
                                     INSTALL_DESTINATION ${ARG_CONFIG_INSTALL_DIR}
@@ -134,10 +134,9 @@ function(mexiface_configure_install)
     foreach(location IN LISTS ARG_DEPENDENT_STARTUP_M_LOCATIONS)
         string(REGEX REPLACE "^${CMAKE_INSTALL_PREFIX}/" "" location ${location})
         list(APPEND _DEPENDENT_STARTUP_M_LOCATIONS ${location})
-    endif()
     endforeach()
     configure_file(${ARG_STARTUP_M_TEMPLATE} ${ARG_CONFIG_DIR}/${ARG_STARTUP_M_INSTALL_TREE_FILE})
-    install(FILES ${ARG_CONFIG_DIR}/${ARG_STARTUP_M_INSTALL_INSTALL_TREE_FILE} RENAME ${ARG_STARTUP_M_FILE}
+    install(FILES ${ARG_CONFIG_DIR}/${ARG_STARTUP_M_INSTALL_TREE_FILE} RENAME ${ARG_STARTUP_M_FILE}
             DESTINATION ${ARG_MATLAB_CODE_INSTALL_DIR} COMPONENT Runtime)
     unset(_MATLAB_INSTALLED_MEX_PATH)
 
@@ -167,7 +166,7 @@ function(mexiface_configure_install)
             #Remap dependent startup.m locations to be relative to the install prefix for this file
             string(REGEX REPLACE "^${_prefix}/" "" location ${location})
             list(APPEND _DEPENDENT_STARTUP_M_LOCATIONS ${location})
-        endif()
+        endforeach()
         configure_file(${ARG_STARTUP_M_TEMPLATE} ${ARG_CONFIG_DIR}/${ARG_STARTUP_M_FILE})
     endif()
 endfunction()

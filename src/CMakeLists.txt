@@ -17,6 +17,7 @@ set(MexIFace_TARGETS)
 foreach(idx RANGE ${niter})
     list(GET MexIFace_MATLAB_VERSIONS ${idx} ver)
     list(GET MexIFace_MATLAB_VERSION_STRINGS ${idx} vers)
+    list(GET MexIFace_MATLAB_LINKER_MAP_FILES ${idx} map_file)
     set(lib MexIFace${vers})
     set(matlab_target "MATLAB::${vers}::MEX_LIBRARIES")
     message(STATUS "lib:${lib} target:${matlab_target}")
@@ -27,6 +28,11 @@ foreach(idx RANGE ${niter})
         target_sources(${lib} PRIVATE ${vers_src_file})
     endif()
     add_library(MexIFace::${lib} ALIAS ${lib})
+    if(UNIX OR (CMAKE_CROSSCOMPILING AND WIN32))
+        #Sets visibility of symbols to only mexFunction and related interface
+        #Can't have this be an interface property of MATLAB::X_Y::MEX_LIBRARIES as it would cause MexIFace to not export symbols needed by clients.
+        target_link_options(${lib} INTERFACE -Wl,--version-script,${map_file})
+    endif()
     target_link_libraries(${lib} PUBLIC BacktraceException::BacktraceException) #Exception backtraces
     target_link_libraries(${lib} PUBLIC ${matlab_target}) #Matlab Mex libraries
     target_include_directories(${lib} PUBLIC $<BUILD_INTERFACE:${PUBLIC_HEADER_SRC_DIR}>
@@ -37,7 +43,7 @@ foreach(idx RANGE ${niter})
             RUNTIME DESTINATION lib COMPONENT Runtime
             ARCHIVE DESTINATION lib COMPONENT Development
             LIBRARY DESTINATION lib COMPONENT Runtime)
-    list(APPEND MexIFace_TARGETS ${lib})
+    list(APPEND MexIFace_TARGETS MexIFace::${lib})
 endforeach()
 
 install(DIRECTORY ${PUBLIC_HEADER_SRC_DIR}/ DESTINATION include COMPONENT Development)
