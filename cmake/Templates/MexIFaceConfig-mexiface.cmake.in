@@ -3,5 +3,9 @@
 # Configures the matlab-related variables for MexIFace to enable build-tree and install-tree useage
 #
 
-set(@PROJECT_NAME@_MATLAB_CODE_DIR @_MATLAB_CODE_DIR@) #Should be absolute path
-set(@PROJECT_NAME@_MATLAB_STARTUP_M @_MATLAB_STARTUP_M@) #Should be absolute path
+@PACKAGE_INIT@
+
+#Matlab source code dir
+set_and_check(MexIFace_MATLAB_CODE_DIR @PACKAGE__MATLAB_CODE_DIR@)
+#Path to startup@PROJECT_NAME@.m
+set_and_check(MexIFace_MATLAB_STARTUP_M @PACKAGE__MATLAB_STARTUP_M@)
