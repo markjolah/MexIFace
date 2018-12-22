@@ -60,6 +60,7 @@
 #
 
 set(MATLAB_VERSIONS_MAPPING
+    "R2019a=9.6"
     "R2018b=9.5"
     "R2018a=9.4"
     "R2017b=9.3"
@@ -77,6 +78,7 @@ set(MATLAB_VERSIONS_MAPPING
     )
 
 set(MATLAB_LIBSTDCXX_MAPPING
+    "R2019a=6.0.22"
     "R2018b=6.0.22"
     "R2018a=6.0.22"
     "R2017b=6.0.20"
