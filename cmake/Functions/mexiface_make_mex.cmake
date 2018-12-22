@@ -54,7 +54,7 @@ function(mexiface_make_mex)
         if(ARG_MATLAB_LINK_LIBRARIES)
             target_link_libraries(${mexfile} PUBLIC ${MATLAB_LINK_LIBRARIES}) #Additional matlab libraries
         endif()
-        set_target_properties(${mexfile} PROPERTIES PREFIX "" SUFFIX .${MexIFace_MATLAB_SYSTEM_MEXEXT})
+        set_target_properties(${mexfile} PROPERTIES PREFIX "" DEBUG_POSTFIX "" SUFFIX .${MexIFace_MATLAB_SYSTEM_MEXEXT})
         install(TARGETS ${mexfile} LIBRARY DESTINATION ${mex_dir} COMPONENT Runtime)
         if(UNIX)
             # RPATH config

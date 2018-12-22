@@ -82,7 +82,7 @@ classdef IFaceMixin < handle
             if isempty(tokens) || (numel(tokens{1} ~= 2)
                 error('@PROJECT_NAME@:LogicalError',['Package @PROJECT_NAME@ cannot determine matlab numeric version from version string:', version()]);
             end
-            version_str = sprintf('%d_%d',tokens{1}{1},tokens{1}{2});
+            version_str = [tokens{1}{1} '_' tokens{1}{2}];
         end
 
         function varargout=callstatic(ifaceHandle, cmdstr, varargin)

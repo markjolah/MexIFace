@@ -103,7 +103,7 @@ function(mexiface_configure_install)
 
 
     #Install matlab source
-    install(DIRECTORY matlab DESTINATION ${ARG_MATLAB_CODE_INSTALL_DIR} COMPONENT Runtime)
+    install(DIRECTORY matlab/ DESTINATION ${ARG_MATLAB_CODE_INSTALL_DIR} COMPONENT Runtime)
 
     include(CMakePackageConfigHelpers)
     #install-tree export config @PACKAGE_NAME@Config-mexiface.cmake

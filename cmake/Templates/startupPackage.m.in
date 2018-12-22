@@ -23,37 +23,37 @@ function startup@PROJECT_NAME@(debug)
     end
     function is_abs = is_absolute_path(path_dir)
         [p,~,~] = fileparts(path_dir);
-        ps = strsplit(p,filesep())
-        is_abs = ps(1) == "/" || regexp(ps(1),'[A-Z]:')
+        ps = strsplit(p,filesep());
+        is_abs = isempty(ps{1}) || ~isempty(regexp(ps{1},'^[A-Z]:','ONCE'));
     end
 
     %Get matlab major.minor version
-    version_re = '^(?<major>\d+)\.(?<minor>\d+)\.'
+    version_re = '^(?<major>\d+)\.(?<minor>\d+)\.';
     tokens = regexp(version(),version_re,'tokens');
-    if isempty(tokens) || (numel(tokens{1} ~= 2)
+    if isempty(tokens) || numel(tokens{1}) ~= 2
         error('@PROJECT_NAME@:LogicalError',['Package @PROJECT_NAME@ cannot determine matlab numeric version from version string:', version()]);
     end
-    version_str = sprintf('%d_%d',tokens{1}{1},tokens{1}{2});
+    version_str = [tokens{1}{1} '_' tokens{1}{2}];
 
     %Find package_install_prefix
-    [startup_install_path,func_name,~] = fileparts(mfilename('fullpath'));
-    prefix_relative_path = @_STARTUP_M_INSTALL_DIR@; %Install directory for this file relative to the install prefix
+    [startup_install_path,~,~] = fileparts(mfilename('fullpath'));
+    prefix_relative_path = '@_STARTUP_M_INSTALL_DIR@'; %Install directory for this file relative to the install prefix
     all_path_dirs = strsplit(startup_install_path,filesep());
     prefix_relative_path_dirs = strsplit(prefix_relative_path,filesep());
     while ~isempty(prefix_relative_path_dirs)
-        if prefix_relative_path_dirs(end) == "."
-            prefix_relative_path_dirs(end)=[]; %Remove any "." paths from prefix
+        if prefix_relative_path_dirs(end) == "." ||  prefix_relative_path_dirs(end) == ""
+            prefix_relative_path_dirs(end)=[]; %Remove any "." or empty paths from prefix
             continue;
         end
-        if prefix_relative_path_dirs(end) ~= all_path_dirs(end)
-            error('@PROJECT_NAME@:InvalidPackageLayout',
+        if prefix_relative_path_dirs{end} ~= all_path_dirs{end}
+            error('@PROJECT_NAME@:InvalidPackageLayout', ...
                 ['Startup file location has changed with respect to install prefix. Got startup_install_path:',startup_install_path,'prefix_relative_path:',prefix_relative_path]);
         end
         %Remove matching dirs.
         prefix_relative_path_dirs(end)=[];
         all_path_dirs(end)=[];
     end
-    package_install_prefix = fullfile(all_path_dirs);
+    package_install_prefix = strjoin(all_path_dirs,filesep());
 
     if isempty(all_path_dirs{1})
         package_install_prefix = ['/', package_install_prefix]; %On unix
@@ -61,8 +61,8 @@ function startup@PROJECT_NAME@(debug)
     if ~exist(package_install_prefix,'dir')
         error('@PROJECT_NAME@:InvalidPackageLayout',['Startup file must be located within the within the "lib" sub-directory of the install prefix. Found bad install_prefix: ',package_install_prefix]);
     end
-    disp('@PROJECT_NAME@ Found. Install prefix: ',package_install_prefix);
-    disp('@PROJECT_NAME@ Initializing for matlab vers:', version_str)
+    disp(['@PROJECT_NAME@ Found. Install prefix: ',package_install_prefix]);
+    disp(['@PROJECT_NAME@ Initializing for matlab vers:', version_str])
 
     % package matlab code <install_prefix>/lib/<pgkname>/matlab/*
     %Normally relative to package_install_prefix, but for build-tree exports it may be absolute or relative
@@ -79,9 +79,10 @@ function startup@PROJECT_NAME@(debug)
 
     %These paths are only enabled when called from the build directory.  They do not have extensions.
     %These paths should be relative to the build directory
-    relative_mex_build_paths = strsplit('@_MATLAB_BUILD_MEX_PATHS@',';');
+    relative_mex_build_paths = '@_MATLAB_BUILD_MEX_PATHS@';
     mexfile_paths={};
     if ~isempty(relative_mex_build_paths)
+        relative_mex_build_paths = strsplit(relative_mex_build_paths,';');
         %Build tree
         for path = relative_mex_build_paths
             build_path = fullfile(package_install_prefix,path{1});
@@ -110,7 +111,7 @@ function startup@PROJECT_NAME@(debug)
         installed_mex_path = '@_MATLAB_INSTALLED_MEX_PATH@'; %Should be relative
         if ~isempty(installed_mex_path)
             installed_package_mex_arch_path = fullfile(package_install_prefix,installed_mex_path,mex_sub_dir);
-            if ~exist(package_mex_arch_path,'dir')
+            if ~exist(installed_package_mex_arch_path,'dir')
                 error('@PROJECT_NAME@:InvalidPackageLayout',['Package @PROJECT_NAME@ cannot find mex directory: ',strrep(installed_package_mex_arch_path,'\','/')]);
             end
             mexfile_paths = [mexfile_paths, installed_package_mex_arch_path];
@@ -121,6 +122,10 @@ function startup@PROJECT_NAME@(debug)
     dependent_startup_m_locations = strsplit('@_DEPENDENT_STARTUP_M_LOCATIONS@',';');
     if ~isempty(dependent_startup_m_locations)
         for location = dependent_startup_m_locations
+            location = location{1};
+            if isempty(location)
+                continue
+            end
             [p,~,~] = fileparts(location);
             if isempty(p)
                 %We recieved no relative or absolute path.  Assume this .m file is in the same directory
@@ -129,8 +134,7 @@ function startup@PROJECT_NAME@(debug)
                     error('@PROJECT_NAME@:BadDependentStarupMLocation',['Package @PROJECT_NAME@ cannot find dependent startup.m file relative to current directory: ',strrep(m_file,'\','/')]);
                 end
             else
-                ps = strsplit(p,filesep())
-                if ps(1) == "/" || regexp(ps(1),'[A-Z]:')
+                if is_absolute_path(location)
                     %Absolute path.
                     m_file = location;
                     if ~exist(m_file,'file')
@@ -144,16 +148,16 @@ function startup@PROJECT_NAME@(debug)
                     end
                 end
             end
-            disp('@PROJECT_NAME@ Processing Dependent startup.m :', strrep(m_file,'\','/'));
+            disp(['@PROJECT_NAME@ Processing Dependent startup.m :', strrep(m_file,'\','/')]);
             run(m_file); %Process dependent startup.m file
         end
     end
 
     %Add matlab code and mex paths for this project
-    disp('@PROJECT_NAME@ Adding matlab code path: ', package_matlab_code_path)
+    disp(['@PROJECT_NAME@ Adding matlab code path: ', package_matlab_code_path])
     addpath(package_matlab_code_path);
     for path = mexfile_paths
-        disp('@PROJECT_NAME@ Adding mex path: ', path{1})
+        disp(['@PROJECT_NAME@ Adding mex path: ', path{1}])
         addpath(path{1});
     end
 end
