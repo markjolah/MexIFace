@@ -25,9 +25,9 @@ classdef IFaceMixin < handle
         function obj = IFaceMixin(ifaceHandle)
             % Inputs:
             %  ifaceHandle - A function handle to the *_Iface mex function that implements the C++ side of the interface
-            vers = IFaceMixin.get_version_string();
-            if exist([ifaceHandle,vers]) == 3
-                obj.ifaceHandle = [ifaceHandle,vers];
+            vers = MexIFace.IFaceMixin.get_version_string();
+            if exist([func2str(ifaceHandle),vers],'file') == 3
+                obj.ifaceHandle = str2func([func2str(ifaceHandle),vers]);
             else
                 error('IFaceMixin:BadHandle',['Unable to find a mex module named ', ifaceHandle,' for Matlab version:',vers])
             end
@@ -77,9 +77,9 @@ classdef IFaceMixin < handle
     methods (Access=protected, Static=true)
         function version_str = get_version_string()
             %Get matlab major.minor version
-            version_re = '^(?<major>\d+)\.(?<minor>\d+)\.'
+            version_re = '^(?<major>\d+)\.(?<minor>\d+)\.';
             tokens = regexp(version(),version_re,'tokens');
-            if isempty(tokens) || (numel(tokens{1} ~= 2)
+            if isempty(tokens) || numel(tokens{1}) ~= 2
                 error('@PROJECT_NAME@:LogicalError',['Package @PROJECT_NAME@ cannot determine matlab numeric version from version string:', version()]);
             end
             version_str = [tokens{1}{1} '_' tokens{1}{2}];
