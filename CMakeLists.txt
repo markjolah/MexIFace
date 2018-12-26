@@ -78,6 +78,8 @@ include(ConfigureIPO)
 
 #Debugging configuration
 include(ConfigureDebugBuilds)
+# add_link_options("-v" "-Wl,--verbose") #Debug
+
 
 #include(MexIFace-Doxygen) #Add Doxygen documentation targets
 
@@ -130,7 +132,7 @@ unset(_MATLAB_CODE_DIR)
 unset(_MATLAB_STARTUP_M)
 unset(_MATLAB_INSTALLED_MEX_PATH)
 
-if(NOT CMAKE_CROSSCOMPILING) # No build-tree export when crosscompiling
+if(NOT ARG_DISABLE_BUILD_EXPORT AND NOT CMAKE_EXPORT_NO_PACKAGE_REGISTRY AND NOT CMAKE_CROSSCOMPILING) # No build-tree export when crosscompiling
     #build-tree export config MexIFaceConfig-mexiface.cmake
     set(_MATLAB_CODE_DIR ${CMAKE_SOURCE_DIR}/matlab) #Use source repository for matlab code
     set(_MATLAB_STARTUP_M ${CMAKE_BINARY_DIR}/startupMexIFace.m)
