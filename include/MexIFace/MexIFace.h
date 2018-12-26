@@ -320,9 +320,11 @@ void MexIFace::checkType(const mxArray *m)
 inline
 void MexIFace::checkType(const mxArray *m, mxClassID expected_classid)
 {
-    if (mxGetClassID(m) != expected_classid) {        
+    mxClassID m_id=mxGetClassID(m);
+    std::cout<<"Checking type: "<<m_id<<" vs. "<<expected_classid<<std::endl;
+    if (m_id != expected_classid) {
         std::ostringstream msg;
-        msg<<"Expected Type="<<get_mx_class_name(expected_classid)<<" | Got Type="<<get_mx_class_name(m);
+        msg<<"Expected Type="<<get_mx_class_name(expected_classid)<<" (id:"<<expected_classid<<") "<<" | Got Type="<<get_mx_class_name(m)<<" (id:"<<m_id<<")";
         throw MexIFaceError("BadType",msg.str());
     }
 }

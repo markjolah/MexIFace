@@ -16,6 +16,7 @@ set(BUILD_STATIC_LIBS OFF CACHE BOOL "Build static libraries. Ignored. Exists fo
 
 option(MexIFace_MATLAB_INTERLEAVED_COMPLEX "Enable interleaved complex API in R2018a+" OFF)
 option(MexIFace_MATLAB_LARGE_ARRAY_DIMS "Enable 64-bit array indexes in R2017a+" OFF)
+option(BUILD_TESTING "Build testing framework" OFF)
 option(OPT_EXTRA_DEBUG "Support extra noisy debugging features" OFF) #Extra debug features (Armadillo)
 
 #Locations of the MexIFace cmake build system components
@@ -154,4 +155,8 @@ if(NOT ARG_DISABLE_BUILD_EXPORT AND NOT CMAKE_EXPORT_NO_PACKAGE_REGISTRY AND NOT
     unset(_MATLAB_STARTUP_M)
     unset(_MATLAB_BUILD_MEX_PATHS)
     unset(_DEPENDENT_STARTUP_M_LOCATIONS)
+endif()
+
+if(BUILD_TESTING)
+    add_subdirectory(test)
 endif()

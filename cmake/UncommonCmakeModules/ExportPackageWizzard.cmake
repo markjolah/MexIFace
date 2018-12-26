@@ -69,7 +69,7 @@ endif()
 
 if(NOT ARG_PACKAGE_CONFIG_TEMPLATE)
     find_file(ARG_PACKAGE_CONFIG_TEMPLATE PackageConfig.cmake.in PATHS "${CMAKE_SOURCE_DIR}/cmake"
-              PATH_SUFFIXES Modules modules Templates templates NO_DEFAULT_PATH)
+              PATH_SUFFIXES Modules modules Templates templates NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
     mark_as_advanced(ARG_PACKAGE_CONFIG_TEMPLATE)
     if(NOT ARG_PACKAGE_CONFIG_TEMPLATE)
         message(FATAL_ERROR "Unable to find PackageConfig.cmake.in. Cannot configure exports.")
