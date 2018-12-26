@@ -29,7 +29,7 @@ classdef IFaceMixin < handle
             if exist([func2str(ifaceHandle),vers],'file') == 3
                 obj.ifaceHandle = str2func([func2str(ifaceHandle),vers]);
             else
-                error('IFaceMixin:BadHandle',['Unable to find a mex module named ', ifaceHandle,' for Matlab version:',vers])
+                error('IFaceMixin:BadHandle',['Unable to find a mex module named ', func2str(ifaceHandle),' for Matlab version:',vers])
             end
         end
 
