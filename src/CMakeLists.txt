@@ -31,7 +31,7 @@ foreach(idx RANGE ${niter})
     if(UNIX OR (CMAKE_CROSSCOMPILING AND WIN32))
         #Sets visibility of symbols to only mexFunction and related interface
         #Can't have this be an interface property of MATLAB::X_Y::MEX_LIBRARIES as it would cause MexIFace to not export symbols needed by clients.
-        target_link_options(${lib} INTERFACE -Wl,--version-script,${map_file})
+#         target_link_options(${lib} INTERFACE -Wl,--version-script,${map_file})
     endif()
     target_link_libraries(${lib} PUBLIC BacktraceException::BacktraceException) #Exception backtraces
     target_link_libraries(${lib} PUBLIC ${matlab_target}) #Matlab Mex libraries
