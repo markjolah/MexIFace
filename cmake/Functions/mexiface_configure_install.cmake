@@ -42,7 +42,7 @@ function(mexiface_configure_install)
 
     if(NOT ARG_PACKAGE_CONFIG_TEMPLATE)
         find_file(ARG_PACKAGE_CONFIG_TEMPLATE PackageConfig-mexiface.cmake.in
-                PATHS ${_mexiface_configure_install_PATH}/../Templates NO_DEFAULT_PATH)
+                PATHS ${_mexiface_configure_install_PATH}/../Templates NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
         mark_as_advanced(ARG_PACKAGE_CONFIG_TEMPLATE)
         if(NOT ARG_PACKAGE_CONFIG_TEMPLATE)
             message(FATAL_ERROR "Unable to find PackageConfig-mexiface.cmake.in. Cannot configure exports.")
@@ -59,7 +59,7 @@ function(mexiface_configure_install)
 
     if(NOT ARG_STARTUP_M_TEMPLATE)
         find_file(ARG_STARTUP_M_TEMPLATE startupPackage.m.in
-                PATHS ${_mexiface_configure_install_PATH}/../Templates NO_DEFAULT_PATH)
+                PATHS ${_mexiface_configure_install_PATH}/../Templates NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
         mark_as_advanced(ARG_PACKAGE_CONFIG_TEMPLATE)
         if(NOT ARG_PACKAGE_CONFIG_TEMPLATE)
             message(FATAL_ERROR "Unable to find PackageConfig-mexiface.cmake.in. Cannot configure exports.")
