@@ -10,6 +10,8 @@
 #define MEXIFACE_MEXUTILS_H
 
 #include <cstdint>
+#include <string>
+
 
 #include "mex.h"
 
@@ -65,6 +67,13 @@ const char* get_mx_class_name(const mxArray *array)
 {
     return get_mx_class_name(mxGetClassID(array));
 }
+
+std::string demangle(const char* name);
+
+template<class T>
+std::string type_name(const T&t) { return demangle(typeid(t).name()); }
+template<class T>
+std::string type_name() { return demangle(typeid(T).name()); }
 
 } /* namespace mexiface */
 

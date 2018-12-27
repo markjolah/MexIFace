@@ -4,6 +4,8 @@
  * @copyright Licensed under the Apache License, Version 2.0.  See LICENSE file.
  * @brief Helper functions for working with Matlab mxArrays and mxClassIDs
  */
+#include <memory>
+#include <cxxabi.h>
 
 #include "MexIFace/MexUtils.h"
 #include "MexIFace/explore.h"
@@ -66,6 +68,14 @@ void exploreMexArgs(int nargs, const mxArray *args[] )
         explore::analyze_class(args[i]);
     }
 }
+
+std::string demangle(const char* name)
+{
+    int status = -4;
+    std::unique_ptr<char, void(*)(void*)> res{abi::__cxa_demangle(name, NULL, NULL, &status),std::free};
+    return (status==0) ? res.get() : name;
+}
+
 
 } /* namespace mexiface */
 

@@ -10,6 +10,7 @@
 
 #include "MexIFace/Handle.h"
 #include "MexIFace/MexIFaceBase.h"
+#include "MexIFace/MexUtils.h"
 
 namespace mexiface 
 {
@@ -54,7 +55,7 @@ private:
 
 template<class ObjT>
 MexIFaceHandler<ObjT>::MexIFaceHandler() : 
-    _obj_name(std::type_index(typeid(ObjT)).name())
+    _obj_name(type_name<ObjT>())
 { }
 
 template<class ObjT>

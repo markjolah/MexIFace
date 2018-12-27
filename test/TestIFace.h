@@ -13,25 +13,26 @@
 
 class TestArmadillo
 {
-    using VecT = arma::Col<double>;
-    VecT v;
 public:
+    using VecT = arma::Col<double>;
     TestArmadillo(VecT v) : v(v) {}
-    VecT add(const VecT &o) {return o+v;}
+    VecT add(const VecT &o) const {return o+v;}
+    VecT ret() const {return v;}
+    void inc(const VecT &o) { v+=o; }
+private:
+    VecT v;
 };
 
 
-class TestIFace : public mexiface::MexIFace
+class TestIFace : public mexiface::MexIFace, public mexiface::MexIFaceHandler<TestArmadillo>
 {
 public:
     TestIFace();
 private:
-    int max_threads;
-    
-    TrackerT *obj;
-    //Abstract member functions inherited from Mex_Iface
     void objConstruct();
     void objAdd();
+    void objRet();
+    void objInc();
 };
 
 #endif /* MEXIFACE_TESTIFACE_H */

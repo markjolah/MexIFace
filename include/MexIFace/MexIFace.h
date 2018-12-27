@@ -183,10 +183,10 @@ protected:
 
     MXArgCountT nlhs; /**< The number of lhs (output) arguments asked for */
     mxArray **lhs; /**< The lhs (output) arguments to be returned */
-    IdxT lhs_idx=0; /**< The index of the next lhs argument to write as output */
+    IdxT lhs_idx; /**< The index of the next lhs argument to write as output */
     MXArgCountT nrhs; /**< The number of rhs (input) arguments given */
     const mxArray **rhs; /**< The rhs (input) arguments given */
-    IdxT rhs_idx=0; /**< The index of the next rhs argument to read as input */
+    IdxT rhs_idx; /**< The index of the next rhs argument to read as input */
 
     /* methods to check the number and shape of arguments */
     void checkNumArgs(MXArgCountT expected_nlhs, MXArgCountT expected_nrhs) const;
@@ -276,7 +276,7 @@ protected:
     void error(std::string component,std::string condition, std::string message) const;
 
 private:
-    void callMethod(std::string name, const MethodMap &map) noexcept;
+    void callMethod(std::string name, const MethodMap &map);
     void popRhs();
     void setArguments(MXArgCountT _nlhs, mxArray *_lhs[], MXArgCountT _nrhs, const mxArray *_rhs[]);    
     
@@ -321,7 +321,6 @@ inline
 void MexIFace::checkType(const mxArray *m, mxClassID expected_classid)
 {
     mxClassID m_id=mxGetClassID(m);
-    std::cout<<"Checking type: "<<m_id<<" vs. "<<expected_classid<<std::endl;
     if (m_id != expected_classid) {
         std::ostringstream msg;
         msg<<"Expected Type="<<get_mx_class_name(expected_classid)<<" (id:"<<expected_classid<<") "<<" | Got Type="<<get_mx_class_name(m)<<" (id:"<<m_id<<")";
@@ -1201,7 +1200,9 @@ Hypercube<ElemT> MexIFace::makeOutputArray(IdxT rows, IdxT cols, IdxT slices, Id
 
 inline
 void MexIFace::output(mxArray *m)
-{ lhs[lhs_idx++] = m; }
+{
+    lhs[lhs_idx++] = m;
+}
 
 template<class ConvertableT>
 void MexIFace::output(ConvertableT&& val)
@@ -1222,10 +1223,12 @@ void MexIFace::output(ConvertableT&& val)
 inline
 void MexIFace::setArguments(MXArgCountT _nlhs, mxArray *_lhs[], MXArgCountT _nrhs, const mxArray *_rhs[])
 {
-    nlhs=_nlhs;
-    lhs=_lhs;
-    nrhs=_nrhs;
-    rhs=_rhs;
+    nlhs = _nlhs;
+    lhs = _lhs;
+    nrhs = _nrhs;
+    rhs = _rhs;
+    lhs_idx = 0;
+    rhs_idx = 0;
 }
 
 /** @brief Remove the first right-hand-side (input) argument as it has already been used to find the correct command
@@ -1234,7 +1237,7 @@ inline
 void MexIFace::popRhs()
 {
     nrhs--; 
-    rhs+=1;
+    rhs += 1;
 }
 
 

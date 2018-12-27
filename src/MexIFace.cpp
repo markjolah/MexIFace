@@ -26,8 +26,8 @@ MexIFace::MexIFace()
  */
 void MexIFace::error(std::string condition, std::string message) const
 {
-    mexErrMsgIdAndTxt((remove_alphanumeric(obj_name())+":"+remove_alphanumeric(condition)).c_str(), 
-                      message.c_str());
+    std::string message_id =remove_alphanumeric(obj_name())+":"+remove_alphanumeric(condition);
+    mexErrMsgIdAndTxt(message_id.c_str(),message.c_str());
 }
 
 /** @brief Reports an error condition in a specified component to Matlab using the mexErrMsgIdAndTxt function
@@ -46,6 +46,7 @@ std::string MexIFace::remove_alphanumeric(std::string name)
 {
     auto nonalphanumeric = [](const char &c) {return !isalnum(c);};
     name.erase(std::remove_if(name.begin(), name.end(), nonalphanumeric), name.end());
+    name.erase(name.begin(),std::find_if(name.begin(), name.end(),isalpha)); //delete any numerals preceeding name.
     return name;
 }
 
@@ -69,9 +70,12 @@ void MexIFace::mexFunction(MXArgCountT _nlhs, mxArray *_lhs[], MXArgCountT _nrhs
     checkMinNumArgs(0,1);
     auto command = getString(rhs[0]);
     popRhs();//remove command from RHS
-    if (command=="@new") { 
-        objConstruct(); 
-    } else if (command=="@delete") { 
+//     std::cout<<"Command called: "<<command<<std::endl;
+//     exploreMexArgs(_nrhs,_rhs);
+//     std::cout<<std::endl;
+    if (command=="@new") {
+        objConstruct();
+    } else if (command=="@delete") {
         checkMinNumArgs(0,1);
         objDestroy(rhs[0]); 
     } else if (command=="@static") {
@@ -94,7 +98,7 @@ void MexIFace::mexFunction(MXArgCountT _nlhs, mxArray *_lhs[], MXArgCountT _nrhs
  *
  * Throws an error if the name is not in the methodmap std::map data structure.
  */
-void MexIFace::callMethod(std::string name,const MethodMap &map) noexcept
+void MexIFace::callMethod(std::string name,const MethodMap &map)
 {
     auto it = methodmap.find(name);
     if (it == methodmap.end()){

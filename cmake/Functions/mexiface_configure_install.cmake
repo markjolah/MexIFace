@@ -141,33 +141,35 @@ function(mexiface_configure_install)
     unset(_MATLAB_INSTALLED_MEX_PATH)
 
     #build-tree export
+    set(_MATLAB_CODE_DIR ${ARG_MATLAB_SRC_DIR})
+    set(_MATLAB_STARTUP_M ${ARG_CONFIG_DIR}/${ARG_STARTUP_M_FILE})
     if(NOT ARG_DISABLE_BUILD_EXPORT)
         #build-tree export config @PACKAGE_NAME@Config-mexiface.cmake
-        set(_MATLAB_CODE_DIR ${ARG_MATLAB_SRC_DIR})
-        set(_MATLAB_STARTUP_M ${ARG_CONFIG_DIR}/${ARG_STARTUP_M_FILE})
         configure_package_config_file(${ARG_PACKAGE_CONFIG_TEMPLATE} ${ARG_PACKAGE_CONFIG_FILE}
                                     INSTALL_DESTINATION ${ARG_CONFIG_DIR}
                                     INSTALL_PREFIX ${ARG_CONFIG_DIR}
                                     PATH_VARS _MATLAB_CODE_DIR _MATLAB_STARTUP_M
                                     NO_CHECK_REQUIRED_COMPONENTS_MACRO)
-        #startup.m build-tree
-        set(_STARTUP_M_INSTALL_DIR "") #Install dir for build-tree export startup.m to install location at ${ARG_CONFIG_DIR}
-        get_property(_MATLAB_BUILD_MEX_PATHS GLOBAL PROPERTY MexIFace_MODULE_BUILD_DIRS)
-        if(NOT _MATLAB_BUILD_MEX_PATHS OR ARG_NOMEX)
-            set(_MATLAB_BUILD_MEX_PATHS) #Disable mex exporting
-        endif()
-        set(_DEPENDENT_STARTUP_M_LOCATIONS)
-        if(IS_ABSOLUTE ${ARG_CONFIG_DIR})
-            set(_prefix ${ARG_CONFIG_DIR})
-        else()
-            set(_prefix ${CMAKE_BINARY_DIR}/${ARG_CONFIG_DIR})
-        endif()
-        foreach(location IN LISTS ARG_DEPENDENT_STARTUP_M_LOCATIONS)
-            #Remap dependent startup.m locations to be relative to the install prefix for this file
-            string(REGEX REPLACE "^${_prefix}/" "" location ${location})
-            list(APPEND _DEPENDENT_STARTUP_M_LOCATIONS ${location})
-        endforeach()
-        configure_file(${ARG_STARTUP_M_TEMPLATE} ${ARG_CONFIG_DIR}/${ARG_STARTUP_M_FILE})
     endif()
+
+    #startup.m build-tree
+    set(_STARTUP_M_INSTALL_DIR "") #Install dir for build-tree export startup.m to install location at ${ARG_CONFIG_DIR}
+    get_property(_MATLAB_BUILD_MEX_PATHS GLOBAL PROPERTY MexIFace_MODULE_BUILD_DIRS)
+    if(NOT _MATLAB_BUILD_MEX_PATHS OR ARG_NOMEX)
+        set(_MATLAB_BUILD_MEX_PATHS) #Disable mex exporting
+    endif()
+    set(_DEPENDENT_STARTUP_M_LOCATIONS)
+    if(IS_ABSOLUTE ${ARG_CONFIG_DIR})
+        set(_prefix ${ARG_CONFIG_DIR})
+    else()
+        set(_prefix ${CMAKE_BINARY_DIR}/${ARG_CONFIG_DIR})
+    endif()
+    foreach(location IN LISTS ARG_DEPENDENT_STARTUP_M_LOCATIONS)
+        #Remap dependent startup.m locations to be relative to the install prefix for this file
+        string(REGEX REPLACE "^${_prefix}/" "" location ${location})
+        list(APPEND _DEPENDENT_STARTUP_M_LOCATIONS ${location})
+    endforeach()
+    configure_file(${ARG_STARTUP_M_TEMPLATE} ${ARG_CONFIG_DIR}/${ARG_STARTUP_M_FILE})
+
 endfunction()
 

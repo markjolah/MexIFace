@@ -14,6 +14,7 @@
 #include "mex.h"
 
 #include "MexIFace/MexIFaceError.h"
+#include "MexIFace/MexUtils.h"
 
 namespace mexiface {
 
@@ -64,7 +65,7 @@ private:
 template<class T>
 Handle<T>::Handle(T *obj)
     : signature(class_handle_signature),
-      name(std::type_index(typeid(T)).name()),
+      name(type_name<T>()),
       obj(obj)
 {
 }
@@ -87,7 +88,7 @@ template<class T>
 bool Handle<T>::is_valid() const
 {
     bool sig_ok = (signature == class_handle_signature);
-    bool name_ok = (name == std::type_index(typeid(T)).name());
+    bool name_ok = (name == type_name<T>());
     return sig_ok && name_ok;
 }
 
@@ -113,7 +114,7 @@ T* Handle<T>::object() const
 template<class T>
 mxArray* Handle<T>::makeHandle(T *obj)
 {
-    mexLock(); /* Increment the lock count */
+    mexLock(); /* Increment the lock count to keep this MEX file in memory */
     auto m = mxCreateNumericMatrix(1, 1, mxUINT64_CLASS, mxREAL); //Make a new numeric array to hold the handle address
     auto handle_data = static_cast<HandlePtrT*>(mxGetData(m)); //Get pointer to arrays internal storage
     *handle_data = reinterpret_cast<HandlePtrT>(new Handle<T>(obj)); //Save the pointer to the handle in the mxarray returned
