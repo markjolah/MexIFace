@@ -1,13 +1,13 @@
 #!/bin/bash
 #
-#gcc4_9.build.sh
+# build.gcc4_9.sh
 #
 #
 
 
 ARCH=gcc4_9
 FULL_ARCH=x86_64-${ARCH}-linux-gnu
-TOOLCHAIN_FILE=./cmake/Toolchains/Toolchain-${FULL_ARCH}.cmake
+TOOLCHAIN_FILE=./cmake/UncommonCMakeModules/Toolchains/Toolchain-${FULL_ARCH}.cmake
 INSTALL_PATH=_${ARCH}.install
 BUILD_PATH=_${ARCH}.build/Debug
 NUM_PROCS=`grep -c ^processor /proc/cpuinfo`
