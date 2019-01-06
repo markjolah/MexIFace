@@ -15,7 +15,7 @@ set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries Ignored. Exists for 
 set(BUILD_STATIC_LIBS OFF CACHE BOOL "Build static libraries. Ignored. Exists for compatability. Never build static." FORCE )
 
 option(MexIFace_MATLAB_INTERLEAVED_COMPLEX "Enable interleaved complex API in R2018a+" OFF)
-option(MexIFace_MATLAB_LARGE_ARRAY_DIMS "Enable 64-bit array indexes in R2017a+" OFF)
+option(MexIFace_MATLAB_LARGE_ARRAY_DIMS "Enable 64-bit array indexes in R2017a+.  Probably this needs to be on." ON)
 option(BUILD_TESTING "Build testing framework" OFF)
 option(OPT_EXTRA_DEBUG "Support extra noisy debugging features" OFF) #Extra debug features (Armadillo)
 
