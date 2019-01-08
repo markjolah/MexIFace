@@ -23,11 +23,12 @@ option(OPT_EXTRA_DEBUG "Support extra noisy debugging features" OFF) #Extra debu
 #Export all these variables in package-config also.
 set(MexIFace_CMAKE_DIR ${CMAKE_SOURCE_DIR}/cmake)
 set(MexIFace_CMAKE_MODULES_DIR ${MexIFace_CMAKE_DIR}/Modules)
-set(MexIFace_CMAKE_TOOLCHAINS_DIR ${MexIFace_CMAKE_DIR}/Toolchains)
 set(MexIFace_CMAKE_FUNCTIONS_DIR ${MexIFace_CMAKE_DIR}/Functions)
 set(MexIFace_CMAKE_EXECUTABLE_DIR ${MexIFace_CMAKE_DIR}/Executables)
 set(MexIFace_CMAKE_TEMPLATES_DIR ${MexIFace_CMAKE_DIR}/Templates)
 list(INSERT CMAKE_MODULE_PATH 0 ${MexIFace_CMAKE_MODULES_DIR} ${MexIFace_CMAKE_FUNCTIONS_DIR})
+
+set(MexIFace_CMAKE_TOOLCHAINS_DIR ${MexIFace_CMAKE_DIR}/UncommonCMakeModules/Toolchains)
 list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_CURRENT_LIST_DIR}/cmake/UncommonCMakeModules)
 
 include(AddExternalDependency)
@@ -95,10 +96,14 @@ endif()
 #Install Cmake modules and helper files for development
 set(SHARED_CMAKE_INSTALL_DIR share/${PROJECT_NAME}/cmake)
 install(DIRECTORY ${MexIFace_CMAKE_MODULES_DIR}/ DESTINATION ${SHARED_CMAKE_INSTALL_DIR}/Modules COMPONENT Development)
-install(DIRECTORY ${MexIFace_CMAKE_TOOLCHAINS_DIR}/ DESTINATION ${SHARED_CMAKE_INSTALL_DIR}/Toolchains COMPONENT Development)
 install(DIRECTORY ${MexIFace_CMAKE_FUNCTIONS_DIR}/ DESTINATION ${SHARED_CMAKE_INSTALL_DIR}/Functions COMPONENT Development)
 install(DIRECTORY ${MexIFace_CMAKE_EXECUTABLE_DIR}/ DESTINATION ${SHARED_CMAKE_INSTALL_DIR}/Executables COMPONENT Development)
 install(DIRECTORY ${MexIFace_CMAKE_TEMPLATES_DIR}/ DESTINATION ${SHARED_CMAKE_INSTALL_DIR}/Templates COMPONENT Development)
+
+#Install cmake files from UncommonCMakeModules subrepo that consumers might use.
+install(DIRECTORY ${MexIFace_CMAKE_TOOLCHAINS_DIR}/ DESTINATION ${SHARED_CMAKE_INSTALL_DIR}/Toolchains COMPONENT Development)
+install(FILES ${MexIFace_CMAKE_DIR}/UncommonCMakeModules/FixupDependencies.cmake DESTINATION ${SHARED_CMAKE_INSTALL_DIR}/Modules COMPONENT Development)
+install(FILES ${MexIFace_CMAKE_DIR}/UncommonCMakeModules/Templates/FixupTargetDependenciesScript.cmake.in DESTINATION ${SHARED_CMAKE_INSTALL_DIR}/Templates COMPONENT Development)
 
 ### PackageConfig
 include(ExportPackageWizzard)

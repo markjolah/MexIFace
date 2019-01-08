@@ -18,6 +18,8 @@
 # LINK_LIBRARIES
 # MATLAB_LINK_LIBRARIES - [optional] Values:  ENG, MWBLAS, MWLAPACK, MATLAB_DATA_ARRAY MATLAB_ENGINE
 #
+include(FixupDependencies)
+
 function(mexiface_make_mex)
     set(options)
     set(oneValueArgs MEXNAME MATLAB_MEX_INSTALL_DIR)
@@ -46,6 +48,7 @@ function(mexiface_make_mex)
         elseif(WIN32)
             set(mex_dir "${ARG_MATLAB_MEX_INSTALL_DIR}/win64$<$<CONFIG:Debug>:.debug>")
         endif()
+        message(STATUS "[mexiface_make_mex] Using mex_dir:${mex_dir}")
         add_library(${mexfile} SHARED ${ARG_SOURCES} )
         target_link_libraries(${mexfile} PUBLIC MexIFace::MexIFace${vers}) #This does most of the magic.
         if(ARG_LINK_LIBRARIES)
@@ -59,11 +62,12 @@ function(mexiface_make_mex)
         if(UNIX)
             # RPATH config
             # $ORIGIN/../../..: This will be lib - location of global libraries for project and dependency libraries like MexIFace
-            file(RELATIVE_PATH relpath_install_prefix "/${mex_dir}" "/") # relative path to the install prefix from mex_dir
-            message(STATUS "Computed relpath to lib_dir as: ${rpath}")
-            set_target_properties(${mexfile} PROPERTIES INSTALL_RPATH "\$ORIGIN/${relpath_install_prefix}/lib") #link back to lib directory
+            string(REGEX REPLACE "[^/]+" ".." relpath_install_prefix ${mex_dir})
+            set(rpath ${relpath_install_prefix}/lib)
+            #message(STATUS "Computed relpath to lib_dir as: ${rpath}")
+            set_target_properties(${mexfile} PROPERTIES INSTALL_RPATH "\$ORIGIN/${rpath}") #link back to lib directory
             if(CMAKE_CROSSCOMPILING)
-                fixup_dependencies(TARGETS ${mexfile} TARGET_DESTINATION ${mex_dir} COPY_DESTINATION "${relpath_install_prefix}/lib")
+                fixup_dependencies(TARGETS ${mexfile} TARGET_DESTINATION ${mex_dir} COPY_RPATH ${rpath})
             endif()
         elseif(WIN32)
             install(TARGETS ${mexfile} RUNTIME DESTINATION ${mex_dir} COMPONENT Runtime)
@@ -92,7 +96,6 @@ function(mexiface_make_mex)
         endforeach()
     endforeach()
     file(RELATIVE_PATH binary_module_path ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
-    message(STATUS "[MexIFace::make_mex] Computed relative path: ${binary_module_path}")
     set_property(GLOBAL APPEND PROPERTY MexIFace_MODULE_BUILD_DIRS ${binary_module_path}) #Record build directories for build-tree exports
 endfunction()
 
