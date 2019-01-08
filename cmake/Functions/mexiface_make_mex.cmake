@@ -59,11 +59,15 @@ function(mexiface_make_mex)
         if(UNIX)
             # RPATH config
             # $ORIGIN/../../..: This will be lib - location of global libraries for project and dependency libraries like MexIFace
-            set_target_properties(${mexfile} PROPERTIES INSTALL_RPATH "\$ORIGIN/../../..") #link back to lib directory
-#             fixup_dependencies(${mexfile} COPY_DESTINATION "../../../.." RPATH "../../..")
+            file(RELATIVE_PATH relpath_install_prefix "/${mex_dir}" "/") # relative path to the install prefix from mex_dir
+            message(STATUS "Computed relpath to lib_dir as: ${rpath}")
+            set_target_properties(${mexfile} PROPERTIES INSTALL_RPATH "\$ORIGIN/${relpath_install_prefix}/lib") #link back to lib directory
+            if(CMAKE_CROSSCOMPILING)
+                fixup_dependencies(TARGETS ${mexfile} TARGET_DESTINATION ${mex_dir} COPY_DESTINATION "${relpath_install_prefix}/lib")
+            endif()
         elseif(WIN32)
             install(TARGETS ${mexfile} RUNTIME DESTINATION ${mex_dir} COMPONENT Runtime)
-            fixup_dependencies(${mexfile}) #No additional rpaths possible on windows.  have to fixup in-place :(
+            fixup_dependencies(TARGETS ${mexfile} TARGET_DESTINATION ${mex_dir} COPY_DESTINATION ".")
 #         elseif(APPLE)
 #             set_target_properties(${mexfile} PROPERTIES INSTALL_RPATH "@loader_path/../../..:@loader_path/../../../..") #link back to lib directory
 #             fixup_dependencies(${mexfile} COPY_DESTINATION "../../../.." RPATH "../../..")
