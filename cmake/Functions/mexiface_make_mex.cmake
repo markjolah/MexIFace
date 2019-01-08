@@ -58,7 +58,6 @@ function(mexiface_make_mex)
             target_link_libraries(${mexfile} PUBLIC ${MATLAB_LINK_LIBRARIES}) #Additional matlab libraries
         endif()
         set_target_properties(${mexfile} PROPERTIES PREFIX "" DEBUG_POSTFIX "" SUFFIX .${MexIFace_MATLAB_SYSTEM_MEXEXT})
-        install(TARGETS ${mexfile} LIBRARY DESTINATION ${mex_dir} COMPONENT Runtime)
         if(UNIX)
             # RPATH config
             # $ORIGIN/../../..: This will be lib - location of global libraries for project and dependency libraries like MexIFace
@@ -66,6 +65,7 @@ function(mexiface_make_mex)
             set(rpath ${relpath_install_prefix}/lib)
             #message(STATUS "Computed relpath to lib_dir as: ${rpath}")
             set_target_properties(${mexfile} PROPERTIES INSTALL_RPATH "\$ORIGIN/${rpath}") #link back to lib directory
+            install(TARGETS ${mexfile} LIBRARY DESTINATION ${mex_dir} COMPONENT Runtime)
             if(CMAKE_CROSSCOMPILING)
                 fixup_dependencies(TARGETS ${mexfile} TARGET_DESTINATION ${mex_dir} COPY_RPATH ${rpath})
             endif()

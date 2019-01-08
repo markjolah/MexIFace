@@ -76,7 +76,7 @@ if(NOT MexIFace_MATLAB_ROOTS)
 endif()
 
 #Enable Inter-proceedural optimization
-include(ConfigureIPO)
+#include(ConfigureIPO)
 
 #Debugging configuration
 include(ConfigureDebugBuilds)
