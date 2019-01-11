@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/markjolah/UncommonCMakeModules.git
 	branch = master
-	commit = 5fa28fcef7cd10827818010e0a0b5ef8e1982ceb
-	parent = e604f4d62488da082b638a290a509683f81e7ef4
+	commit = 1c9ed45d71dee3602c7a537f2195b3d7a4ab0152
+	parent = ccdabc5a2e40607c58934c4acb6f112f3f169e96
 	method = merge
 	cmdver = 0.4.0
