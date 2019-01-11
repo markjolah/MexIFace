@@ -112,7 +112,13 @@ function startup@PROJECT_NAME@(debug)
         if ~isempty(installed_mex_path)
             installed_package_mex_arch_path = fullfile(package_install_prefix,installed_mex_path,mex_sub_dir);
             if ~exist(installed_package_mex_arch_path,'dir')
-                error('@PROJECT_NAME@:InvalidPackageLayout',['Package @PROJECT_NAME@ cannot find mex directory: ',strrep(installed_package_mex_arch_path,'\','/')]);
+                if ~debug && exist([installed_package_mex_arch_path '.debug'],'dir')
+                    disp('@PROJECT_NAME@ Found debug versions.  Enabling debug mode.')
+                    installed_package_mex_arch_path = [installed_package_mex_arch_path '.debug'];
+                    debug = 1;
+                else
+                    error('@PROJECT_NAME@:InvalidPackageLayout',['Package @PROJECT_NAME@ cannot find mex directory: ',strrep(installed_package_mex_arch_path,'\','/')]);
+                end
             end
             mexfile_paths = [mexfile_paths, installed_package_mex_arch_path];
         end

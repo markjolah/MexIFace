@@ -58,20 +58,22 @@ function(mexiface_make_mex)
             target_link_libraries(${mexfile} PUBLIC ${MATLAB_LINK_LIBRARIES}) #Additional matlab libraries
         endif()
         set_target_properties(${mexfile} PROPERTIES PREFIX "" DEBUG_POSTFIX "" SUFFIX .${MexIFace_MATLAB_SYSTEM_MEXEXT})
+        string(REGEX REPLACE "[^/]+" ".." relpath_install_prefix ${mex_dir})
+        set(rpath ${relpath_install_prefix})
+        get_target_property(_MATLAB_LIB_PATH MATLAB::${vers}::MEX_LIBRARIES INTERFACE_LINK_DIRECTORIES)
+        #message(STATUS "Got lib_path: MATLAB::${vers}::MEX_LIBRARIES ${_MATLAB_LIB_PATH}")
         if(UNIX)
             # RPATH config
             # $ORIGIN/../../..: This will be lib - location of global libraries for project and dependency libraries like MexIFace
-            string(REGEX REPLACE "[^/]+" ".." relpath_install_prefix ${mex_dir})
-            set(rpath ${relpath_install_prefix}/lib)
             #message(STATUS "Computed relpath to lib_dir as: ${rpath}")
-            set_target_properties(${mexfile} PROPERTIES INSTALL_RPATH "\$ORIGIN/${rpath}") #link back to lib directory
+            set_target_properties(${mexfile} PROPERTIES INSTALL_RPATH "\$ORIGIN/${rpath}/lib") #link back to lib directory
             install(TARGETS ${mexfile} LIBRARY DESTINATION ${mex_dir} COMPONENT Runtime)
             if(CMAKE_CROSSCOMPILING)
-                fixup_dependencies(TARGETS ${mexfile} TARGET_DESTINATION ${mex_dir} COPY_RPATH ${rpath})
+                fixup_dependencies(TARGETS ${mexfile} TARGET_DESTINATION ${mex_dir} COPY_DESTINATION ${rpath}/lib PROVIDED_LIB_DIRS ${_MATLAB_LIB_PATH})
             endif()
         elseif(WIN32)
             install(TARGETS ${mexfile} RUNTIME DESTINATION ${mex_dir} COMPONENT Runtime)
-            fixup_dependencies(TARGETS ${mexfile} TARGET_DESTINATION ${mex_dir} COPY_DESTINATION ".")
+            fixup_dependencies(TARGETS ${mexfile} TARGET_DESTINATION ${mex_dir} COPY_DESTINATION "." PROVIDED_LIB_DIRS ${_MATLAB_LIB_PATH})
 #         elseif(APPLE)
 #             set_target_properties(${mexfile} PROPERTIES INSTALL_RPATH "@loader_path/../../..:@loader_path/../../../..") #link back to lib directory
 #             fixup_dependencies(${mexfile} COPY_DESTINATION "../../../.." RPATH "../../..")

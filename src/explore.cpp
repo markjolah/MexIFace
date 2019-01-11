@@ -506,7 +506,7 @@ void get_characteristics(const mxArray *array_ptr)
   temp_string=(char *)mxCalloc(64, sizeof(char));
 
   for (c=0; c<number_of_dimensions; c++) {
-      sprintf(temp_string, "%dx", dims[c]);
+      sprintf(temp_string, "%lux", static_cast<unsigned long>(dims[c]));
     strcat(shape_string, temp_string);
   }
 
@@ -514,7 +514,7 @@ void get_characteristics(const mxArray *array_ptr)
   /* replace the last 'x' with a space */
   shape_string[length_of_shape_string-1]='\0';
   if (length_of_shape_string > 16) {
-      sprintf(shape_string, "%u-D", number_of_dimensions);
+      sprintf(shape_string, "%lu-D", static_cast<unsigned long>(number_of_dimensions));
   }
   mexPrintf("Dimensions: %s\n", shape_string);
   
