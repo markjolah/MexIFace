@@ -71,9 +71,6 @@ endif()
 #               the RE "^[r|R]20\d\d[a|b]"
 include(MexIFace-configure-matlab)
 
-if(NOT MexIFace_MATLAB_ROOTS)
-    message(FATAL_ERROR "[Mexiface]: No valid MATLAB_ROOTS.  Set MATLAB_ROOT or MATLAB_ROOTS as a CMake variable or environment variable to a valid matlab install directory(s).")
-endif()
 
 #Enable Inter-proceedural optimization
 #include(ConfigureIPO)

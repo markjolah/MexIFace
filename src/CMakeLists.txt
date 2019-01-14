@@ -14,6 +14,7 @@ if(niter LESS 0)
     message(FATAL_ERROR "[Mexiface]: No valid MATLAB_ROOTS")
 endif()
 set(MexIFace_TARGETS)
+include(FixupDependencies)
 foreach(idx RANGE ${niter})
     list(GET MexIFace_MATLAB_VERSIONS ${idx} ver)
     list(GET MexIFace_MATLAB_VERSION_STRINGS ${idx} vers)
@@ -33,6 +34,7 @@ foreach(idx RANGE ${niter})
         #Can't have this be an interface property of MATLAB::X_Y::MEX_LIBRARIES as it would cause MexIFace to not export symbols needed by clients.
 #         target_link_options(${lib} INTERFACE -Wl,--version-script,${map_file})
     endif()
+    target_link_options(${lib} PUBLIC "-Wl,--as-needed")
     target_link_libraries(${lib} PUBLIC BacktraceException::BacktraceException) #Exception backtraces
     target_link_libraries(${lib} PUBLIC ${matlab_target}) #Matlab Mex libraries
     target_include_directories(${lib} PUBLIC $<BUILD_INTERFACE:${PUBLIC_HEADER_SRC_DIR}>
@@ -44,6 +46,10 @@ foreach(idx RANGE ${niter})
             ARCHIVE DESTINATION lib COMPONENT Development
             LIBRARY DESTINATION lib COMPONENT Runtime)
     list(APPEND MexIFace_TARGETS MexIFace::${lib})
+#     if(CMAKE_CROSSCOMPILING)
+#         get_target_property(_MATLAB_LIB_PATH MATLAB::${vers}::MEX_LIBRARIES INTERFACE_LINK_DIRECTORIES)
+#         fixup_dependencies(TARGETS ${lib} TARGET_DESTINATION lib PROVIDED_LIB_DIRS ${_MATLAB_LIB_PATH})
+#     endif()
 endforeach()
 
 install(DIRECTORY ${PUBLIC_HEADER_SRC_DIR}/ DESTINATION include COMPONENT Development)

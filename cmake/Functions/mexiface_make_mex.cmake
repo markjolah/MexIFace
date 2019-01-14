@@ -41,6 +41,28 @@ function(mexiface_make_mex)
         file(RELATIVE_PATH ARG_MATLAB_MEX_INSTALL_DIR ${CMAKE_INSTALL_PREFIX} ${ARG_MATLAB_MEX_INSTALL_DIR})
     endif()
 
+    # Looks for options:
+    #   OPT_INSTALL_DEPENDENCIES - Fixup dependencies.  Should be ON if crosscompiling.
+    #   OPT_INSTALL_SYSTEM_DEPENDENCIES
+    #   OPT_BUILD_TREE_EXPORT
+    #   OPT_LINK_INSTALLED_LIBS
+    #Args for fixup_dependencies.
+    if(CMAKE_CROSSCOMPILING AND OPT_INSTALL_DEPENDENCIES)
+        include(FixupDependencies)
+        set(_fixup_args)
+        if(OPT_BUILD_TREE_EXPORT)
+            list(APPEND _fixup_args BUILD_TREE_EXPORT)
+        endif()
+        if(OPT_INSTALL_SYSTEM_DEPENDENCIES)
+            list(APPEND _fixup_args COPY_SYSTEM_LIBS)
+        endif()
+        if(OPT_LINK_INSTALLED_LIBS)
+            list(APPEND _fixup_args LINK_INSTALLED_LIBS)
+        endif()
+    elseif(CMAKE_CROSSCOMPILING)
+        message(WARNING "  [MexIFace::make_mex()] Crosscompiling, but OPT_INSTALL_DEPENDENCIES is not set.  Dependencies may not be found correctly for mex files that link to external shared libraries.")
+    endif()
+
     foreach(vers IN LISTS MexIFace_COMPATABLE_MATLAB_VERSION_STRINGS)
         set(mexfile ${ARG_MEXNAME}${vers})
         if(UNIX)
@@ -48,7 +70,6 @@ function(mexiface_make_mex)
         elseif(WIN32)
             set(mex_dir "${ARG_MATLAB_MEX_INSTALL_DIR}/win64$<$<CONFIG:Debug>:.debug>")
         endif()
-        message(STATUS "[mexiface_make_mex] Using mex_dir:${mex_dir}")
         add_library(${mexfile} SHARED ${ARG_SOURCES} )
         target_link_libraries(${mexfile} PUBLIC MexIFace::MexIFace${vers}) #This does most of the magic.
         if(ARG_LINK_LIBRARIES)
@@ -61,19 +82,20 @@ function(mexiface_make_mex)
         string(REGEX REPLACE "[^/]+" ".." relpath_install_prefix ${mex_dir})
         set(rpath ${relpath_install_prefix})
         get_target_property(_MATLAB_LIB_PATH MATLAB::${vers}::MEX_LIBRARIES INTERFACE_LINK_DIRECTORIES)
-        #message(STATUS "Got lib_path: MATLAB::${vers}::MEX_LIBRARIES ${_MATLAB_LIB_PATH}")
         if(UNIX)
-            # RPATH config
-            # $ORIGIN/../../..: This will be lib - location of global libraries for project and dependency libraries like MexIFace
-            #message(STATUS "Computed relpath to lib_dir as: ${rpath}")
             set_target_properties(${mexfile} PROPERTIES INSTALL_RPATH "\$ORIGIN/${rpath}/lib") #link back to lib directory
-            install(TARGETS ${mexfile} LIBRARY DESTINATION ${mex_dir} COMPONENT Runtime)
-            if(CMAKE_CROSSCOMPILING)
-                fixup_dependencies(TARGETS ${mexfile} TARGET_DESTINATION ${mex_dir} COPY_DESTINATION ${rpath}/lib PROVIDED_LIB_DIRS ${_MATLAB_LIB_PATH})
+            if(CMAKE_CROSSCOMPILING AND OPT_INSTALL_DEPENDENCIES) #Fixup before install as otherwise the toolchain install override will auto-call fixup-dependencies
+                get_target_property(_MATLAB_INCLUDE_PATH MATLAB::${vers}::MEX_LIBRARIES INTERFACE_LINK_DIRECTORIES)
+                get_filename_component(_matlab_executable ${_MATLAB_INCLUDE_PATH}/../../bin/${MexIFace_MATLAB_ARCH}/MATLAB ABSOLUTE)
+                message("Setting Matlab executable: ${_matlab_executable}")
+                fixup_dependencies(TARGETS ${mexfile} TARGET_DESTINATION ${mex_dir} COPY_DESTINATION ${rpath}/lib PROVIDED_LIB_DIRS ${_MATLAB_LIB_PATH} PARENT_LIB ${_matlab_executable} ${_fixup_args})
             endif()
+            install(TARGETS ${mexfile} LIBRARY DESTINATION ${mex_dir} COMPONENT Runtime)
         elseif(WIN32)
+            if(CMAKE_CROSSCOMPILING AND OPT_INSTALL_DEPENDENCIES) #Fixup before install as otherwise the toolchain install override will auto-call fixup-dependencies
+                fixup_dependencies(TARGETS ${mexfile} TARGET_DESTINATION ${mex_dir} COPY_DESTINATION "." PROVIDED_LIB_DIRS ${_MATLAB_LIB_PATH} ${_fixup_args})
+            endif()
             install(TARGETS ${mexfile} RUNTIME DESTINATION ${mex_dir} COMPONENT Runtime)
-            fixup_dependencies(TARGETS ${mexfile} TARGET_DESTINATION ${mex_dir} COPY_DESTINATION "." PROVIDED_LIB_DIRS ${_MATLAB_LIB_PATH})
 #         elseif(APPLE)
 #             set_target_properties(${mexfile} PROPERTIES INSTALL_RPATH "@loader_path/../../..:@loader_path/../../../..") #link back to lib directory
 #             fixup_dependencies(${mexfile} COPY_DESTINATION "../../../.." RPATH "../../..")

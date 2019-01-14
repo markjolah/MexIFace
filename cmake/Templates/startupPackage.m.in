@@ -39,7 +39,7 @@ function startup@PROJECT_NAME@(debug)
     [startup_install_path,~,~] = fileparts(mfilename('fullpath'));
     prefix_relative_path = '@_STARTUP_M_INSTALL_DIR@'; %Install directory for this file relative to the install prefix
     all_path_dirs = strsplit(startup_install_path,filesep());
-    prefix_relative_path_dirs = strsplit(prefix_relative_path,filesep());
+    prefix_relative_path_dirs = strsplit(prefix_relative_path,'/');
     while ~isempty(prefix_relative_path_dirs)
         if strcmp(prefix_relative_path_dirs{end},'.') ||  strcmp(prefix_relative_path_dirs{end},'')
             prefix_relative_path_dirs(end)=[]; %Remove any "." or empty paths from prefix
