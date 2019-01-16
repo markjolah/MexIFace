@@ -23,7 +23,7 @@ if(CMAKE_CROSSCOMPILING AND OPT_FIXUP_DEPENDENCIES) #Fixup before install as oth
         list(APPEND _fixup_args COPY_GCC_LIBS)
     endif()
     if(OPT_FIXUP_BUILD_TREE_DEPENDENCIES)
-        list(APPEND _fixup_args BUILD_TREE_EXPORT)
+        list(APPEND _fixup_args EXPORT_BUILD_TREE)
     endif()
 endif()
 foreach(idx RANGE ${niter})
