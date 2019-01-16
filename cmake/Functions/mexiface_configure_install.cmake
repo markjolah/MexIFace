@@ -7,10 +7,9 @@
 # Installs matlab code and startup${PACKAGE_NAME}.m file for matlab integration, which is able to run dependennt startup.m file
 # from DEPENDENT_STARTUP_M_LOCATIONS
 #
-# Configures a build-tree export which enables editing of the sources .m files in-repository.  Disable with DISABLE_BUILD_EXPORT
+# Configures a build-tree export which enables editing of the sources .m files in-repository. [EXPORT_BUILD_TREE True]
 #
 # Options:
-#  DISABLE_BUILD_EXPORT - Disable exporting from the build tree
 #  NOMEX - Disable mex. This flag should be added by packages that export matlab code only, no mex modules.
 # Single Argument Keywords:
 #  CONFIG_DIR - [Default: ${CMAKE_BINARY_DIR}] Path within build directory to make configured files before installation.  Also serves as the exported build directory.
@@ -22,15 +21,17 @@
 #  STARTUP_M_FILE - [Default: startup${PROJECT_NAME}.m
 #  MATLAB_CODE_INSTALL_DIR - [Default: lib/${PACKAGE_NAME}/matlab] Should be relative to CMAKE_INSTALL_PREFIX
 #  MATLAB_MEX_INSTALL_DIR - [Defualt: lib/${PACKAGE_NAME}/mex] Should be relative to CMAKE_INSTALL_PREFIX
+#  EXPORT_BUILD_TREE - Bool. [optional] [Default: False] - Enable the export of the build tree. And configuration of startup<PACKAGE_NAME>.cmake
+#                        script that can be used from the build tree.  For development.
 # Multi-Argument Keywords:
 #  DEPENDENT_STARTUP_M_LOCATIONS - Paths for .m files that this package depends on.  Should be relative to CMAKE_INSTALL_PREFIX, or absolute for files outside the install prefix
 #                                   (normally this only makes sense when using from the build directory for development)
 
 set(_mexiface_configure_install_PATH ${CMAKE_CURRENT_LIST_DIR})
 function(mexiface_configure_install)
-    set(options DISABLE_BUILD_EXPORT NOMEX)
+    set(options NOMEX)
     set(oneValueArgs CONFIG_DIR PACKAGE_CONFIG_TEMPLATE CONFIG_INSTALL_DIR MATLAB_SRC_DIR STARTUP_M_TEMPLATE STARTUP_M_FILE
-                     MATLAB_CODE_INSTALL_DIR MATLAB_MEX_INSTALL_DIR)
+                     MATLAB_CODE_INSTALL_DIR MATLAB_MEX_INSTALL_DIR EXPORT_BUILD_TREE)
     set(multiValueArgs DEPENDENT_STARTUP_M_LOCATIONS)
     cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}"  ${ARGN})
     if(ARG_UNPARSED_ARGUMENTS)
@@ -93,7 +94,7 @@ function(mexiface_configure_install)
 
     # Set different names for build-tree and install-tree files
     set(ARG_PACKAGE_CONFIG_FILE ${PROJECT_NAME}Config-mexiface.cmake)
-    if(NOT ARG_DISABLE_BUILD_EXPORT)
+    if(ARG_EXPORT_BUILD_TREE)
         set(ARG_PACKAGE_CONFIG_INSTALL_TREE_FILE ${PROJECT_NAME}Config-mexiface.cmake.install_tree) #Generated <Package>Config.cmake Version meant for the install tree but name mangled to prevent use in build tree
         set(ARG_STARTUP_M_INSTALL_TREE_FILE ${ARG_STARTUP_M_FILE}.install_tree)
     else()
@@ -119,7 +120,7 @@ function(mexiface_configure_install)
     else()
         set(ABSOLUTE_CONFIG_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/${ARG_CONFIG_INSTALL_DIR})
     endif()
-    set(_MATLAB_CODE_DIR ${ARG_MATLAB_CODE_INSTALL_DIR})
+    set(_MATLAB_CODE_DIR ${ARG_MATLAB_CODE_INSTALL_DIR}) #Set relative to install prefix for configure_package_config_file
     set(_MATLAB_STARTUP_M ${ARG_CONFIG_DIR}/${STARTUP_M_FILE})
     configure_package_config_file(${ARG_PACKAGE_CONFIG_TEMPLATE} ${ARG_CONFIG_DIR}/${ARG_PACKAGE_CONFIG_INSTALL_TREE_FILE}
                                     INSTALL_DESTINATION ${ARG_CONFIG_INSTALL_DIR}
@@ -130,15 +131,19 @@ function(mexiface_configure_install)
 
 
     #startup.m install-tree
+    set(_MATLAB_CODE_DIR ".") # Relative to startup<PACKAGE_NAME>.m file startup.m
     set(_STARTUP_M_INSTALL_DIR ${ARG_MATLAB_CODE_INSTALL_DIR}) #Install dir relative to install prefix
     if(ARG_NOMEX)
         set(_MATLAB_INSTALLED_MEX_PATH) #Disable mex exporting in startup.m
     else()
         set(_MATLAB_INSTALLED_MEX_PATH ${ARG_MATLAB_MEX_INSTALL_DIR})
     endif()
+    #Remap install time dependent startup.m locations to be relative to startup@PACKAGE_NAME@.m location
     set(_DEPENDENT_STARTUP_M_LOCATIONS)
+    message("GOT ARG_DEPENDENT_STARTUP_M_LOCATIONS:${ARG_DEPENDENT_STARTUP_M_LOCATIONS}")
+    file(RELATIVE_PATH _install_rpath "/${ARG_MATLAB_CODE_INSTALL_DIR}" "/")
     foreach(location IN LISTS ARG_DEPENDENT_STARTUP_M_LOCATIONS)
-        string(REGEX REPLACE "^${CMAKE_INSTALL_PREFIX}/" "" location ${location})
+        string(REGEX REPLACE "^${CMAKE_INSTALL_PREFIX}/" "${_install_rpath}" location ${location})
         list(APPEND _DEPENDENT_STARTUP_M_LOCATIONS ${location})
     endforeach()
     configure_file(${ARG_STARTUP_M_TEMPLATE} ${ARG_CONFIG_DIR}/${ARG_STARTUP_M_INSTALL_TREE_FILE})
@@ -146,36 +151,32 @@ function(mexiface_configure_install)
             DESTINATION ${ARG_MATLAB_CODE_INSTALL_DIR} COMPONENT Runtime)
     unset(_MATLAB_INSTALLED_MEX_PATH)
 
-    #build-tree export
-    set(_MATLAB_CODE_DIR ${ARG_MATLAB_SRC_DIR})
-    set(_MATLAB_STARTUP_M ${ARG_CONFIG_DIR}/${ARG_STARTUP_M_FILE})
-    if(NOT ARG_DISABLE_BUILD_EXPORT)
-        #build-tree export config @PACKAGE_NAME@Config-mexiface.cmake
-        configure_package_config_file(${ARG_PACKAGE_CONFIG_TEMPLATE} ${ARG_PACKAGE_CONFIG_FILE}
-                                    INSTALL_DESTINATION ${ARG_CONFIG_DIR}
-                                    INSTALL_PREFIX ${ARG_CONFIG_DIR}
-                                    PATH_VARS _MATLAB_CODE_DIR _MATLAB_STARTUP_M
-                                    NO_CHECK_REQUIRED_COMPONENTS_MACRO)
-    endif()
+    if(ARG_EXPORT_BUILD_TREE)
+        #build-tree export
+        file(RELATIVE_PATH _MATLAB_CODE_DIR ${CMAKE_BINARY_DIR} ${ARG_MATLAB_SRC_DIR}) #Relative to CMAKE_BINARY_DIR
+        set(_MATLAB_STARTUP_M ${ARG_CONFIG_DIR}/${ARG_STARTUP_M_FILE})
+        if(ARG_EXPORT_BUILD_TREE)
+            #build-tree export config @PACKAGE_NAME@Config-mexiface.cmake
+            configure_package_config_file(${ARG_PACKAGE_CONFIG_TEMPLATE} ${ARG_PACKAGE_CONFIG_FILE}
+                                        INSTALL_DESTINATION ${ARG_CONFIG_DIR}
+                                        INSTALL_PREFIX ${ARG_CONFIG_DIR}
+                                        PATH_VARS _MATLAB_CODE_DIR _MATLAB_STARTUP_M
+                                        NO_CHECK_REQUIRED_COMPONENTS_MACRO)
+        endif()
 
-    #startup.m build-tree
-    set(_STARTUP_M_INSTALL_DIR "") #Install dir for build-tree export startup.m to install location at ${ARG_CONFIG_DIR}
-    get_property(_MATLAB_BUILD_MEX_PATHS GLOBAL PROPERTY MexIFace_MODULE_BUILD_DIRS)
-    if(NOT _MATLAB_BUILD_MEX_PATHS OR ARG_NOMEX)
-        set(_MATLAB_BUILD_MEX_PATHS) #Disable mex exporting
+        #startup.m build-tree
+        set(_STARTUP_M_INSTALL_DIR "") #Install dir for build-tree export startupp@PACKAGE_NAME@.m to install location at ${ARG_CONFIG_DIR}
+        get_property(_MATLAB_BUILD_MEX_PATHS GLOBAL PROPERTY MexIFace_MODULE_BUILD_DIRS)
+        if(NOT _MATLAB_BUILD_MEX_PATHS OR ARG_NOMEX)
+            set(_MATLAB_BUILD_MEX_PATHS) #Disable mex exporting
+        endif()
+        #Remap build time dependent startup.m locations to be relative to startupp@PACKAGE_NAME@.m location
+        set(_DEPENDENT_STARTUP_M_LOCATIONS)
+        foreach(location IN LISTS ARG_DEPENDENT_STARTUP_M_LOCATIONS)
+            file(RELATIVE_PATH location ${CMAKE_BINARY_DIR} ${location})
+            list(APPEND _DEPENDENT_STARTUP_M_LOCATIONS ${location})
+        endforeach()
+        configure_file(${ARG_STARTUP_M_TEMPLATE} ${ARG_CONFIG_DIR}/${ARG_STARTUP_M_FILE})
     endif()
-    set(_DEPENDENT_STARTUP_M_LOCATIONS)
-    if(IS_ABSOLUTE ${ARG_CONFIG_DIR})
-        set(_prefix ${ARG_CONFIG_DIR})
-    else()
-        set(_prefix ${CMAKE_BINARY_DIR}/${ARG_CONFIG_DIR})
-    endif()
-    foreach(location IN LISTS ARG_DEPENDENT_STARTUP_M_LOCATIONS)
-        #Remap dependent startup.m locations to be relative to the install prefix for this file
-        string(REGEX REPLACE "^${_prefix}/" "" location ${location})
-        list(APPEND _DEPENDENT_STARTUP_M_LOCATIONS ${location})
-    endforeach()
-    configure_file(${ARG_STARTUP_M_TEMPLATE} ${ARG_CONFIG_DIR}/${ARG_STARTUP_M_FILE})
-
 endfunction()
 

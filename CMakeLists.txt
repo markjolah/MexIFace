@@ -111,7 +111,7 @@ unset(_EXCLUDE)
 #install-tree export config MexIFaceConfig-mexiface.cmake
 include(CMakePackageConfigHelpers)
 set(_DEPENDENT_STARTUP_M_LOCATIONS)
-set(_MATLAB_CODE_DIR ${MATLAB_CODE_INSTALL_DIR})
+set(_MATLAB_CODE_DIR ${MATLAB_CODE_INSTALL_DIR}) #Set relative to install prefix for configure_package_config_file
 set(_MATLAB_STARTUP_M ${_MATLAB_CODE_DIR}/startup${PROJECT_NAME}.m)
     if(BUILD_TESTING)
         set(_MATLAB_INSTALLED_MEX_PATH lib/${PROJECT_NAME}/mex) #Test mex file installation
@@ -129,6 +129,7 @@ install(FILES ${_CONFIGURE_FILE_INSTALL_TREE} RENAME MexIFaceConfig-mexiface.cma
 unset(_CONFIGURE_FILE_INSTALL_TREE)
 
 #startup.m install-tree
+set(_MATLAB_CODE_DIR ".") # Relative to startup<PACKAGE_NAME>.m file startup.m
 set(_STARTUP_M_INSTALL_DIR ${MATLAB_CODE_INSTALL_DIR}) #Install dir relative to install prefix of startupMexIFace.m
 set(_STARTUP_M_TEMPLATE ${CMAKE_SOURCE_DIR}/cmake/Templates/startupPackage.m.in)
 configure_file(${_STARTUP_M_TEMPLATE} ${CMAKE_BINARY_DIR}/startupMexIFace.m.install-tree)
@@ -138,29 +139,32 @@ unset(_MATLAB_CODE_DIR)
 unset(_MATLAB_STARTUP_M)
 unset(_MATLAB_INSTALLED_MEX_PATH)
 
-#Build tree settings use the local matlab code dir and startupMexIFace.m
-set(_MATLAB_CODE_DIR ${CMAKE_SOURCE_DIR}/matlab) #Use source repository for matlab code
-file(RELATIVE_PATH _MATLAB_CODE_DIR ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/matlab)
-set(_MATLAB_STARTUP_M ${CMAKE_BINARY_DIR}/startupMexIFace.m)
-if(NOT ARG_DISABLE_BUILD_EXPORT AND NOT CMAKE_EXPORT_NO_PACKAGE_REGISTRY AND NOT CMAKE_CROSSCOMPILING) # No build-tree export when crosscompiling
-    #build-tree export config MexIFaceConfig-mexiface.cmake
-    configure_package_config_file(${_CONFIGURE_TEMPLATE} MexIFaceConfig-mexiface.cmake
-        INSTALL_DESTINATION ${CMAKE_BINARY_DIR}
-        INSTALL_PREFIX ${CMAKE_BINARY_DIR}
-        PATH_VARS _MATLAB_CODE_DIR _MATLAB_STARTUP_M
-        NO_CHECK_REQUIRED_COMPONENTS_MACRO
-        NO_SET_AND_CHECK_MACRO)  #Set and check will have already been defined in main PackageConfig.cmake
-    unset(_CONFIGURE_TEMPLATE)
-endif()
+if(OPT_EXPORT_BUILD_TREE)
+    message(STATUS "@@@@@ MexIFace Build-Tree startup.m")
+    #Build tree settings use the local matlab code dir and startupMexIFace.m
+    #Use source repository for matlab code
+    file(RELATIVE_PATH _MATLAB_CODE_DIR ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/matlab) #Relative to CMAKE_BINARY_DIR
+    set(_MATLAB_STARTUP_M ${CMAKE_BINARY_DIR}/startupMexIFace.m)
+    if(OPT_EXPORT_BUILD_TREE AND NOT CMAKE_EXPORT_NO_PACKAGE_REGISTRY AND NOT CMAKE_CROSSCOMPILING)
+        #build-tree export config MexIFaceConfig-mexiface.cmake
+        configure_package_config_file(${_CONFIGURE_TEMPLATE} MexIFaceConfig-mexiface.cmake
+            INSTALL_DESTINATION ${CMAKE_BINARY_DIR}
+            INSTALL_PREFIX ${CMAKE_BINARY_DIR}
+            PATH_VARS _MATLAB_CODE_DIR _MATLAB_STARTUP_M
+            NO_CHECK_REQUIRED_COMPONENTS_MACRO
+            NO_SET_AND_CHECK_MACRO)  #Set and check will have already been defined in main PackageConfig.cmake
+        unset(_CONFIGURE_TEMPLATE)
+    endif()
 
-#startup.m build-tree
-set(_STARTUP_M_INSTALL_DIR "") #Location of startupMexIFace.m relative to ${CMAKE_BINARY_DIR} for build-tree export
-if(BUILD_TESTING)
-    get_property(_MATLAB_BUILD_MEX_PATHS GLOBAL PROPERTY MexIFace_MODULE_BUILD_DIRS) #Test build locations
-else()
-    set(_MATLAB_BUILD_MEX_PATHS) #Disable mex export
+    #startup.m build-tree
+    set(_STARTUP_M_INSTALL_DIR "") #Location of startupMexIFace.m relative to ${CMAKE_BINARY_DIR} for build-tree export
+    if(BUILD_TESTING)
+        get_property(_MATLAB_BUILD_MEX_PATHS GLOBAL PROPERTY MexIFace_MODULE_BUILD_DIRS) #Test build locations
+    else()
+        set(_MATLAB_BUILD_MEX_PATHS) #Disable mex export
+    endif()
+    configure_file(${_STARTUP_M_TEMPLATE} ${CMAKE_BINARY_DIR}/startupMexIFace.m @ONLY)
 endif()
-configure_file(${_STARTUP_M_TEMPLATE} ${CMAKE_BINARY_DIR}/startupMexIFace.m)
 unset(_STARTUP_M_TEMPLATE)
 unset(_MATLAB_CODE_DIR)
 unset(_MATLAB_STARTUP_M)

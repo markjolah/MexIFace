@@ -71,7 +71,8 @@ function startup@PROJECT_NAME@(debug)
     if is_absolute_path(matlab_code_dir)
         package_matlab_code_path = matlab_code_dir;
     else
-        package_matlab_code_path = fullfile(package_install_prefix,matlab_code_dir);
+        [curr_mfile_dir,~,~] = fileparts(mfilename('fullpath'));
+        package_matlab_code_path = fullfile(curr_mfile_dir,matlab_code_dir);
     end
     if ~exist(package_matlab_code_path,'dir')
         error('@PROJECT_NAME@:InvalidPackageLayout',['Package @PROJECT_NAME@ cannot find matlab code lib directory: ',package_matlab_code_path]);
@@ -147,8 +148,9 @@ function startup@PROJECT_NAME@(debug)
                         error('@PROJECT_NAME@:BadDependentLocation',['Package @PROJECT_NAME@ cannot find dependent startup.m file at absolute location: ',strrep(m_file,'\','/')]);
                     end
                 else
-                    %Relative path.  Relative to package_install_prefix
-                    m_file = fullfile(package_install_prefix, location);
+                    %Relative path.  Relative to this startup@PACKAGE_NAME@.m file
+                    [curr_mfile_dir,~,~] = fileparts(mfilename('fullpath'));
+                    m_file = fullfile(curr_mfile_dir, location);
                     if ~exist(m_file,'file')
                         error('@PROJECT_NAME@:BadDependentLocation',['Package @PROJECT_NAME@ cannot find dependent startup.m file at relative location: ',strrep(m_file,'\','/')]);
                     end

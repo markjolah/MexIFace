@@ -15,6 +15,7 @@ if(niter LESS 0)
 endif()
 set(MexIFace_TARGETS)
 if(CMAKE_CROSSCOMPILING AND OPT_FIXUP_DEPENDENCIES) #Fixup before install as otherwise the toolchain install override will auto-call fixup-dependencies
+    include(FixupDependencies)
     set(_fixup_args)
     if(OPT_LINK_INSTALLED_LIBS)
         list(APPEND _fixup_args LINK_INSTALLED_LIBS)
