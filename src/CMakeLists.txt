@@ -14,7 +14,7 @@ if(niter LESS 0)
     message(FATAL_ERROR "[Mexiface]: No valid MATLAB_ROOTS")
 endif()
 set(MexIFace_TARGETS)
-if(CMAKE_CROSSCOMPILING AND OPT_INSTALL_DEPENDENCIES) #Fixup before install as otherwise the toolchain install override will auto-call fixup-dependencies
+if(CMAKE_CROSSCOMPILING AND OPT_FIXUP_DEPENDENCIES) #Fixup before install as otherwise the toolchain install override will auto-call fixup-dependencies
     set(_fixup_args)
     if(OPT_LINK_INSTALLED_LIBS)
         list(APPEND _fixup_args LINK_INSTALLED_LIBS)
@@ -22,7 +22,7 @@ if(CMAKE_CROSSCOMPILING AND OPT_INSTALL_DEPENDENCIES) #Fixup before install as o
     if(OPT_INSTALL_GCC_DEPENDENCIES)
         list(APPEND _fixup_args COPY_GCC_LIBS)
     endif()
-    if(OPT_BUILD_TREE_EXPORT)
+    if(OPT_FIXUP_BUILD_TREE_DEPENDENCIES)
         list(APPEND _fixup_args BUILD_TREE_EXPORT)
     endif()
 endif()
@@ -42,7 +42,6 @@ foreach(idx RANGE ${niter})
     add_library(MexIFace::${lib} ALIAS ${lib})
     if(UNIX OR (CMAKE_CROSSCOMPILING AND WIN32))
         #Sets visibility of symbols to only mexFunction and related interface
-        #Can't have this be an interface property of MATLAB::X_Y::MEX_LIBRARIES as it would cause MexIFace to not export symbols needed by clients.
 #         target_link_options(${lib} INTERFACE -Wl,--version-script,${map_file})
     endif()
     target_link_options(${lib} PUBLIC "-Wl,--as-needed")
@@ -57,7 +56,8 @@ foreach(idx RANGE ${niter})
             LIBRARY DESTINATION lib COMPONENT Runtime)
     get_target_property(_build_rpath ${lib} BUILD_RPATH)
 
-    if(CMAKE_CROSSCOMPILING AND OPT_INSTALL_DEPENDENCIES)
+    #Copy in dependencies to build-tree / install-tree as necessary
+    if(CMAKE_CROSSCOMPILING AND OPT_FIXUP_DEPENDENCIES)
         get_target_property(_MATLAB_LIB_PATH MATLAB::${vers}::MEX_LIBRARIES INTERFACE_LINK_DIRECTORIES)
         fixup_dependencies(TARGETS ${lib} TARGET_DESTINATION lib PROVIDED_LIB_DIRS ${_MATLAB_LIB_PATH} ${_fixup_args})
     endif()

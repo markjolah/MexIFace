@@ -12,7 +12,6 @@ cmake_minimum_required( VERSION 3.9 )
 
 project(MexIFace VERSION 0.1.1 LANGUAGES CXX)
 set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries Ignored. Exists for compatability. Always build shared." FORCE)
-set(BUILD_STATIC_LIBS OFF CACHE BOOL "Build static libraries. Ignored. Exists for compatability. Never build static." FORCE )
 
 option(MexIFace_MATLAB_INTERLEAVED_COMPLEX "Enable interleaved complex API in R2018a+" OFF)
 option(MexIFace_MATLAB_LARGE_ARRAY_DIMS "Enable 64-bit array indexes in R2017a+.  Probably this needs to be on." ON)
@@ -37,7 +36,8 @@ list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_CURRENT_LIST_DIR}/cmake/UncommonCMakeMod
 include(AddExternalDependency)
 #BacktraceException allows for exceptions that encode a backtrace for debugging
 set(BacktraceExceptionURL https://github.com/markjolah/BacktraceException.git)
-add_external_dependency(NAME BacktraceException URL ${BacktraceExceptionURL} SHARED PASS_CACHE_VARIABLES BUILD_TESTING ${External_Dependency_PASS_CACHE_VARIABLES})
+add_external_dependency(NAME BacktraceException URL ${BacktraceExceptionURL} SHARED
+                        PASS_CACHE_VARIABLES BUILD_TESTING ${External_Dependency_PASS_CACHE_VARIABLES})
 
 # Armadillo
 find_package(Armadillo REQUIRED)

@@ -15,7 +15,7 @@
 # MATLAB_MEX_INSTALL_DIR - [Defualt: lib/${PACKAGE_NAME}/mex] Should be relative to CMAKE_INSTALL_PREFIX
 ## Multi-Argument Keywords
 # SOURCES - source file. [Defaults to ${MEXNAME}.cpp].  Must specify either SOURCE or MEXNAME or both
-# LINK_LIBRARIES
+# LINK_LIBRARIES - [optional] Additional target libraries to link to.
 # MATLAB_LINK_LIBRARIES - [optional] Values:  ENG, MWBLAS, MWLAPACK, MATLAB_DATA_ARRAY MATLAB_ENGINE
 #
 include(FixupDependencies)
@@ -42,15 +42,15 @@ function(mexiface_make_mex)
     endif()
 
     # Looks for options:
-    #   OPT_INSTALL_DEPENDENCIES - Fixup dependencies.  Should be ON if crosscompiling.
+    #   OPT_FIXUP_DEPENDENCIES - Fixup dependencies.  Should be ON if crosscompiling.
     #   OPT_INSTALL_SYSTEM_DEPENDENCIES
-    #   OPT_BUILD_TREE_EXPORT
+    #   OPT_FIXUP_BUILD_TREE_DEPENDENCIES
     #   OPT_LINK_INSTALLED_LIBS
     #Args for fixup_dependencies.
-    if(CMAKE_CROSSCOMPILING AND OPT_INSTALL_DEPENDENCIES)
+    if(CMAKE_CROSSCOMPILING AND OPT_FIXUP_DEPENDENCIES)
         include(FixupDependencies)
         set(_fixup_args)
-        if(OPT_BUILD_TREE_EXPORT)
+        if(OPT_FIXUP_BUILD_TREE_DEPENDENCIES)
             list(APPEND _fixup_args BUILD_TREE_EXPORT)
         endif()
         if(OPT_INSTALL_SYSTEM_DEPENDENCIES)
@@ -60,7 +60,7 @@ function(mexiface_make_mex)
             list(APPEND _fixup_args LINK_INSTALLED_LIBS)
         endif()
     elseif(CMAKE_CROSSCOMPILING)
-        message(WARNING "  [MexIFace::make_mex()] Crosscompiling, but OPT_INSTALL_DEPENDENCIES is not set.  Dependencies may not be found correctly for mex files that link to external shared libraries.")
+        message(WARNING "  [MexIFace::make_mex()] Crosscompiling, but OPT_FIXUP_DEPENDENCIES is not set.  Dependencies may not be found correctly for mex files that link to external shared libraries.")
     endif()
 
     foreach(vers IN LISTS MexIFace_COMPATABLE_MATLAB_VERSION_STRINGS)
@@ -87,14 +87,14 @@ function(mexiface_make_mex)
             install(TARGETS ${mexfile} LIBRARY DESTINATION ${mex_dir} COMPONENT Runtime)
             get_target_property(_build_rpath ${mexfile} BUILD_RPATH)
 
-            if(CMAKE_CROSSCOMPILING AND OPT_INSTALL_DEPENDENCIES) #Fixup before install as otherwise the toolchain install override will auto-call fixup-dependencies
+            if(CMAKE_CROSSCOMPILING AND OPT_FIXUP_DEPENDENCIES) #Fixup before install as otherwise the toolchain install override will auto-call fixup-dependencies
                 get_target_property(_MATLAB_INCLUDE_PATH MATLAB::${vers}::MEX_LIBRARIES INTERFACE_INCLUDE_DIRECTORIES)
                 get_filename_component(_matlab_executable "${_MATLAB_INCLUDE_PATH}/../../bin/${MexIFace_MATLAB_SYSTEM_ARCH}/MATLAB" ABSOLUTE)
                 fixup_dependencies(TARGETS ${mexfile} TARGET_DESTINATION ${mex_dir} COPY_DESTINATION ${rpath}/lib PROVIDED_LIB_DIRS ${_MATLAB_LIB_PATH} PARENT_LIB ${_matlab_executable} ${_fixup_args})
             endif()
         elseif(WIN32)
             install(TARGETS ${mexfile} RUNTIME DESTINATION ${mex_dir} COMPONENT Runtime)
-            if(CMAKE_CROSSCOMPILING AND OPT_INSTALL_DEPENDENCIES) #Fixup before install as otherwise the toolchain install override will auto-call fixup-dependencies
+            if(CMAKE_CROSSCOMPILING AND OPT_FIXUP_DEPENDENCIES) #Fixup before install as otherwise the toolchain install override will auto-call fixup-dependencies
                 fixup_dependencies(TARGETS ${mexfile} TARGET_DESTINATION ${mex_dir} COPY_DESTINATION "." PROVIDED_LIB_DIRS ${_MATLAB_LIB_PATH} ${_fixup_args})
             endif()
 #         elseif(APPLE)
