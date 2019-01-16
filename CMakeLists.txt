@@ -17,9 +17,8 @@ option(MexIFace_MATLAB_INTERLEAVED_COMPLEX "Enable interleaved complex API in R2
 option(MexIFace_MATLAB_LARGE_ARRAY_DIMS "Enable 64-bit array indexes in R2017a+.  Probably this needs to be on." ON)
 option(BUILD_TESTING "Build testing framework" OFF)
 option(OPT_EXTRA_DEBUG "Support extra noisy debugging features" OFF) #Extra debug features (Armadillo)
-if(CMAKE_CROSSCOMPILING)
-    set(OPT_DISABLE_AUTO_FIXUP_DEPENDENCIES ON CACHE BOOL "Disable the auto hood on install() function for fixup_dependencies()." FORCE)
-endif()
+
+set(OPT_AUTO_FIXUP_DEPENDENCIES OFF CACHE BOOL "MexIFace disables the auto hook on install() function for fixup_dependencies()." FORCE)
 
 #Locations of the MexIFace cmake build system components
 #Export all these variables in package-config also.
