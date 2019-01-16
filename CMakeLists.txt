@@ -3,7 +3,7 @@
 # A Cross-Platform C++ / MEX Object-based interface wrapper and CMake build tool.
 #
 # Mark J. Olah (mjo@cs.unm DOT edu)
-# Copyright 2014-2017
+# Copyright 2014-2019
 # Licensed under the Apache License, Version 2.0
 # https://www.apache.org/licenses/LICENSE-2.0
 # See: LICENCE file
@@ -22,6 +22,8 @@ option(OPT_EXPORT_BUILD_TREE "Configure the package so it is usable from the bui
 message(STATUS "OPTION: BUILD_TESTING: ${BUILD_TESTING}")
 message(STATUS "OPTION: OPT_EXTRA_DEBUG: ${OPT_EXTRA_DEBUG}")
 message(STATUS "OPTION: OPT_EXPORT_BUILD_TREE: ${OPT_EXPORT_BUILD_TREE}")
+message(STATUS "OPTION: MexIFace_MATLAB_INTERLEAVED_COMPLEX: ${MexIFace_MATLAB_INTERLEAVED_COMPLEX}")
+message(STATUS "OPTION: MexIFace_MATLAB_LARGE_ARRAY_DIMS: ${MexIFace_MATLAB_LARGE_ARRAY_DIMS}")
 
 set(OPT_AUTO_FIXUP_DEPENDENCIES OFF CACHE BOOL "MexIFace disables the auto hook on install() function for fixup_dependencies()." FORCE)
 

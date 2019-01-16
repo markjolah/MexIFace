@@ -41,6 +41,9 @@ function(mexiface_make_mex)
         file(RELATIVE_PATH ARG_MATLAB_MEX_INSTALL_DIR ${CMAKE_INSTALL_PREFIX} ${ARG_MATLAB_MEX_INSTALL_DIR})
     endif()
 
+    #TODO: This might not work totally as intetended.  We need to disable the intall(TARGETS) hook.
+    set(OPT_AUTO_FIXUP_DEPENDENCIES OFF CACHE BOOL "MexIFace disables the auto hook on install() function for fixup_dependencies()." FORCE)
+
     # Looks for options:
     #   OPT_FIXUP_DEPENDENCIES - Fixup dependencies.  Should be ON if crosscompiling.
     #   OPT_INSTALL_SYSTEM_DEPENDENCIES
