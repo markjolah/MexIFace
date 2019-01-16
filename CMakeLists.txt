@@ -37,7 +37,7 @@ list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_CURRENT_LIST_DIR}/cmake/UncommonCMakeMod
 include(AddExternalDependency)
 #BacktraceException allows for exceptions that encode a backtrace for debugging
 set(BacktraceExceptionURL https://github.com/markjolah/BacktraceException.git)
-add_external_dependency(NAME BacktraceException URL ${BacktraceExceptionURL} SHARED PASS_CACHE_VARIABLES ${External_Dependency_PASS_CACHE_VARIABLES})
+add_external_dependency(NAME BacktraceException URL ${BacktraceExceptionURL} SHARED PASS_CACHE_VARIABLES BUILD_TESTING ${External_Dependency_PASS_CACHE_VARIABLES})
 
 # Armadillo
 find_package(Armadillo REQUIRED)

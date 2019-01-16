@@ -56,7 +56,6 @@ foreach(idx RANGE ${niter})
             ARCHIVE DESTINATION lib COMPONENT Development
             LIBRARY DESTINATION lib COMPONENT Runtime)
     get_target_property(_build_rpath ${lib} BUILD_RPATH)
-    message(" libMexIFACE Build RPATH: ${_build_rpath}")
 
     if(CMAKE_CROSSCOMPILING AND OPT_INSTALL_DEPENDENCIES)
         get_target_property(_MATLAB_LIB_PATH MATLAB::${vers}::MEX_LIBRARIES INTERFACE_LINK_DIRECTORIES)

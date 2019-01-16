@@ -86,7 +86,6 @@ function(mexiface_make_mex)
             set_target_properties(${mexfile} PROPERTIES INSTALL_RPATH "\$ORIGIN/${rpath}/lib") #link back to lib directory
             install(TARGETS ${mexfile} LIBRARY DESTINATION ${mex_dir} COMPONENT Runtime)
             get_target_property(_build_rpath ${mexfile} BUILD_RPATH)
-            message("***make_mex Build RPATH: ${_build_rpath}")
 
             if(CMAKE_CROSSCOMPILING AND OPT_INSTALL_DEPENDENCIES) #Fixup before install as otherwise the toolchain install override will auto-call fixup-dependencies
                 get_target_property(_MATLAB_INCLUDE_PATH MATLAB::${vers}::MEX_LIBRARIES INTERFACE_INCLUDE_DIRECTORIES)
