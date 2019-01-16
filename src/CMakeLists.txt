@@ -14,7 +14,18 @@ if(niter LESS 0)
     message(FATAL_ERROR "[Mexiface]: No valid MATLAB_ROOTS")
 endif()
 set(MexIFace_TARGETS)
-include(FixupDependencies)
+if(CMAKE_CROSSCOMPILING AND OPT_INSTALL_DEPENDENCIES) #Fixup before install as otherwise the toolchain install override will auto-call fixup-dependencies
+    set(_fixup_args)
+    if(OPT_LINK_INSTALLED_LIBS)
+        list(APPEND _fixup_args LINK_INSTALLED_LIBS)
+    endif()
+    if(OPT_INSTALL_GCC_DEPENDENCIES)
+        list(APPEND _fixup_args COPY_GCC_LIBS)
+    endif()
+    if(OPT_BUILD_TREE_EXPORT)
+        list(APPEND _fixup_args BUILD_TREE_EXPORT)
+    endif()
+endif()
 foreach(idx RANGE ${niter})
     list(GET MexIFace_MATLAB_VERSIONS ${idx} ver)
     list(GET MexIFace_MATLAB_VERSION_STRINGS ${idx} vers)
@@ -40,11 +51,18 @@ foreach(idx RANGE ${niter})
     target_include_directories(${lib} PUBLIC $<BUILD_INTERFACE:${PUBLIC_HEADER_SRC_DIR}>
                                              $<INSTALL_INTERFACE:include>)
     target_compile_features(${lib} PUBLIC cxx_std_11) #Declare C++11 required for building
-
     install(TARGETS ${lib} EXPORT ${PROJECT_NAME}Targets
             RUNTIME DESTINATION lib COMPONENT Runtime
             ARCHIVE DESTINATION lib COMPONENT Development
             LIBRARY DESTINATION lib COMPONENT Runtime)
+    get_target_property(_build_rpath ${lib} BUILD_RPATH)
+    message(" libMexIFACE Build RPATH: ${_build_rpath}")
+
+    if(CMAKE_CROSSCOMPILING AND OPT_INSTALL_DEPENDENCIES)
+        get_target_property(_MATLAB_LIB_PATH MATLAB::${vers}::MEX_LIBRARIES INTERFACE_LINK_DIRECTORIES)
+        fixup_dependencies(TARGETS ${lib} TARGET_DESTINATION lib PROVIDED_LIB_DIRS ${_MATLAB_LIB_PATH} ${_fixup_args})
+    endif()
+
     list(APPEND MexIFace_TARGETS MexIFace::${lib})
 #     if(CMAKE_CROSSCOMPILING)
 #         get_target_property(_MATLAB_LIB_PATH MATLAB::${vers}::MEX_LIBRARIES INTERFACE_LINK_DIRECTORIES)

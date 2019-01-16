@@ -18,6 +18,9 @@ option(MexIFace_MATLAB_INTERLEAVED_COMPLEX "Enable interleaved complex API in R2
 option(MexIFace_MATLAB_LARGE_ARRAY_DIMS "Enable 64-bit array indexes in R2017a+.  Probably this needs to be on." ON)
 option(BUILD_TESTING "Build testing framework" OFF)
 option(OPT_EXTRA_DEBUG "Support extra noisy debugging features" OFF) #Extra debug features (Armadillo)
+if(CMAKE_CROSSCOMPILING)
+    set(OPT_DISABLE_AUTO_FIXUP_DEPENDENCIES ON CACHE BOOL "Disable the auto hood on install() function for fixup_dependencies()." FORCE)
+endif()
 
 #Locations of the MexIFace cmake build system components
 #Export all these variables in package-config also.
@@ -34,7 +37,7 @@ list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_CURRENT_LIST_DIR}/cmake/UncommonCMakeMod
 include(AddExternalDependency)
 #BacktraceException allows for exceptions that encode a backtrace for debugging
 set(BacktraceExceptionURL https://github.com/markjolah/BacktraceException.git)
-add_external_dependency(NAME BacktraceException URL ${BacktraceExceptionURL} SHARED)
+add_external_dependency(NAME BacktraceException URL ${BacktraceExceptionURL} SHARED PASS_CACHE_VARIABLES ${External_Dependency_PASS_CACHE_VARIABLES})
 
 # Armadillo
 find_package(Armadillo REQUIRED)

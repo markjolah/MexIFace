@@ -84,18 +84,20 @@ function(mexiface_make_mex)
         get_target_property(_MATLAB_LIB_PATH MATLAB::${vers}::MEX_LIBRARIES INTERFACE_LINK_DIRECTORIES)
         if(UNIX)
             set_target_properties(${mexfile} PROPERTIES INSTALL_RPATH "\$ORIGIN/${rpath}/lib") #link back to lib directory
+            install(TARGETS ${mexfile} LIBRARY DESTINATION ${mex_dir} COMPONENT Runtime)
+            get_target_property(_build_rpath ${mexfile} BUILD_RPATH)
+            message("***make_mex Build RPATH: ${_build_rpath}")
+
             if(CMAKE_CROSSCOMPILING AND OPT_INSTALL_DEPENDENCIES) #Fixup before install as otherwise the toolchain install override will auto-call fixup-dependencies
-                get_target_property(_MATLAB_INCLUDE_PATH MATLAB::${vers}::MEX_LIBRARIES INTERFACE_LINK_DIRECTORIES)
-                get_filename_component(_matlab_executable ${_MATLAB_INCLUDE_PATH}/../../bin/${MexIFace_MATLAB_ARCH}/MATLAB ABSOLUTE)
-                message("Setting Matlab executable: ${_matlab_executable}")
+                get_target_property(_MATLAB_INCLUDE_PATH MATLAB::${vers}::MEX_LIBRARIES INTERFACE_INCLUDE_DIRECTORIES)
+                get_filename_component(_matlab_executable "${_MATLAB_INCLUDE_PATH}/../../bin/${MexIFace_MATLAB_SYSTEM_ARCH}/MATLAB" ABSOLUTE)
                 fixup_dependencies(TARGETS ${mexfile} TARGET_DESTINATION ${mex_dir} COPY_DESTINATION ${rpath}/lib PROVIDED_LIB_DIRS ${_MATLAB_LIB_PATH} PARENT_LIB ${_matlab_executable} ${_fixup_args})
             endif()
-            install(TARGETS ${mexfile} LIBRARY DESTINATION ${mex_dir} COMPONENT Runtime)
         elseif(WIN32)
+            install(TARGETS ${mexfile} RUNTIME DESTINATION ${mex_dir} COMPONENT Runtime)
             if(CMAKE_CROSSCOMPILING AND OPT_INSTALL_DEPENDENCIES) #Fixup before install as otherwise the toolchain install override will auto-call fixup-dependencies
                 fixup_dependencies(TARGETS ${mexfile} TARGET_DESTINATION ${mex_dir} COPY_DESTINATION "." PROVIDED_LIB_DIRS ${_MATLAB_LIB_PATH} ${_fixup_args})
             endif()
-            install(TARGETS ${mexfile} RUNTIME DESTINATION ${mex_dir} COMPONENT Runtime)
 #         elseif(APPLE)
 #             set_target_properties(${mexfile} PROPERTIES INSTALL_RPATH "@loader_path/../../..:@loader_path/../../../..") #link back to lib directory
 #             fixup_dependencies(${mexfile} COPY_DESTINATION "../../../.." RPATH "../../..")
