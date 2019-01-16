@@ -17,6 +17,11 @@ option(MexIFace_MATLAB_INTERLEAVED_COMPLEX "Enable interleaved complex API in R2
 option(MexIFace_MATLAB_LARGE_ARRAY_DIMS "Enable 64-bit array indexes in R2017a+.  Probably this needs to be on." ON)
 option(BUILD_TESTING "Build testing framework" OFF)
 option(OPT_EXTRA_DEBUG "Support extra noisy debugging features" OFF) #Extra debug features (Armadillo)
+option(OPT_EXPORT_BUILD_TREE "Configure the package so it is usable from the build tree.  Useful for development." OFF)
+
+message(STATUS "OPTION: BUILD_TESTING: ${BUILD_TESTING}")
+message(STATUS "OPTION: OPT_EXTRA_DEBUG: ${OPT_EXTRA_DEBUG}")
+message(STATUS "OPTION: OPT_EXPORT_BUILD_TREE: ${OPT_EXPORT_BUILD_TREE}")
 
 set(OPT_AUTO_FIXUP_DEPENDENCIES OFF CACHE BOOL "MexIFace disables the auto hook on install() function for fixup_dependencies()." FORCE)
 
@@ -35,8 +40,7 @@ list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_CURRENT_LIST_DIR}/cmake/UncommonCMakeMod
 include(AddExternalDependency)
 #BacktraceException allows for exceptions that encode a backtrace for debugging
 set(BacktraceExceptionURL https://github.com/markjolah/BacktraceException.git)
-add_external_dependency(NAME BacktraceException URL ${BacktraceExceptionURL} SHARED
-                        PASS_CACHE_VARIABLES BUILD_TESTING ${External_Dependency_PASS_CACHE_VARIABLES})
+add_external_dependency(NAME BacktraceException URL ${BacktraceExceptionURL} SHARED TESTING)
 
 # Armadillo
 find_package(Armadillo REQUIRED)
@@ -47,18 +51,6 @@ set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS $<$<NOT:$<CONFIG:Debu
 if(OPT_EXTRA_DEBUG)
     set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS $<$<CONFIG:Debug>:ARMA_EXTRA_DEBUG>)
 endif()
-
-# #libc++.so compatability
-# if(OPT_LIBCXX)
-#     find_package(LibCXX)
-#     if(LibCXX_FOUND)
-#         set(MEXIFACE_LIBCXX_VERSION ${LIBCXX_VERSION_STRING})
-#     else()
-#         set(MEXIFACE_LIBSTDCXX_VERSION False)
-#     endif()
-# else()
-#     set(MEXIFACE_LIBSTDCXX_VERSION False)
-# endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL GNU AND NOT MexIFace_SYSTEM_LIBSTDCXX_VERSION)
     include(get_libstdcxx_version)
@@ -73,14 +65,8 @@ endif()
 #               the RE "^[r|R]20\d\d[a|b]"
 include(MexIFace-configure-matlab)
 
-
-#Enable Inter-proceedural optimization
-#include(ConfigureIPO)
-
 #Debugging configuration
 include(ConfigureDebugBuilds)
-# add_link_options("-v" "-Wl,--verbose") #Debug
-
 
 #include(MexIFace-Doxygen) #Add Doxygen documentation targets
 
@@ -106,10 +92,9 @@ install(FILES ${MexIFace_CMAKE_DIR}/UncommonCMakeModules/Templates/FixupTargetDe
 
 ### PackageConfig
 include(ExportPackageWizzard)
-#Call after "src" subdirectory because MexIFace_TARGETS list is set there and we export it in packageconfig
-#Give path to FindMatlab.cmake so it can be called by PackageConfig.cmake correctly from build tree or install tree
-export_package_wizzard()
+export_package_wizzard(EXPORT_BUILD_TREE "${OPT_EXPORT_BUILD_TREE}") #setup build-tree and install-tree exports and packageconfig files
 
+#Give path to FindMatlab.cmake so it can be called by PackageConfig.cmake correctly from build tree or install tree
 set(MATLAB_CODE_INSTALL_DIR lib/MexIFace/matlab)
 
 #Install matlab source
