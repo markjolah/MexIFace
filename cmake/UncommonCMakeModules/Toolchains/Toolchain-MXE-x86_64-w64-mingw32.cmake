@@ -55,7 +55,7 @@ if(OPT_FIXUP_DEPENDENCIES)
                                                 OPT_LINK_INSTALLED_LIBS)
         SET(CMAKE_INSTALL_RPATH "\$ORIGIN/../lib")
 
-        message(STATUS "mingw-w64 Toolchain option: OPT_INSTALL_DEPENDENCIES:${OPT_INSTALL_DEPENDENCIES}")
+        message(STATUS "mingw-w64 Toolchain option: OPT_FIXUP_DEPENDENCIES:${OPT_FIXUP_DEPENDENCIES}")
         message(STATUS "mingw-w64 Toolchain option: OPT_FIXUP_BUILD_TREE_DEPENDENCIES:${OPT_FIXUP_BUILD_TREE_DEPENDENCIES}")
         message(STATUS "mingw-w64 Toolchain option: OPT_AUTO_FIXUP_DEPENDENCIES:${OPT_AUTO_FIXUP_DEPENDENCIES}")
 
