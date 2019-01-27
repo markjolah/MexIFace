@@ -1,0 +1,52 @@
+#!/bin/bash
+#
+# build.distribution.sh
+#
+# Build both linux and windows into the same file for distribution
+#
+
+LINUX_FULL_ARCH=x86_64-gcc4_9-linux-gnu
+W64_FULL_ARCH=x86_64-w64-mingw32
+VERSION=0.3
+INSTALL_DIR_NAME=MexIFace-${VERSION}
+ZIP_FILE=MexIFace-${VERSION}.zip
+TAR_FILE=MexIFace-${VERSION}.tbz2
+
+LINUX_TOOLCHAIN_FILE=./cmake/UncommonCMakeModules/Toolchains/Toolchain-${LINUX_FULL_ARCH}.cmake
+W64_TOOLCHAIN_FILE=./cmake/UncommonCMakeModules/Toolchains/Toolchain-MXE-${W64_FULL_ARCH}.cmake
+INSTALL_DIR=_install-dist
+INSTALL_PATH=${INSTALL_DIR}/$INSTALL_DIR_NAME
+BUILD_PATH=_build-dist
+NUM_PROCS=$(grep -c ^processor /proc/cpuinfo)
+
+ARGS=""
+ARGS="${ARGS} -DCMAKE_INSTALL_PREFIX=$INSTALL_PATH"
+#ARGS="${ARGS} -DBUILD_STATIC_LIBS=ON"
+ARGS="${ARGS} -DBUILD_SHARED_LIBS=ON"
+ARGS="${ARGS} -DBUILD_TESTING=On"
+ARGS="${ARGS} -DOPT_INSTALL_TESTING=On"
+ARGS="${ARGS} -DOPT_EXPORT_BUILD_TREE=Off"
+ARGS="${ARGS} -DOPT_FIXUP_DEPENDENCIES=On"
+ARGS="${ARGS} -DOPT_FIXUP_DEPENDENCIES_BUILD_TREE=Off"
+ARGS="${ARGS} -DOPT_FIXUP_DEPENDENCIES_COPY_GCC_LIBS=Off"
+ARGS="${ARGS} -DOPT_MexIFace_INSTALL_DISTRIBUTION_STARTUP=On" #Copy startupPackage.m to root for distribution
+
+
+set -ex
+rm -rf $INSTALL_PATH $BUILD_PATH
+
+cmake -H. -B$BUILD_PATH/LinuxDebug -DCMAKE_TOOLCHAIN_FILE=$LINUX_TOOLCHAIN_FILE -DCMAKE_BUILD_TYPE=Debug ${ARGS}
+cmake --build $BUILD_PATH/LinuxDebug --target install -- -j${NUM_PROCS}
+
+cmake -H. -B$BUILD_PATH/LinuxRelease -DCMAKE_TOOLCHAIN_FILE=$LINUX_TOOLCHAIN_FILE -DCMAKE_BUILD_TYPE=Release ${ARGS}
+cmake --build $BUILD_PATH/LinuxRelease --target install -- -j${NUM_PROCS}
+
+cmake -H. -B$BUILD_PATH/W64Debug -DCMAKE_TOOLCHAIN_FILE=$W64_TOOLCHAIN_FILE -DCMAKE_BUILD_TYPE=Debug ${ARGS}
+cmake --build $BUILD_PATH/W64Debug --target install -- -j${NUM_PROCS}
+
+cmake -H. -B$BUILD_PATH/W64Release -DCMAKE_TOOLCHAIN_FILE=$W64_TOOLCHAIN_FILE -DCMAKE_BUILD_TYPE=Release ${ARGS}
+cmake --build $BUILD_PATH/W64Release --target install -- -j${NUM_PROCS}
+
+cd $INSTALL_DIR
+zip -rq $ZIP_FILE $INSTALL_DIR_NAME
+tar cjf $TAR_FILE $INSTALL_DIR_NAME

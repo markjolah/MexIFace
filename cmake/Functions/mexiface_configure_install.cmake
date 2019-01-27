@@ -104,8 +104,8 @@ function(mexiface_configure_install)
 
 
     #Install matlab source
-    if(BUILD_TESTING)
-        set(_EXCLUDE)
+    if(BUILD_TESTING AND (NOT DEFINED OPT_INSTALL_TESTING OR OPT_INSTALL_TESTING))
+        set(_EXCLUDE) #
     else()
         set(_EXCLUDE REGEX "\\+Test" EXCLUDE)
     endif()
@@ -149,6 +149,11 @@ function(mexiface_configure_install)
     configure_file(${ARG_STARTUP_M_TEMPLATE} ${ARG_CONFIG_DIR}/${ARG_STARTUP_M_INSTALL_TREE_FILE})
     install(FILES ${ARG_CONFIG_DIR}/${ARG_STARTUP_M_INSTALL_TREE_FILE} RENAME ${ARG_STARTUP_M_FILE}
             DESTINATION ${ARG_MATLAB_CODE_INSTALL_DIR} COMPONENT Runtime)
+    if(OPT_MexIFace_INSTALL_DISTRIBUTION_STARTUP)
+        #Install a copy of the startup at the root of install-tree for convenience of end MATLAB users
+        install(FILES ${ARG_CONFIG_DIR}/${ARG_STARTUP_M_INSTALL_TREE_FILE} RENAME ${ARG_STARTUP_M_FILE}
+                DESTINATION "." COMPONENT Runtime)
+    endif()
     unset(_MATLAB_INSTALLED_MEX_PATH)
 
     if(ARG_EXPORT_BUILD_TREE)
@@ -165,7 +170,7 @@ function(mexiface_configure_install)
         endif()
 
         #startup.m build-tree
-        set(_STARTUP_M_INSTALL_DIR "") #Install dir for build-tree export startupp@PACKAGE_NAME@.m to install location at ${ARG_CONFIG_DIR}
+        set(_STARTUP_M_INSTALL_DIR "") #Install dir for build-tree export
         get_property(_MATLAB_BUILD_MEX_PATHS GLOBAL PROPERTY MexIFace_MODULE_BUILD_DIRS)
         if(NOT _MATLAB_BUILD_MEX_PATHS OR ARG_NOMEX)
             set(_MATLAB_BUILD_MEX_PATHS) #Disable mex exporting

@@ -346,22 +346,20 @@ function(_mexiface_make_matlab_targets)
             target_include_directories(${target_prefix}MEX_LIBRARIES INTERFACE ${include_dir})
             target_compile_options(${target_prefix}MEX_LIBRARIES INTERFACE -fexceptions -fno-omit-frame-pointer)
             target_compile_definitions(${target_prefix}MEX_LIBRARIES INTERFACE MATLAB_MEX_FILE)
-            target_link_libraries(${target_prefix}MEX_LIBRARIES INTERFACE ${PTHREAD_LIBRARY})
+            target_link_libraries(${target_prefix}MEX_LIBRARIES INTERFACE Pthread::Pthread)
             target_link_options(${target_prefix}MEX_LIBRARIES INTERFACE -Wl,--no-undefined)
             target_link_options(${target_prefix}MEX_LIBRARIES INTERFACE -Wl,--as-needed)
             target_link_directories(${target_prefix}MEX_LIBRARIES INTERFACE ${lib_dir} ${extern_lib_dir} ${os_lib_dir})
             target_link_libraries(${target_prefix}MEX_LIBRARIES INTERFACE -lmx -lmat -lmex)
-            #set_target_properties(${target_prefix}MEX_LIBRARIES PROPERTIES INTERFACE_LINK_LIBRARIES "-leng -lmx -lmat -lmex -lmwlapack -lmwblas")
-            #set_target_properties(${target_prefix}MEX_LIBRARIES PROPERTIES INTERFACE_COMPILE_DEFINITIONS _GNU_SOURCE) #Unsure if we need this one.  Got from offical matlab makefile.
 
             #Support for interleaved complex
-            if(MexIFace_MATLAB_INTERLEAVED_COMPLEX AND ${_vers} VERSION_GREATER_EQUAL 9.4)
+            if(OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX AND ${_vers} VERSION_GREATER_EQUAL 9.4)
                 target_compile_definitions(${target_prefix}MEX_LIBRARIES INTERFACE MATLAB_DEFAULT_RELEASE=R2018a)
             else()
                 target_compile_definitions(${target_prefix}MEX_LIBRARIES INTERFACE MATLAB_DEFAULT_RELEASE=R2017b)
             endif()
             #Support for 64-bit indexed arrays
-            if(MexIFace_MATLAB_LARGE_ARRAY_DIMS AND ${_vers} VERSION_GREATER_EQUAL 9.2)
+            if(OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS AND ${_vers} VERSION_GREATER_EQUAL 9.2)
                 target_compile_definitions(${target_prefix}MEX_LIBRARIES INTERFACE MX_COMPAT_64)
             else()
                 target_compile_definitions(${target_prefix}MEX_LIBRARIES INTERFACE MX_COMPAT_32)
@@ -385,8 +383,6 @@ function(_mexiface_make_matlab_targets)
         set(MexIFace_MATLAB_LINKER_MAP_FILES ${_linker_map_files} PARENT_SCOPE)
     endif()
 endfunction()
-
-
 
 if(WIN32)
     set(MexIFace_MATLAB_SYSTEM_MEXEXT mexw64)
@@ -487,29 +483,14 @@ message(STATUS "[MexIFace::Matlab] MexIFace_MATLAB_INCOMPATABLE_ARCHS:${MexIFace
 message(STATUS "[MexIFace::Matlab] MexIFace_MATLAB_INCOMPATABLE_LIBSTDCXX_VERSIONS:${MexIFace_MATLAB_INCOMPATABLE_LIBSTDCXX_VERSIONS}")
 message(STATUS "[MexIFace::Matlab] MexIFace_MATLAB_INCOMPATABLE_REASONS:${MexIFace_MATLAB_INCOMPATABLE_REASONS}")
 
-# set(_internals MexIFace_MATLAB_ROOTS MexIFace_MATLAB_VERSIONS MexIFace_MATLAB_VERSION_STRINGS MexIFace_MATLAB_RELEASES MexIFace_MATLAB_LIBSTDCXX_VERSIONS
-#                MexIFace_MATLAB_INCOMPATABLE_ROOTS MexIFace_MATLAB_INCOMPATABLE_VERSIONS MexIFace_MATLAB_INCOMPATABLE_RELEASES MexIFace_MATLAB_INCOMPATABLE_ARCHS
-#                MexIFace_MATLAB_INCOMPATABLE_LIBSTDCXX_VERSIONS MexIFace_MATLAB_INCOMPATABLE_REASONS)
-# foreach(_int IN LISTS _internals)
-#     message(STATUS "${_int}:${${_int}}")
-#     set(${_int} "${${_int}}" CACHE INTERNAL "")
-#     mark_as_advanced(${_int})
-# endforeach()
-# unset(_int)
-# unset(_internals)
 
-# Pthreads
-if (WIN32)
-    find_library(PTHREAD_LIBRARY libwinpthread.dll REQUIRED)
-elseif(UNIX)
-    set(PTHREAD_LIBRARY "-lpthread" CACHE STRING "Linking flags for pthreads" )
-endif()
+find_package(Pthread REQUIRED)
 message(STATUS "[MexIFace::Matlab]  Found Pthread Libarary: ${PTHREAD_LIBRARY}")
 
 _mexiface_make_matlab_targets()
 
-message(STATUS "[MexIFace::Matlab] MexIFace_MATLAB_INTERLEAVED_COMPLEXS:${MexIFace_MATLAB_INTERLEAVED_COMPLEX}")
-message(STATUS "[MexIFace::Matlab] MexIFace_MATLAB_LARGE_ARRAY_DIMS:${MexIFace_MATLAB_LARGE_ARRAY_DIMS}")
+message(STATUS "[MexIFace::Matlab] OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX:${OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX}")
+message(STATUS "[MexIFace::Matlab] OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS:${OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS}")
 message(STATUS "[MexIFace::Matlab] MexIFace_MATLAB_MEX_LIBRARIES_ALL_TARGETS:${MexIFace_MATLAB_MEX_LIBRARIES_ALL_TARGETS}")
 message(STATUS "[MexIFace::Matlab] MexIFace_MATLAB_INCLUDE_DIRS:${MexIFace_MATLAB_INCLUDE_DIRS}")
 message(STATUS "[MexIFace::Matlab] MexIFace_MATLAB_LIBRARY_DIRS:${MexIFace_MATLAB_LIBRARY_DIRS}")

@@ -1,9 +1,9 @@
 # MexIFace: src/CMakeLists.txt
+#
+# build libMexIFaceX_Y.so for each X_Y version
 
 ## Source Files ##
 set(MexIFace_SRCS MexIFace.cpp MexUtils.cpp explore.cpp)
-## MexIfaceCore Object library. ##
-# add_library(MexIFaceCore OBJECT ${MexIFace_SRCS})
 
 set(PUBLIC_HEADER_SRC_DIR ${CMAKE_SOURCE_DIR}/include)
 
@@ -17,13 +17,10 @@ set(MexIFace_TARGETS)
 if(CMAKE_CROSSCOMPILING AND OPT_FIXUP_DEPENDENCIES) #Fixup before install as otherwise the toolchain install override will auto-call fixup-dependencies
     include(FixupDependencies)
     set(_fixup_args)
-    if(OPT_LINK_INSTALLED_LIBS)
-        list(APPEND _fixup_args LINK_INSTALLED_LIBS)
-    endif()
-    if(OPT_INSTALL_GCC_DEPENDENCIES)
+    if(OPT_FIXUP_DEPENDENCIES_COPY_GCC_LIBS)
         list(APPEND _fixup_args COPY_GCC_LIBS)
     endif()
-    if(OPT_FIXUP_BUILD_TREE_DEPENDENCIES)
+    if(OPT_FIXUP_DEPENDENCIES_BUILD_TREE)
         list(APPEND _fixup_args EXPORT_BUILD_TREE)
     endif()
 endif()
@@ -33,10 +30,8 @@ foreach(idx RANGE ${niter})
     list(GET MexIFace_MATLAB_LINKER_MAP_FILES ${idx} map_file)
     set(lib MexIFace${vers})
     set(matlab_target "MATLAB::${vers}::MEX_LIBRARIES")
-    message(STATUS "lib:${lib} target:${matlab_target}")
     add_library(${lib} SHARED ${MexIFace_SRCS})
-    #Add version file for R2018a+
-    if(ver VERSION_GREATER_EQUAL "9.4")
+    if(ver VERSION_GREATER_EQUAL "9.4") #Add version file for R2018a+
         list(GET MexIFace_MATLAB_MEXAPI_VERSION_SOURCES ${idx} vers_src_file)
         target_sources(${lib} PRIVATE ${vers_src_file})
     endif()
@@ -52,7 +47,7 @@ foreach(idx RANGE ${niter})
                                              $<INSTALL_INTERFACE:include>)
     target_compile_features(${lib} PUBLIC cxx_std_11) #Declare C++11 required for building
     install(TARGETS ${lib} EXPORT ${PROJECT_NAME}Targets
-            RUNTIME DESTINATION lib COMPONENT Runtime
+            RUNTIME DESTINATION bin COMPONENT Runtime
             ARCHIVE DESTINATION lib COMPONENT Development
             LIBRARY DESTINATION lib COMPONENT Runtime)
     get_target_property(_build_rpath ${lib} BUILD_RPATH)
@@ -60,7 +55,7 @@ foreach(idx RANGE ${niter})
     #Copy in dependencies to build-tree / install-tree as necessary
     if(CMAKE_CROSSCOMPILING AND OPT_FIXUP_DEPENDENCIES)
         get_target_property(_MATLAB_LIB_PATH MATLAB::${vers}::MEX_LIBRARIES INTERFACE_LINK_DIRECTORIES)
-        fixup_dependencies(TARGETS ${lib} TARGET_DESTINATION lib PROVIDED_LIB_DIRS ${_MATLAB_LIB_PATH} ${_fixup_args})
+        fixup_dependencies(TARGETS ${lib} PROVIDED_LIB_DIRS ${_MATLAB_LIB_PATH} ${_fixup_args})
     endif()
 
     list(APPEND MexIFace_TARGETS MexIFace::${lib})

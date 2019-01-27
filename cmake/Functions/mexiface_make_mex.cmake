@@ -42,25 +42,23 @@ function(mexiface_make_mex)
     endif()
 
     #TODO: This might not work totally as intetended.  We need to disable the intall(TARGETS) hook.
-    set(OPT_AUTO_FIXUP_DEPENDENCIES OFF CACHE BOOL "MexIFace disables the auto hook on install() function for fixup_dependencies()." FORCE)
+    set(OPT_FIXUP_DEPENDENCIES_AUTO OFF CACHE BOOL "MexIFace disables the auto hook on install() function for fixup_dependencies()." FORCE)
 
-    # Looks for options:
+    # Looks for FIXUP_DEPENDENCIES options:
     #   OPT_FIXUP_DEPENDENCIES - Fixup dependencies.  Should be ON if crosscompiling.
-    #   OPT_INSTALL_SYSTEM_DEPENDENCIES
-    #   OPT_FIXUP_BUILD_TREE_DEPENDENCIES
-    #   OPT_LINK_INSTALLED_LIBS
+    #   OPT_FIXUP_DEPENDENCIES_LINK_INSTALLED_LIBS
+    #   OPT_FIXUP_DEPENDENCIES_COPY_GCC_LIBS
+    #   OPT_FIXUP_DEPENDENCIES_COPY_GLIBC_LIBS
+    #   OPT_FIXUP_DEPENDENCIES_BUILD_TREE
     #Args for fixup_dependencies.
     if(CMAKE_CROSSCOMPILING AND OPT_FIXUP_DEPENDENCIES)
         include(FixupDependencies)
         set(_fixup_args)
-        if(OPT_FIXUP_BUILD_TREE_DEPENDENCIES)
+        if(OPT_FIXUP_DEPENDENCIES_COPY_GCC_LIBS)
+            list(APPEND _fixup_args COPY_GCC_LIBS)
+        endif()
+        if(OPT_FIXUP_DEPENDENCIES_BUILD_TREE)
             list(APPEND _fixup_args EXPORT_BUILD_TREE)
-        endif()
-        if(OPT_INSTALL_SYSTEM_DEPENDENCIES)
-            list(APPEND _fixup_args COPY_SYSTEM_LIBS)
-        endif()
-        if(OPT_LINK_INSTALLED_LIBS)
-            list(APPEND _fixup_args LINK_INSTALLED_LIBS)
         endif()
     elseif(CMAKE_CROSSCOMPILING)
         message(WARNING "  [MexIFace::make_mex()] Crosscompiling, but OPT_FIXUP_DEPENDENCIES is not set.  Dependencies may not be found correctly for mex files that link to external shared libraries.")
@@ -93,12 +91,12 @@ function(mexiface_make_mex)
             if(CMAKE_CROSSCOMPILING AND OPT_FIXUP_DEPENDENCIES) #Fixup before install as otherwise the toolchain install override will auto-call fixup-dependencies
                 get_target_property(_MATLAB_INCLUDE_PATH MATLAB::${vers}::MEX_LIBRARIES INTERFACE_INCLUDE_DIRECTORIES)
                 get_filename_component(_matlab_executable "${_MATLAB_INCLUDE_PATH}/../../bin/${MexIFace_MATLAB_SYSTEM_ARCH}/MATLAB" ABSOLUTE)
-                fixup_dependencies(TARGETS ${mexfile} TARGET_DESTINATION ${mex_dir} COPY_DESTINATION ${rpath}/lib PROVIDED_LIB_DIRS ${_MATLAB_LIB_PATH} PARENT_LIB ${_matlab_executable} ${_fixup_args})
+                fixup_dependencies(TARGETS ${mexfile} TARGET_DESTINATIONS ${mex_dir} COPY_DESTINATION lib PROVIDED_LIB_DIRS ${_MATLAB_LIB_PATH} PARENT_LIB ${_matlab_executable} ${_fixup_args})
             endif()
         elseif(WIN32)
             install(TARGETS ${mexfile} RUNTIME DESTINATION ${mex_dir} COMPONENT Runtime)
             if(CMAKE_CROSSCOMPILING AND OPT_FIXUP_DEPENDENCIES) #Fixup before install as otherwise the toolchain install override will auto-call fixup-dependencies
-                fixup_dependencies(TARGETS ${mexfile} TARGET_DESTINATION ${mex_dir} COPY_DESTINATION "." PROVIDED_LIB_DIRS ${_MATLAB_LIB_PATH} ${_fixup_args})
+                fixup_dependencies(TARGETS ${mexfile} TARGET_DESTINATIONS ${mex_dir} COPY_DESTINATION bin PROVIDED_LIB_DIRS ${_MATLAB_LIB_PATH} ${_fixup_args})
             endif()
 #         elseif(APPLE)
 #             set_target_properties(${mexfile} PROPERTIES INSTALL_RPATH "@loader_path/../../..:@loader_path/../../../..") #link back to lib directory

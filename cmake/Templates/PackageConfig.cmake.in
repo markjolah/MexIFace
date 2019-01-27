@@ -22,8 +22,8 @@ add_definitions(-DARMA_USE_CXX11)
 # MexIFace_COMPATABLE_MATLAB_VERSIONS
 # MexIFace_COMPATABLE_MATLAB_RELEASES
 # MexIFace_COMPATABLE_MATLAB_ARCH
-# MexIFace_MATLAB_INTERLEAVED_COMPLEX - Settings for Matlab complex API
-# MexIFace_MATLAB_LARGE_ARRAY_DIMS - Settings for Matlab 64-bit index API
+# OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX - Settings for Matlab complex API
+# OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS - Settings for Matlab 64-bit index API
 #
 # MexIFace_SYSTEM_LIBSTDCXX_VERSION
 #
@@ -40,8 +40,9 @@ set(MexIFace_COMPATABLE_MATLAB_VERSION_STRINGS "@MexIFace_MATLAB_VERSION_STRINGS
 set(MexIFace_COMPATABLE_MATLAB_VERSIONS "@MexIFace_MATLAB_VERSIONS@")
 set(MexIFace_COMPATABLE_MATLAB_RELEASES "@MexIFace_MATLAB_RELEASES@")
 set(MexIFace_COMPATABLE_MATLAB_ARCH @MexIFace_MATLAB_SYSTEM_ARCH@)
-option(MexIFace_MATLAB_INTERLEAVED_COMPLEX "Enable interleaved complex API in R2018a+" @MexIFace_MATLAB_INTERLEAVED_COMPLEX@) #Propagate settings for complex API
-option(MexIFace_MATLAB_LARGE_ARRAY_DIMS "Enable 64-bit array indexes in R2017a+" @MexIFace_MATLAB_LARGE_ARRAY_DIMS@) #Propagate settings for array index types API
+option(OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX "Enable interleaved complex API in R2018a+" @OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX@) #Propagate settings for complex API
+option(OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS "Enable 64-bit array indexes in R2017a+" @OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS@) #Propagate settings for array index types API
+option(OPT_MexIFace_INSTALL_DISTRIBUTION_STARTUP "Install an additional copy of startupPackage.m at the INSTALL_PREFIX root in addition to the normal directory.  This makes it easy to distribute as a zip file." Off)
 # @PROJECT_NAME@Config-mexiface.cmake Sets properties that are particular to the Build vs. Install tree
 #MexIFace_MATLAB_CODE_DIR
 #MexIFace_MATLAB_STARTUP_M
@@ -84,8 +85,8 @@ message(STATUS "[MexIFaceConfig.cmake] MexIFace_COMPATABLE_MATLAB_VERSION_STRING
 message(STATUS "[MexIFaceConfig.cmake] MexIFace_COMPATABLE_MATLAB_VERSIONS:${MexIFace_COMPATABLE_MATLAB_VERSIONS}")
 message(STATUS "[MexIFaceConfig.cmake] MexIFace_COMPATABLE_MATLAB_RELEASES:${MexIFace_COMPATABLE_MATLAB_RELEASES}")
 message(STATUS "[MexIFaceConfig.cmake] MexIFace_COMPATABLE_MATLAB_ARCH:${MexIFace_COMPATABLE_MATLAB_ARCH}")
-message(STATUS "[MexIFaceConfig.cmake] MexIFace_MATLAB_INTERLEAVED_COMPLEX:${MexIFace_MATLAB_INTERLEAVED_COMPLEX}")
-message(STATUS "[MexIFaceConfig.cmake] MexIFace_MATLAB_LARGE_ARRAY_DIMS:${MexIFace_MATLAB_LARGE_ARRAY_DIMS}")
+message(STATUS "[MexIFaceConfig.cmake] OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX:${OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX}")
+message(STATUS "[MexIFaceConfig.cmake] OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS:${OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS}")
 message(STATUS "[MexIFaceConfig.cmake] MexIFace_SYSTEM_LIBSTDCXX_VERSION:${MexIFace_SYSTEM_LIBSTDCXX_VERSION}")
 
 check_required_components("@PROJECT_NAME@")

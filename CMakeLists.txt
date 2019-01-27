@@ -13,19 +13,24 @@ cmake_minimum_required( VERSION 3.9 )
 project(MexIFace VERSION 0.1.1 LANGUAGES CXX)
 set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries Ignored. Exists for compatability. Always build shared." FORCE)
 
-option(MexIFace_MATLAB_INTERLEAVED_COMPLEX "Enable interleaved complex API in R2018a+" OFF)
-option(MexIFace_MATLAB_LARGE_ARRAY_DIMS "Enable 64-bit array indexes in R2017a+.  Probably this needs to be on." ON)
+option(OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX "Enable interleaved complex API in R2018a+" OFF)
+option(OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS "Enable 64-bit array indexes in R2017a+.  Probably this needs to be on." ON)
+option(OPT_MexIFace_INSTALL_DISTRIBUTION_STARTUP "Install an additional copy of startupPackage.m at the INSTALL_PREFIX root in addition to the normal directory.  This makes it easy to distribute as a zip file." Off)
 option(BUILD_TESTING "Build testing framework" OFF)
+option(OPT_INSTALL_TESTING "Install testing executables" OFF)
 option(OPT_EXTRA_DEBUG "Support extra noisy debugging features" OFF) #Extra debug features (Armadillo)
 option(OPT_EXPORT_BUILD_TREE "Configure the package so it is usable from the build tree.  Useful for development." OFF)
 
 message(STATUS "OPTION: BUILD_TESTING: ${BUILD_TESTING}")
+message(STATUS "OPTION: OPT_INSTALL_TESTING: ${OPT_INSTALL_TESTING}")
 message(STATUS "OPTION: OPT_EXTRA_DEBUG: ${OPT_EXTRA_DEBUG}")
 message(STATUS "OPTION: OPT_EXPORT_BUILD_TREE: ${OPT_EXPORT_BUILD_TREE}")
-message(STATUS "OPTION: MexIFace_MATLAB_INTERLEAVED_COMPLEX: ${MexIFace_MATLAB_INTERLEAVED_COMPLEX}")
-message(STATUS "OPTION: MexIFace_MATLAB_LARGE_ARRAY_DIMS: ${MexIFace_MATLAB_LARGE_ARRAY_DIMS}")
+message(STATUS "OPTION: OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX: ${OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX}")
+message(STATUS "OPTION: OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS: ${OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS}")
+message(STATUS "OPTION: OPT_MexIFace_INSTALL_DISTRIBUTION_STARTUP: ${OPT_MexIFace_INSTALL_DISTRIBUTION_STARTUP}")
 
-set(OPT_AUTO_FIXUP_DEPENDENCIES OFF CACHE BOOL "MexIFace disables the auto hook on install() function for fixup_dependencies()." FORCE)
+#Force the install() hook off [default:on in the toolchains].  MexIFace is fixup_dependencies aware and we will call manually
+set(OPT_FIXUP_DEPENDENCIES_AUTO OFF CACHE BOOL "MexIFace disables the auto hook on install() function for fixup_dependencies()." FORCE)
 
 #Locations of the MexIFace cmake build system components
 #Export all these variables in package-config also.
@@ -42,7 +47,8 @@ list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_CURRENT_LIST_DIR}/cmake/UncommonCMakeMod
 include(AddExternalDependency)
 #BacktraceException allows for exceptions that encode a backtrace for debugging
 set(BacktraceExceptionURL https://github.com/markjolah/BacktraceException.git)
-add_external_dependency(NAME BacktraceException URL ${BacktraceExceptionURL} SHARED TESTING)
+add_external_dependency(NAME BacktraceException URL ${BacktraceExceptionURL} SHARED
+                        PASS_CACHE_VARIABLES BUILD_TESTING OPT_INSTALL_TESTING)
 
 # Armadillo
 find_package(Armadillo REQUIRED)
@@ -113,11 +119,11 @@ include(CMakePackageConfigHelpers)
 set(_DEPENDENT_STARTUP_M_LOCATIONS)
 set(_MATLAB_CODE_DIR ${MATLAB_CODE_INSTALL_DIR}) #Set relative to install prefix for configure_package_config_file
 set(_MATLAB_STARTUP_M ${_MATLAB_CODE_DIR}/startup${PROJECT_NAME}.m)
-    if(BUILD_TESTING)
-        set(_MATLAB_INSTALLED_MEX_PATH lib/${PROJECT_NAME}/mex) #Test mex file installation
-    else()
-        set(_MATLAB_INSTALLED_MEX_PATH) #Disable mex export
-    endif()
+if(BUILD_TESTING AND OPT_INSTALL_TESTING)
+    set(_MATLAB_INSTALLED_MEX_PATH lib/${PROJECT_NAME}/mex) #Test mex file installation
+else()
+    set(_MATLAB_INSTALLED_MEX_PATH) #Disable mex export
+endif()
 set(_CONFIGURE_TEMPLATE ${CMAKE_SOURCE_DIR}/cmake/Templates/MexIFaceConfig-mexiface.cmake.in)
 set(_CONFIGURE_FILE_INSTALL_TREE ${CMAKE_BINARY_DIR}/MexIFaceConfig-mexiface.cmake.install-tree)
 configure_package_config_file(${_CONFIGURE_TEMPLATE} MexIFaceConfig-mexiface.cmake.install-tree
@@ -135,12 +141,16 @@ set(_STARTUP_M_TEMPLATE ${CMAKE_SOURCE_DIR}/cmake/Templates/startupPackage.m.in)
 configure_file(${_STARTUP_M_TEMPLATE} ${CMAKE_BINARY_DIR}/startupMexIFace.m.install-tree)
 install(FILES ${CMAKE_BINARY_DIR}/startupMexIFace.m.install-tree RENAME startupMexIFace.m
         DESTINATION ${MATLAB_CODE_INSTALL_DIR} COMPONENT Runtime)
+if(OPT_MexIFace_INSTALL_DISTRIBUTION_STARTUP)
+    #Install a copy of the startup at the root of install-tree for convenience of end MATLAB users
+    install(FILES ${CMAKE_BINARY_DIR}/startupMexIFace.m.install-tree RENAME startupMexIFace.m
+            DESTINATION "." COMPONENT Runtime)
+endif()
 unset(_MATLAB_CODE_DIR)
 unset(_MATLAB_STARTUP_M)
 unset(_MATLAB_INSTALLED_MEX_PATH)
 
 if(OPT_EXPORT_BUILD_TREE)
-    message(STATUS "@@@@@ MexIFace Build-Tree startup.m")
     #Build tree settings use the local matlab code dir and startupMexIFace.m
     #Use source repository for matlab code
     file(RELATIVE_PATH _MATLAB_CODE_DIR ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/matlab) #Relative to CMAKE_BINARY_DIR
@@ -170,4 +180,3 @@ unset(_MATLAB_CODE_DIR)
 unset(_MATLAB_STARTUP_M)
 unset(_MATLAB_BUILD_MEX_PATHS)
 unset(_DEPENDENT_STARTUP_M_LOCATIONS)
-

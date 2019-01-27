@@ -1,9 +1,9 @@
 #Local checkout of gh-pages branch
 _gh-pages
 #Local Build dir-tree
-_build
+_build*
 #Local install dir
-_install
+_install*
 _win64.*
 _maci64.*
 _gcc4_9.build
