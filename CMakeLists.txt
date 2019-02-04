@@ -49,11 +49,13 @@ set(MexIFace_CMAKE_TOOLCHAINS_DIR ${MexIFace_CMAKE_DIR}/UncommonCMakeModules/Too
 list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_CURRENT_LIST_DIR}/cmake/UncommonCMakeModules)
 
 include(AddExternalDependency)
+# message(STATUS "CMAKE_MODULE_PATH:${CMAKE_MODULE_PATH}")
 #BacktraceException allows for exceptions that encode a backtrace for debugging
 set(BacktraceExceptionURL https://github.com/markjolah/BacktraceException.git)
 add_external_dependency(NAME BacktraceException URL ${BacktraceExceptionURL} SHARED
                         PASS_CACHE_VARIABLES BUILD_TESTING OPT_INSTALL_TESTING)
 
+# message(STATUS "CMAKE_MODULE_PATH:${CMAKE_MODULE_PATH}")
 # Armadillo
 find_package(Armadillo REQUIRED COMPONENTS CXX11 INT64) #INT64 required by Matlab BLAS and LAPACK
 add_compile_definitions(${ARMADILLO_PRIVATE_COMPILE_DEFINITIONS})

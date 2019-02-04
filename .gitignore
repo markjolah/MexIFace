@@ -8,6 +8,7 @@ _win64.*
 _maci64.*
 _gcc4_9.build
 _gcc4_9.install
+_dist
 
 .kdev4*
 *.kdev4

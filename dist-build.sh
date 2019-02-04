@@ -1,9 +1,20 @@
 #!/bin/bash
-#
-# build.distribution.sh
+# dist-build.sh <INSTALL_PREFIX>
+# Release-only build for distribution.  Testing is enabled.
+# Does not clear INSTALL_PATH for obvious reasons.
 #
 # Build both linux and windows into the same file for distribution
 #
+# Args:
+#  <INSTALL_PREFIX> - path to distribution install directory [Default: _dist]. Installed at <PkgName>-<PkgVers> subdir.
+#                     Interpreted relative to current directory.
+#
+#
+if [ -z $1 ]; then
+    INSTALL_DIR=_dist
+else
+    INSTALL_DIR=$1
+fi
 
 LINUX_FULL_ARCH=x86_64-gcc4_9-linux-gnu
 W64_FULL_ARCH=x86_64-w64-mingw32
@@ -14,9 +25,8 @@ TAR_FILE=MexIFace-${VERSION}.tbz2
 
 LINUX_TOOLCHAIN_FILE=./cmake/UncommonCMakeModules/Toolchains/Toolchain-${LINUX_FULL_ARCH}.cmake
 W64_TOOLCHAIN_FILE=./cmake/UncommonCMakeModules/Toolchains/Toolchain-MXE-${W64_FULL_ARCH}.cmake
-INSTALL_DIR=_install-dist
 INSTALL_PATH=${INSTALL_DIR}/$INSTALL_DIR_NAME
-BUILD_PATH=_build-dist
+BUILD_PATH=_build/dist
 NUM_PROCS=$(grep -c ^processor /proc/cpuinfo)
 
 ARGS=""
@@ -33,7 +43,7 @@ ARGS="${ARGS} -DOPT_MexIFace_INSTALL_DISTRIBUTION_STARTUP=On" #Copy startupPacka
 
 
 set -ex
-rm -rf $INSTALL_PATH $BUILD_PATH
+rm -rf $BUILD_PATH
 
 cmake -H. -B$BUILD_PATH/LinuxDebug -DCMAKE_TOOLCHAIN_FILE=$LINUX_TOOLCHAIN_FILE -DCMAKE_BUILD_TYPE=Debug ${ARGS}
 cmake --build $BUILD_PATH/LinuxDebug --target install -- -j${NUM_PROCS}
