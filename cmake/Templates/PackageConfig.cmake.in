@@ -9,7 +9,7 @@ set_and_check(PACKAGE_FIND_MODULES_PATH @PACKAGE_FIND_MODULES_PATH@)
 list(INSERT CMAKE_MODULE_PATH 0 ${PACKAGE_FIND_MODULES_PATH})
 #Use find_package because find_dependency does not respect COMPONENTS argument or allow
 #re-finding of packages with different COMPONENTS settings
-find_package(Armadillo REQUIRED COMPONENTS CXX11)
+find_package(Armadillo REQUIRED COMPONENTS CXX11 INT64) #INT64 always required for MATLAB
 list(REMOVE_AT CMAKE_MODULE_PATH 0)
 
 #Sets:
