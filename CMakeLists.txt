@@ -11,12 +11,16 @@
 cmake_minimum_required( VERSION 3.9 )
 
 project(MexIFace VERSION 0.1.1 LANGUAGES CXX)
-set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries Ignored. Exists for compatability. Always build shared." FORCE)
+set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries Ignored. Exists for comparability. Always build shared." FORCE)
 
 option(OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX "Enable interleaved complex API in R2018a+" OFF)
-option(OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS "Enable 64-bit array indexes in R2017a+.  Probably this needs to be on." ON)
+option(OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS "Enable 64-bit array indexes in R2017a+.  If BLAS or LAPACK are used this needs to be on." ON)
 option(OPT_MexIFace_INSTALL_DISTRIBUTION_STARTUP "Install an additional copy of startupPackage.m at the INSTALL_PREFIX root in addition to the normal directory.  This makes it easy to distribute as a zip file." Off)
-option(BUILD_TESTING "Build testing framework" OFF)
+if(${CMAKE_BUILD_TYPE} MATCHES Debug)
+    option(BUILD_TESTING "Build testing framework" ON)
+else()
+    option(BUILD_TESTING "Build testing framework" OFF)
+endif()
 option(OPT_INSTALL_TESTING "Install testing executables" OFF)
 option(OPT_EXTRA_DEBUG "Support extra noisy debugging features" OFF) #Extra debug features (Armadillo)
 option(OPT_EXPORT_BUILD_TREE "Configure the package so it is usable from the build tree.  Useful for development." OFF)
@@ -51,23 +55,17 @@ add_external_dependency(NAME BacktraceException URL ${BacktraceExceptionURL} SHA
                         PASS_CACHE_VARIABLES BUILD_TESTING OPT_INSTALL_TESTING)
 
 # Armadillo
-find_package(Armadillo REQUIRED)
-add_definitions(-DARMA_USE_CXX11)
-add_definitions(-DARMA_DONT_USE_LAPACK -DARMA_DONT_USE_BLAS -DARMA_DONT_USE_OPENMP -DARMA_DONT_USE_HDF5) #disable unused dependencies
-set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS $<$<CONFIG:Debug>:ARMA_PRINT_ERRORS>)
-set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS $<$<NOT:$<CONFIG:Debug>>:ARMA_NO_DEBUG>)
-if(OPT_EXTRA_DEBUG)
-    set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS $<$<CONFIG:Debug>:ARMA_EXTRA_DEBUG>)
-endif()
+find_package(Armadillo REQUIRED COMPONENTS CXX11 INT64) #INT64 required by Matlab BLAS and LAPACK
+add_compile_definitions(${ARMADILLO_PRIVATE_COMPILE_DEFINITIONS})
 
+#Check the GCC libstdc++.so version
 if(CMAKE_CXX_COMPILER_ID STREQUAL GNU AND NOT MexIFace_SYSTEM_LIBSTDCXX_VERSION)
     include(get_libstdcxx_version)
     get_libstdcxx_version(MexIFace_SYSTEM_LIBSTDCXX_VERSION)
     set(MexIFace_SYSTEM_LIBSTDCXX_VERSION ${MexIFace_SYSTEM_LIBSTDCXX_VERSION} CACHE STRING "Version of libsdtc++.so linked for this set of MexIFace targets" FORCE)
 endif()
 
-#Use the MexIFace version of FindMatlab.cmake which will find multiple versions.
-#Set variables on cmake command line or in environment
+#Find MATLAB roots:
 #MATLAB_ROOT - a single matlab 'e.g.: /usr/local/matlab/R2018a'
 #MATLAB_ROOTS - a ";" delimited list of matlab roots or directories containing several roots each root dir should match
 #               the RE "^[r|R]20\d\d[a|b]"
@@ -82,6 +80,8 @@ include(ConfigureDebugBuilds)
 add_subdirectory(src)
 
 if(BUILD_TESTING)
+    include(CTest)
+    enable_testing()
     set(MexIFace_COMPATABLE_MATLAB_VERSION_STRINGS ${MexIFace_MATLAB_VERSION_STRINGS}) #Normally set when MexIFaceConfig.cmake is called by other cmake project with find_package(MexIFace)
     add_subdirectory(test)
 endif()
@@ -100,7 +100,7 @@ install(FILES ${MexIFace_CMAKE_DIR}/UncommonCMakeModules/Templates/FixupTargetDe
 
 ### PackageConfig
 include(ExportPackageWizzard)
-export_package_wizzard(EXPORT_BUILD_TREE "${OPT_EXPORT_BUILD_TREE}") #setup build-tree and install-tree exports and packageconfig files
+export_package_wizzard(FIND_MODULES cmake/UncommonCMakeModules/FindArmadillo.cmake) #setup build-tree and install-tree exports and packageconfig files
 
 #Give path to FindMatlab.cmake so it can be called by PackageConfig.cmake correctly from build tree or install tree
 set(MATLAB_CODE_INSTALL_DIR lib/MexIFace/matlab)
