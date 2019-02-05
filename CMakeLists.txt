@@ -22,16 +22,16 @@ else()
     option(BUILD_TESTING "Build testing framework" OFF)
 endif()
 option(OPT_INSTALL_TESTING "Install testing executables" OFF)
-option(OPT_EXTRA_DEBUG "Support extra noisy debugging features" OFF) #Extra debug features (Armadillo)
 option(OPT_EXPORT_BUILD_TREE "Configure the package so it is usable from the build tree.  Useful for development." OFF)
+option(OPT_EXTRA_DEBUG "Support extra noisy debugging features" OFF) #Extra debug features (Armadillo)
 
 message(STATUS "OPTION: BUILD_TESTING: ${BUILD_TESTING}")
 message(STATUS "OPTION: OPT_INSTALL_TESTING: ${OPT_INSTALL_TESTING}")
-message(STATUS "OPTION: OPT_EXTRA_DEBUG: ${OPT_EXTRA_DEBUG}")
 message(STATUS "OPTION: OPT_EXPORT_BUILD_TREE: ${OPT_EXPORT_BUILD_TREE}")
 message(STATUS "OPTION: OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX: ${OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX}")
 message(STATUS "OPTION: OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS: ${OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS}")
 message(STATUS "OPTION: OPT_MexIFace_INSTALL_DISTRIBUTION_STARTUP: ${OPT_MexIFace_INSTALL_DISTRIBUTION_STARTUP}")
+message(STATUS "OPTION: OPT_EXTRA_DEBUG: ${OPT_EXTRA_DEBUG}")
 
 #Force the install() hook off [default:on in the toolchains].  MexIFace is fixup_dependencies aware and we will call manually
 set(OPT_FIXUP_DEPENDENCIES_AUTO OFF CACHE BOOL "MexIFace disables the auto hook on install() function for fixup_dependencies()." FORCE)
