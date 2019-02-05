@@ -7,21 +7,23 @@ classdef TestArmadillo < MexIFace.IFaceMixin
     end
     methods
         function obj = TestArmadillo(vec)
-            %
             iface = str2func(MexIFace.Test.TestArmadillo.IFaceName);
             obj = obj@MexIFace.IFaceMixin(iface);
             obj.openIface(vec);
         end
 
         function c = add(obj,o)
-           c = obj.call('add',o);
+            c = obj.call('add',o);
         end
         function v = ret(obj)
-           v = obj.call('ret');
+            v = obj.call('ret');
         end
         function inc(obj,o)
-           obj.call('inc',o);
+            obj.call('inc',o);
         end
-
+        function echoArray(obj, arr)
+            %Convert strings to char arrays as C MEX API cannot access string objects
+            obj.call('echoArray',cellstr(arr)); 
+        end
     end
 end

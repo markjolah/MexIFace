@@ -28,7 +28,33 @@ function startup@PROJECT_NAME@(debug)
         ps = strsplit(p,filesep());
         is_abs = (~isempty(ps) && (isempty(ps{1}) && numel(ps)>1)) || ~isempty(regexp(ps{1},'^[A-Z]:','ONCE'));
     end
-
+    % process '.' and '..' paths to produce an absolute version of the path
+    function abs_path = make_absolute_path(path_dir)
+        ps = strsplit(path_dir,filesep());
+        ps(cellfun(@isempty,ps))=[];
+        if isempty(ps)
+            abs_path=ps;
+            return
+        end
+        N = numel(ps);
+        newps = cell(N,1);
+        j=1;
+        for i = 1:N
+            if strcmp(ps{i},'.')
+                continue;
+            elseif strcmp(ps{i},'..') && j>1
+                j=j-1;
+                newps{j}='';
+            else
+                newps{j}=ps{i};
+                j=j+1;
+            end
+        end
+        abs_path = fullfile(newps{:});
+        if path_dir(1)=='/'
+            abs_path = ['/' abs_path];
+        end
+    end
     %Get matlab major.minor version
     version_re = '^(?<major>\d+)\.(?<minor>\d+)\.';
     tokens = regexp(version(),version_re,'tokens');
@@ -43,6 +69,7 @@ function startup@PROJECT_NAME@(debug)
     %Test if this file is at prefix_relative_path or at the install root
     if isfile(fullfile(startup_install_path, prefix_relative_path, [startup_file_name, '.m']))
         %We are being run from copied startup@PACKAGE_NAME@.m located at install_prefix root
+        %Or we are run from the build-directory
         package_install_prefix = startup_install_path;
     else
         %We are being run from normal  startup@PACKAGE_NAME@.m located at prefix_relative_path
@@ -80,7 +107,8 @@ function startup@PROJECT_NAME@(debug)
     if is_absolute_path(matlab_code_dir)
         package_matlab_code_path = matlab_code_dir;
     elseif strcmp(package_install_prefix, startup_install_path)
-        package_matlab_code_path = fullfile(startup_install_path,prefix_relative_path);
+        %Hit this case if run from the built tree or from root of install tree.
+        package_matlab_code_path = fullfile(startup_install_path,prefix_relative_path,matlab_code_dir);
     else
         package_matlab_code_path = fullfile(startup_install_path);
     end
@@ -147,6 +175,7 @@ function startup@PROJECT_NAME@(debug)
 
     %Load dependency startup.m files
     dependent_startup_m_locations = strsplit('@_DEPENDENT_STARTUP_M_LOCATIONS@',';');
+    dependent_startup_m_locations(cellfun(@isempty,dependent_startup_m_locations)) = []; %Remove empty cells
     if ~isempty(dependent_startup_m_locations)
         for location_idx = dependent_startup_m_locations
             location = location_idx{1};
@@ -169,14 +198,16 @@ function startup@PROJECT_NAME@(debug)
 
     %Add matlab code and mex paths for this project. Check for any duplicates.
     all_paths = strsplit(path(),pathsep());
+    package_matlab_code_path = make_absolute_path(package_matlab_code_path);
     if ~any(strcmp(package_matlab_code_path, all_paths))
         addpath(package_matlab_code_path);
         disp(['@PROJECT_NAME@ Adding matlab code path: ', package_matlab_code_path])
     end
     for path_idx = mexfile_paths
-        if ~any(strcmp(path_idx{1}, all_paths))
-            disp(['@PROJECT_NAME@ Adding mex path: ', path_idx{1};])
-            addpath(path_idx{1});
+        mex_path = make_absolute_path(path_idx{1});
+        if ~any(strcmp(mex_path, all_paths))
+            disp(['@PROJECT_NAME@ Adding mex path: ', mex_path;])
+            addpath(mex_path);
         end
     end
 end

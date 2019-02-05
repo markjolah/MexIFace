@@ -50,6 +50,24 @@ std::string MexIFace::remove_alphanumeric(std::string name)
     return name;
 }
 
+/** @brief Reads a mxArray as a string.
+ *
+ * @param m Pointer to the mxArray to interpret.
+ *
+ * Throws an error if the conversion cannot be made.
+ */
+std::string MexIFace::getString(const mxArray *m)
+{
+    if(m == nullptr) m = rhs[rhs_idx++];
+    checkType(m,mxCHAR_CLASS); //Only accept char arrays as strings
+    checkVectorSize(m); //Should be 1D
+    auto cstr = mxArrayToString(m);
+    std::string str(cstr);
+    mxFree(cstr);
+    return str;
+}
+
+
 /**
  * @brief The mexFunction that will be exposed as the entry point for the .mex file
  *
@@ -106,9 +124,15 @@ void MexIFace::callMethod(std::string name,const MethodMap &map)
         mexPrintf("[MexIFace::callMethod] --- Unknown Method Name\n");
         mexPrintf("  MexName: %s\n",obj_name().c_str());
         mexPrintf("  MethodName: %s\n",name.c_str());
-        mexPrintf("  MappedMethods: [\n");
-        for(auto& methods : map) mexPrintf(methods.first.c_str(),",");
-        mexPrintf("]\n");
+        std::string method_names;
+        method_names.reserve(16*map.size());
+        for(auto& method : map) {
+            if(!method_names.empty()) method_names.append(",");
+            method_names.append(method.first);
+        }
+        mexPrintf("  MappedMethods: [%s]\n",method_names.c_str());
+
+        mexPrintf("%s]\n");
         exploreMexArgs(nrhs, rhs);
         #endif
         error("callMethod","UnknownMethod",name);

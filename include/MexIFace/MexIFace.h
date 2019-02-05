@@ -129,7 +129,6 @@ public:
     template<class ElemT, typename=IsArithmeticT<ElemT>> 
     static Hypercube<ElemT> checkedToHypercube(const mxArray *m);
     
-    
     static mxArray* toMXArray(bool val);
     static mxArray* toMXArray(const char* val);
     static mxArray* toMXArray(std::string val);
@@ -161,7 +160,6 @@ public:
     template<template<typename...> class Array, class ConvertableT>
     static mxArray* toMXArray(const Array<ConvertableT> &arr);
 
-    
     template<class SrcIntT,class DestIntT,typename=IsIntegralT<SrcIntT>,typename=IsIntegralT<DestIntT>>
     static DestIntT checkedIntegerToIntegerConversion(const mxArray *m);
     
@@ -173,7 +171,6 @@ public:
     
     template<class SrcFloatT,class DestFloatT,typename=IsFloatingPointT<SrcFloatT>,typename=IsFloatingPointT<DestFloatT>>
     static DestFloatT checkedFloatToFloatConversion(const mxArray *m);
-    
     
 protected:
     using MethodMap = std::map<std::string, std::function<void()>>; /**< The type of mapping for mapping names to member functions to call */    
@@ -209,18 +206,21 @@ protected:
     template<class FloatT=double, typename = IsFloatingPointT<FloatT>>
     FloatT getAsFloat(const mxArray *m=nullptr);
 
-    template<class ElemT=double, typename=IsArithmeticT<ElemT>>
+    template<class ElemT=double>
     Dict<ElemT> getAsScalarDict(const mxArray *m=nullptr);
-    template<template<typename> class Array = std::vector,class ElemT=double, typename=IsArithmeticT<ElemT>> 
+    template<template<typename...> class Array = std::vector,class ElemT=double>
     Array<ElemT> getAsScalarArray(const mxArray *m=nullptr);
-    
+
     /* get methods do not convert any arguments and will throw an exception if the types are not uniform */
     std::string getString(const mxArray *mxdata=nullptr);
-    template<class ElemT=double, typename=IsArithmeticT<ElemT>> 
+    template<template<typename...> class Array = std::vector>
+    Array<std::string> getStringArray(const mxArray *mxdata=nullptr);
+
+    template<class ElemT=double, typename=IsArithmeticT<ElemT>>
     ElemT getScalar(const mxArray *mxdata=nullptr);
-    template<class ElemT=double, typename=IsArithmeticT<ElemT>> 
+    template<class ElemT=double, typename=IsArithmeticT<ElemT>>
     Vec<ElemT> getVec(const mxArray *mxdata=nullptr);
-    template<class ElemT=double, typename=IsArithmeticT<ElemT>> 
+    template<class ElemT=double, typename=IsArithmeticT<ElemT>>
     Mat<ElemT> getMat(const mxArray *mxdata=nullptr);
     template<class ElemT=double, typename=IsArithmeticT<ElemT>> 
     Cube<ElemT> getCube(const mxArray *mxdata=nullptr);
@@ -230,10 +230,9 @@ protected:
     template<template<typename> class NumericArrayT, class ElemT=double>
     NumericArrayT<ElemT> getNumeric(const mxArray *m=nullptr);
 
-        
-    template<template<typename> class Array = std::vector, class ElemT=double, typename=IsArithmeticT<ElemT>> 
+    template<template<typename...> class Array = std::vector, class ElemT=double>
     Array<ElemT> getScalarArray(const mxArray *mxdata=nullptr);
-    template<template<typename> class Array = std::vector, class ElemT=double, typename=IsArithmeticT<ElemT>> 
+    template<template<typename> class Array = std::vector, class ElemT=double, typename=IsArithmeticT<ElemT>>
     Array<Vec<ElemT>> getVecArray(const mxArray *mxdata=nullptr);
     template<template<typename> class Array = std::vector, class ElemT=double, typename=IsArithmeticT<ElemT>> 
     Array<Mat<ElemT>> getMatArray(const mxArray *mxdata=nullptr);
@@ -894,7 +893,7 @@ FloatT MexIFace::getAsFloat(const mxArray *m)
     return 0; //never get here
 }
 
-template<template<typename> class Array, class ElemT, typename> 
+template<template<typename...> class Array, class ElemT>
 Array<ElemT> MexIFace::getAsScalarArray(const mxArray *m)
 {
     if(m == nullptr) m = rhs[rhs_idx++];
@@ -906,35 +905,32 @@ Array<ElemT> MexIFace::getAsScalarArray(const mxArray *m)
     return array;
 }
 
-template<class ElemT, typename>
+template<class ElemT>
 MexIFace::Dict<ElemT> MexIFace::getAsScalarDict(const mxArray *m)
 {
     if(m == nullptr) m = rhs[rhs_idx++];
     checkType(m,mxSTRUCT_CLASS); //Only accept structs arrays
     checkScalarSize(m); //Should be a scalar struct not a struct array
     Dict<ElemT> dict;
-    for(mwSize i=0; i<mxGetNumberOfFields(m); i++)
+    for(int i=0; i<mxGetNumberOfFields(m); i++)
         dict[mxGetFieldNameByNumber(m,i)] = getAsScalar<ElemT>(mxGetFieldByNumber(m,0,i));
     return dict;
-    
+
 }
 
-/** @brief Reads a mxArray as a string.
- *
- * @param m Pointer to the mxArray to interpret.
- *
- * Throws an error if the conversion cannot be made.
- */
-std::string MexIFace::getString(const mxArray *m)
+
+template<template<typename...> class Array>
+Array<std::string>  MexIFace::getStringArray(const mxArray *m)
 {
-    if(m == nullptr) m = rhs[rhs_idx++];
-    checkType(m,mxCHAR_CLASS); //Only accept char arrays as strings
+    if(m == nullptr) m = rhs[rhs_idx++];  //Default to first unhandled rhs argument
+    checkType(m,mxCELL_CLASS);
     checkVectorSize(m); //Should be 1D
-    auto cstr = mxArrayToString(m);
-    std::string str(cstr);
-    mxFree(cstr);
-    return str;
+    auto nfields = mxGetNumberOfElements(m);
+    Array<std::string> array(nfields);
+    for(mwSize n=0; n<nfields; n++) array[n] = getString(mxGetCell(m,n));
+    return array;
 }
+
 
 /** @breif Get exact type.  No conversions.
  * 
@@ -1036,7 +1032,7 @@ MexIFace::Hypercube<ElemT> MexIFace::GetNumericFunctor<MexIFace::template Hyperc
 }
 
 
-template<template<typename> class Array, class ElemT, typename> 
+template<template<typename...> class Array, class ElemT>
 Array<ElemT> MexIFace::getScalarArray(const mxArray *m)
 {
     if(m == nullptr) m = rhs[rhs_idx++];  //Default to first unhandled rhs argument
@@ -1044,10 +1040,22 @@ Array<ElemT> MexIFace::getScalarArray(const mxArray *m)
     checkVectorSize(m); //Should be 1D
     auto nfields = mxGetNumberOfElements(m);
     Array<ElemT> array(nfields);
-    for(auto n=0; n<nfields; n++) array[n] = getScalar<ElemT>(mxGetCell(m,n));
+    for(mwSize n=0; n<nfields; n++) array[n] = getScalar<ElemT>(mxGetCell(m,n));
     return array;
 }
 
+
+// template<template<typename> class Array, class ElemT, typename>
+// Array<ElemT> MexIFace::getScalarArray(const mxArray *m)
+// {
+//     if(m == nullptr) m = rhs[rhs_idx++];  //Default to first unhandled rhs argument
+//     checkType(m,mxCELL_CLASS);
+//     checkVectorSize(m); //Should be 1D
+//     auto nfields = mxGetNumberOfElements(m);
+//     Array<ElemT> array(nfields);
+//     for(auto n=0; n<nfields; n++) array[n] = getScalar<ElemT>(mxGetCell(m,n));
+//     return array;
+// }
 
 template<template<typename> class Array, class ElemT, typename> 
 Array<MexIFace::Vec<ElemT>> MexIFace::getVecArray(const mxArray *m)

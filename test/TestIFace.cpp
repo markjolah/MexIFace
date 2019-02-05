@@ -4,41 +4,60 @@
  */
 
 #include <functional>
-#include "TestIFace.h"
+#include "TestArmadillo.h"
+#include "MexIFace/MexIFace.h"
+
+class TestIFace : public mexiface::MexIFace, public mexiface::MexIFaceHandler<TestArmadillo>
+{
+public:
+    TestIFace();
+private:
+    void objConstruct();
+    void objAdd();
+    void objRet();
+    void objInc();
+    void objEchoArray();
+};
 
 TestIFace::TestIFace()
 {
     methodmap["add"] = std::bind(&TestIFace::objAdd, this);
     methodmap["inc"] = std::bind(&TestIFace::objInc, this);
     methodmap["ret"] = std::bind(&TestIFace::objRet, this);
+    methodmap["echoArray"] = std::bind(&TestIFace::objEchoArray, this);
 }
 
 void TestIFace::objConstruct()
 {
-    this->checkNumArgs(1,1); //(#out, #in)
+    checkNumArgs(1,1); //(#out, #in)
     TestArmadillo::VecT v = getVec();
-//     auto v = this->getVec<double>();
-    this->outputHandle(new TestArmadillo(v));
+    outputHandle(new TestArmadillo(v));
 }
 
 void TestIFace::objInc()
 {
-    this->checkNumArgs(0,1); //(#out, #in)
-    obj->inc(this->getVec());
+    checkNumArgs(0,1); //(#out, #in)
+    obj->inc(getVec());
 }
 
 void TestIFace::objRet()
 {
-    this->checkNumArgs(1,0); //(#out, #in)
-    this->output(obj->ret());
+    checkNumArgs(1,0); //(#out, #in)
+    output(obj->ret());
 }
-
 
 void TestIFace::objAdd()
 {
-    this->checkNumArgs(1,1); //(#out, #in)
-    TestArmadillo::VecT o = this->getVec();
-    this->output(obj->add(o));
+    checkNumArgs(1,1); //(#out, #in)
+    output(obj->add(getVec())); // 1-liner
+}
+
+void TestIFace::objEchoArray()
+{
+    checkNumArgs(0,1); //(#out, #in)
+    auto arr = getStringArray();
+    std::cout<<"Got Array of strings.\n";
+    for(arma::uword n=0;n<arr.size();n++) std::cout<<"["<<n<<"]: "<<arr[n]<<std::endl;
 }
 
 TestIFace iface; /**< Global iface object provides a iface.mexFunction */
