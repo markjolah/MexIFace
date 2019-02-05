@@ -52,8 +52,7 @@ include(AddExternalDependency)
 # message(STATUS "CMAKE_MODULE_PATH:${CMAKE_MODULE_PATH}")
 #BacktraceException allows for exceptions that encode a backtrace for debugging
 set(BacktraceExceptionURL https://github.com/markjolah/BacktraceException.git)
-add_external_dependency(NAME BacktraceException URL ${BacktraceExceptionURL} SHARED
-                        PASS_CACHE_VARIABLES BUILD_TESTING OPT_INSTALL_TESTING)
+add_external_dependency(NAME BacktraceException URL ${BacktraceExceptionURL} SHARED TESTING PASS_CACHE_VARIABLES OPT_INSTALL_TESTING)
 
 # message(STATUS "CMAKE_MODULE_PATH:${CMAKE_MODULE_PATH}")
 # Armadillo
