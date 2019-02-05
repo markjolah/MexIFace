@@ -358,8 +358,8 @@ function(_mexiface_make_matlab_targets)
             else()
                 target_compile_definitions(${target_prefix}MEX_LIBRARIES INTERFACE MATLAB_DEFAULT_RELEASE=R2017b)
             endif()
-            #Support for 64-bit indexed arrays
-            if(OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS AND ${_vers} VERSION_GREATER_EQUAL 9.2)
+            #Support for 64-bit indexed arrays enabled for all Matlab versions
+            if(OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS)
                 target_compile_definitions(${target_prefix}MEX_LIBRARIES INTERFACE MX_COMPAT_64)
             else()
                 target_compile_definitions(${target_prefix}MEX_LIBRARIES INTERFACE MX_COMPAT_32)
