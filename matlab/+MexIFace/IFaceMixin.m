@@ -85,7 +85,7 @@ classdef IFaceMixin < handle
             version_str = [tokens{1}{1} '_' tokens{1}{2}];
         end
 
-        function varargout=callstatic(ifaceHandle, cmdstr, varargin)
+        function varargout=callstatic(cmdstr, varargin)
             % callstatic   The entry point to call a static method of the underlying C++ class.  The Matlab side of the wrapped class
             % should internally call this protected method to call static member functions of the C++ class.  Because these are
             % static methods there is no need to have an active intantiation of the C++ class in objectHandle.
@@ -93,12 +93,11 @@ classdef IFaceMixin < handle
             % The user must provide the ifaceHandle directly, since we won't have an instantiated matlab object from which to get ifaceHandle
             %
             % Inputs:
-            %  ifaceHandle - This is the function pointer to the mex *_Iface function that provides the C++ side of the interface
             %  cmdstr - This is charactor array giving the name of the method to call
             %  varargin - The rest of the arguments the method expects.  These are passed directly in.
             % Output:
             %  varargout - Whatever arguments the method is supposed to return.  These are passed back directly
-            [varargout{1:nargout}]=ifaceHandle('@static',cmdstr, varargin{:});
+            [varargout{1:nargout}]=obj.ifaceHandle('@static',cmdstr, varargin{:});
         end
 
         function structDict = convertStatsToStructs(statsDict)
