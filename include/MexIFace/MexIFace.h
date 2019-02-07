@@ -641,7 +641,7 @@ DestIntT MexIFace::checkedFloatToIntegerConversion(const mxArray *m)
 template<class SrcIntT,class DestFloatT, typename, typename>
 DestFloatT MexIFace::checkedIntegerToFloatConversion(const mxArray *m)
 {
-    int64_t dest_max_int= 1ull << (std::numeric_limits<DestFloatT>::digits()+1);//maximum representable integer
+    int64_t dest_max_int= 1ull << (std::numeric_limits<DestFloatT>::digits+1);//maximum representable integer
     int64_t dest_min_int = -dest_max_int;
     auto val = *static_cast<SrcIntT*>(mxGetData(m));
     if (dest_max_int < val || dest_min_int > val) {
