@@ -168,7 +168,7 @@ if(OPT_EXPORT_BUILD_TREE)
     endif()
 
     #startup.m build-tree
-    set(_STARTUP_M_INSTALL_DIR "") #Location of startupMexIFace.m relative to ${CMAKE_BINARY_DIR} for build-tree export
+    set(_STARTUP_M_INSTALL_DIR) #Set to empty in build tree export to signal to startup.m that it is run from build tree
     if(BUILD_TESTING)
         get_property(_MATLAB_BUILD_MEX_PATHS GLOBAL PROPERTY MexIFace_MODULE_BUILD_DIRS) #Test build locations
     else()

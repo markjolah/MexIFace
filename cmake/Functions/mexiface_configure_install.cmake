@@ -94,12 +94,14 @@ function(mexiface_configure_install)
 
     # Set different names for build-tree and install-tree files
     set(ARG_PACKAGE_CONFIG_FILE ${PROJECT_NAME}Config-mexiface.cmake)
+    if(OPT_EXPORT_BUILD_TREE AND NOT DEFINED ARG_EXPORT_BUILD_TREE)
+        set(ARG_EXPORT_BUILD_TREE True)
+    endif()
+    set(ARG_STARTUP_M_INSTALL_TREE_FILE ${ARG_STARTUP_M_FILE}.install_tree)
     if(ARG_EXPORT_BUILD_TREE)
         set(ARG_PACKAGE_CONFIG_INSTALL_TREE_FILE ${PROJECT_NAME}Config-mexiface.cmake.install_tree) #Generated <Package>Config.cmake Version meant for the install tree but name mangled to prevent use in build tree
-        set(ARG_STARTUP_M_INSTALL_TREE_FILE ${ARG_STARTUP_M_FILE}.install_tree)
     else()
         set(ARG_PACKAGE_CONFIG_INSTALL_TREE_FILE ${ARG_PACKAGE_CONFIG_FILE}) #Generated <Package>Config.cmake Version meant for the install tree but name mangled to prevent use in build tree
-        set(ARG_STARTUP_M_INSTALL_TREE_FILE ${ARG_STARTUP_M_FILE})
     endif()
 
 
@@ -170,7 +172,7 @@ function(mexiface_configure_install)
         endif()
 
         #startup.m build-tree
-        set(_STARTUP_M_INSTALL_DIR "") #Install dir for build-tree export
+        set(_STARTUP_M_INSTALL_DIR) #Set to empty in build tree export to signal to startup.m that it is run from build tree
         get_property(_MATLAB_BUILD_MEX_PATHS GLOBAL PROPERTY MexIFace_MODULE_BUILD_DIRS)
         if(NOT _MATLAB_BUILD_MEX_PATHS OR ARG_NOMEX)
             set(_MATLAB_BUILD_MEX_PATHS) #Disable mex exporting
