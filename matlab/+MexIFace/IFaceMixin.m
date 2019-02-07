@@ -72,20 +72,8 @@ classdef IFaceMixin < handle
             end
             [varargout{1:nargout}]=obj.ifaceHandle(cmdstr,obj.objectHandle, varargin{:});
         end
-    end %Protected methods
-
-    methods (Access=protected, Static=true)
-        function version_str = get_version_string()
-            %Get matlab major.minor version
-            version_re = '^(?<major>\d+)\.(?<minor>\d+)\.';
-            tokens = regexp(version(),version_re,'tokens');
-            if isempty(tokens) || numel(tokens{1}) ~= 2
-                error('@PROJECT_NAME@:LogicalError',['Package @PROJECT_NAME@ cannot determine matlab numeric version from version string:', version()]);
-            end
-            version_str = [tokens{1}{1} '_' tokens{1}{2}];
-        end
-
-        function varargout=callstatic(cmdstr, varargin)
+        
+        function varargout=callstatic(obj, cmdstr, varargin)
             % callstatic   The entry point to call a static method of the underlying C++ class.  The Matlab side of the wrapped class
             % should internally call this protected method to call static member functions of the C++ class.  Because these are
             % static methods there is no need to have an active intantiation of the C++ class in objectHandle.
@@ -99,6 +87,20 @@ classdef IFaceMixin < handle
             %  varargout - Whatever arguments the method is supposed to return.  These are passed back directly
             [varargout{1:nargout}]=obj.ifaceHandle('@static',cmdstr, varargin{:});
         end
+
+    end %Protected methods
+
+    methods (Access=protected, Static=true)
+        function version_str = get_version_string()
+            %Get matlab major.minor version
+            version_re = '^(?<major>\d+)\.(?<minor>\d+)\.';
+            tokens = regexp(version(),version_re,'tokens');
+            if isempty(tokens) || numel(tokens{1}) ~= 2
+                error('@PROJECT_NAME@:LogicalError',['Package @PROJECT_NAME@ cannot determine matlab numeric version from version string:', version()]);
+            end
+            version_str = [tokens{1}{1} '_' tokens{1}{2}];
+        end
+
 
         function structDict = convertStatsToStructs(statsDict)
             % convertStatsToStructs   Convert a stats dictionary returned from C++ to a structured stats dictionary, i.e., a 

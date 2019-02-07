@@ -114,12 +114,12 @@ void MexIFace::mexFunction(MXArgCountT _nlhs, mxArray *_lhs[], MXArgCountT _nrhs
  *
  * @param name The name of the method to call, as given to the mexFunction call.
  *
- * Throws an error if the name is not in the methodmap std::map data structure.
+ * Throws an error if the name is not in the map std::map data structure.
  */
 void MexIFace::callMethod(std::string name,const MethodMap &map)
 {
-    auto it = methodmap.find(name);
-    if (it == methodmap.end()){
+    auto it = map.find(name);
+    if (it == map.end()){
         #if defined(DEBUG)            
         mexPrintf("[MexIFace::callMethod] --- Unknown Method Name\n");
         mexPrintf("  MexName: %s\n",obj_name().c_str());

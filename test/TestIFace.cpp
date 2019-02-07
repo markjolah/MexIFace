@@ -17,6 +17,8 @@ private:
     void objRet();
     void objInc();
     void objEchoArray();
+    /* static methods */
+    void staticVecSum();
 };
 
 TestIFace::TestIFace()
@@ -25,6 +27,7 @@ TestIFace::TestIFace()
     methodmap["inc"] = std::bind(&TestIFace::objInc, this);
     methodmap["ret"] = std::bind(&TestIFace::objRet, this);
     methodmap["echoArray"] = std::bind(&TestIFace::objEchoArray, this);
+    staticmethodmap["vecSum"] = std::bind(&TestIFace::staticVecSum, this);
 }
 
 void TestIFace::objConstruct()
@@ -58,6 +61,14 @@ void TestIFace::objEchoArray()
     auto arr = getStringArray();
     std::cout<<"Got Array of strings.\n";
     for(arma::uword n=0;n<arr.size();n++) std::cout<<"["<<n<<"]: "<<arr[n]<<std::endl;
+}
+
+void TestIFace::staticVecSum()
+{
+    checkNumArgs(1,2); //(#out, #in)
+    auto a=getVec();
+    auto b=getVec();
+    output((a+b).eval());
 }
 
 TestIFace iface; /**< Global iface object provides a iface.mexFunction */

@@ -25,5 +25,9 @@ classdef TestArmadillo < MexIFace.IFaceMixin
             %Convert strings to char arrays as C MEX API cannot access string objects
             obj.call('echoArray',cellstr(arr)); 
         end
+        function s = vecSum(obj, arr1, arr2)
+            s = obj.callstatic('vecSum',arr1,arr2);
+        end
+
     end
 end
