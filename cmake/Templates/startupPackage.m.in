@@ -69,7 +69,7 @@ function startup@PROJECT_NAME@(debug)
     if is_absolute_path(prefix_relative_path)
         %We are being run from the build directory
         package_install_prefix = prefix_relative_path;
-    elseif isfile(fullfile(startup_install_path, prefix_relative_path, [startup_file_name, '.m']))
+    elseif exist(fullfile(startup_install_path, prefix_relative_path, [startup_file_name, '.m']),'file')
         %We are being run from copied startup@PACKAGE_NAME@.m located at install_prefix root
         package_install_prefix = startup_install_path;
     else
