@@ -131,8 +131,6 @@ void MexIFace::callMethod(std::string name,const MethodMap &map)
             method_names.append(method.first);
         }
         mexPrintf("  MappedMethods: [%s]\n",method_names.c_str());
-
-        mexPrintf("%s]\n");
         exploreMexArgs(nrhs, rhs);
         #endif
         error("callMethod","UnknownMethod",name);
