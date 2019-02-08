@@ -24,6 +24,7 @@ endif()
 option(OPT_INSTALL_TESTING "Install testing executables" OFF)
 option(OPT_EXPORT_BUILD_TREE "Configure the package so it is usable from the build tree.  Useful for development." OFF)
 option(OPT_EXTRA_DEBUG "Support extra noisy debugging features" OFF) #Extra debug features (Armadillo)
+option(OPT_MexIFace_PROFILE "Built-in gperftools profiling ProfileStart()/ProfileStop() for every method call to a MexIFace object." OFF)
 
 message(STATUS "OPTION: BUILD_TESTING: ${BUILD_TESTING}")
 message(STATUS "OPTION: OPT_INSTALL_TESTING: ${OPT_INSTALL_TESTING}")
@@ -32,6 +33,7 @@ message(STATUS "OPTION: OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX: ${OPT_MexIFace_
 message(STATUS "OPTION: OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS: ${OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS}")
 message(STATUS "OPTION: OPT_MexIFace_INSTALL_DISTRIBUTION_STARTUP: ${OPT_MexIFace_INSTALL_DISTRIBUTION_STARTUP}")
 message(STATUS "OPTION: OPT_EXTRA_DEBUG: ${OPT_EXTRA_DEBUG}")
+message(STATUS "OPTION: OPT_MexIFace_PROFILE: ${OPT_MexIFace_PROFILE}")
 
 #Force the install() hook off [default:on in the toolchains].  MexIFace is fixup_dependencies aware and we will call manually
 set(OPT_FIXUP_DEPENDENCIES_AUTO OFF CACHE BOOL "MexIFace disables the auto hook on install() function for fixup_dependencies()." FORCE)
@@ -58,6 +60,11 @@ add_external_dependency(NAME BacktraceException URL ${BacktraceExceptionURL} SHA
 # Armadillo
 find_package(Armadillo REQUIRED COMPONENTS CXX11 INT64) #INT64 required by Matlab BLAS and LAPACK
 add_compile_definitions(${ARMADILLO_PRIVATE_COMPILE_DEFINITIONS})
+
+#Google profiler tools
+if(OPT_MexIFace_PROFILE)
+    find_package(GPerfTools REQUIRED)
+endif()
 
 #Check the GCC libstdc++.so version
 if(CMAKE_CXX_COMPILER_ID STREQUAL GNU AND NOT MexIFace_SYSTEM_LIBSTDCXX_VERSION)

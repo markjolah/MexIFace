@@ -46,6 +46,12 @@ foreach(idx RANGE ${niter})
     target_include_directories(${lib} PUBLIC $<BUILD_INTERFACE:${PUBLIC_HEADER_SRC_DIR}>
                                              $<INSTALL_INTERFACE:include>)
     target_compile_features(${lib} PUBLIC cxx_std_11) #Declare C++11 required for building
+
+    if(OPT_MexIFace_PROFILE)
+        target_link_libraries(${lib} PRIVATE GPerfTools::profiler)
+        target_compile_definitions(${lib} PRIVATE MEXIFACE_ENABLE_PROFILER)
+    endif()
+
     install(TARGETS ${lib} EXPORT ${PROJECT_NAME}Targets
             RUNTIME DESTINATION bin COMPONENT Runtime
             ARCHIVE DESTINATION lib COMPONENT Development

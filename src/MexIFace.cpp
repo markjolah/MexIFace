@@ -7,6 +7,9 @@
 
 #include "MexIFace/MexIFace.h"
 #include "MexIFace/explore.h"
+#if MEXIFACE_ENABLE_PROFILER
+    #include <gperftools/profile.h>
+#endif
 
 
 namespace mexiface {
@@ -84,6 +87,10 @@ std::string MexIFace::getString(const mxArray *m)
  */
 void MexIFace::mexFunction(MXArgCountT _nlhs, mxArray *_lhs[], MXArgCountT _nrhs, const mxArray *_rhs[])
 {
+#if MEXIFACE_ENABLE_PROFILER
+    ProfilerStart();
+#endif
+
     setArguments(_nlhs,_lhs,_nrhs,_rhs);
     checkMinNumArgs(0,1);
     auto command = getString(rhs[0]);
@@ -107,6 +114,9 @@ void MexIFace::mexFunction(MXArgCountT _nlhs, mxArray *_lhs[], MXArgCountT _nrhs
         popRhs();//remove handle from RHS
         callMethod(command,methodmap);
     }
+#if MEXIFACE_ENABLE_PROFILER
+    ProfilerStop();
+#endif
 }
 
 /**
