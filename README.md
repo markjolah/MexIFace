@@ -35,7 +35,10 @@ MEX file interface provides an easier, safer, faster, and more organized way of 
 ### MexIFace overview
 
 The goal of MexIFace is to build a complete Matlab class with a C++ backend class.  The Matlab and C++ wrapper classes work in tandem
-to implement constructor and destructor operatrions as well as normal methods (member functions) and static methods (static member functions).
+to implement constructor and destructor operations as well as normal methods (member functions) and static methods (static member functions).
+When an object of MexIFace type is constructed the Matlab
+
+
 When a MexIFace object is created in matlab,
 the constructor arguments are passed to a designated method of a C++ backend class that can use MexIFace methods to easily read and
 it can be given arbitrary constructor arguments, and those arguments can be used to initialize C++ data structures.
