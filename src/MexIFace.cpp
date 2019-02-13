@@ -8,7 +8,7 @@
 #include "MexIFace/MexIFace.h"
 #include "MexIFace/explore.h"
 #if MEXIFACE_ENABLE_PROFILER
-    #include <gperftools/profile.h>
+    #include <gperftools/profiler.h>
 #endif
 
 
@@ -88,7 +88,11 @@ std::string MexIFace::getString(const mxArray *m)
 void MexIFace::mexFunction(MXArgCountT _nlhs, mxArray *_lhs[], MXArgCountT _nrhs, const mxArray *_rhs[])
 {
 #if MEXIFACE_ENABLE_PROFILER
-    ProfilerStart();
+    static IdxT count=0;
+    std::ostringstream s;
+    s<<".mexiface.profile"<<count<<".prof";
+    ProfilerStart(s.str().c_str());
+    count++;
 #endif
 
     setArguments(_nlhs,_lhs,_nrhs,_rhs);
