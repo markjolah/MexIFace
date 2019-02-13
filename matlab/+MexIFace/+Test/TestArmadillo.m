@@ -1,15 +1,11 @@
 %Mark J Olah
 % Test MexIFace operation wiht Armadillo vectors
 
-classdef TestArmadillo < MexIFace.IFaceMixin
-    properties (Constant=true)
-        IFaceName = 'TestIFace';
-    end
+classdef TestArmadillo < MexIFace.MexIFaceMixin
     methods
         function obj = TestArmadillo(vec)
-            iface = str2func(MexIFace.Test.TestArmadillo.IFaceName);
-            obj = obj@MexIFace.IFaceMixin(iface);
-            obj.openIface(vec);
+            obj = obj@MexIFace.MexIFaceMixin('TestArmadilloIFace');
+            obj.openIFace(vec);
         end
 
         function c = add(obj,o)

@@ -1,12 +1,23 @@
-% IFaceMixin.m
+% MexIFace.MexIFaceMixin.m
+%
+% MexIFace.MexIFaceMixin is the base class for MexIFace conforming C++ class interfaces.  Subclasses
+% should call MexIFaceMixin with the function handle (not a string) to the interface MEX function they use. 
+%
+%
+%This base class
+% saves the objectHandle, the unique integer specifying the location in memory of the corresponding C++
+% side of the interface. The objectHandle is returned by C++ on object construction, then it is passed by
+% the underlying mexFunction on each method call, to enable C++ to open the correct object in memory to
+% then call member functions on.  Finally the destructor of this mixin class calls the special destructor
+% interface method passing the objectHandle to the C++ class so it can correctly clean up any allocated
+% C++ objects.
 %
 % Mark J. Olah (mjo@cs.unm DOT edu)
-% 2014 - 2017
+% 2014 - 2019
 % copyright: see LICENCE file
-%
-% A mixin class that is to be inherited from for classes that conform to the Mex_Iface matlab<--->C++ Class interface
 
-classdef IFaceMixin < handle
+classdef MexIFaceMixin < handle
+
     properties (Access = protected)
         % ifaceHandle - Function Handle to the Matlab class which is the interface
         ifaceHandle;
@@ -22,18 +33,23 @@ classdef IFaceMixin < handle
     end
 
     methods (Access=protected)
-        function obj = IFaceMixin(ifaceHandle)
+        function obj = MexIFaceMixin(ifaceHandle)
             % Inputs:
-            %  ifaceHandle - A function handle to the *_Iface mex function that implements the C++ side of the interface
-            vers = MexIFace.IFaceMixin.get_version_string();
-            if exist([func2str(ifaceHandle),vers],'file') == 3
-                obj.ifaceHandle = str2func([func2str(ifaceHandle),vers]);
+            %  ifaceHandle - A string representing the function handle to the MEX function that implements the C++ side of the interface
+            %                Alternatelty a function handle can be provided.  The matlab version name is
+            %                used internally to find the correct module version.
+            vers = MexIFace.MexIFaceMixin.get_version_string();
+            if isa(ifaceHandle,'function_handle')
+                ifaceHandle = func2str(ifaceHandle);
+            end
+            if exist([ifaceHandle, vers],'file') == 3
+                obj.ifaceHandle = str2func([ifaceHandle, vers]);
             else
-                error('IFaceMixin:BadHandle',['Unable to find a mex module named ', func2str(ifaceHandle),' for Matlab version:',vers])
+                error('MexIFaceMixin:BadHandle',['Unable to find a mex module named ', ifaceHandle,' for Matlab version:',vers])
             end
         end
 
-        function success=openIface(obj, varargin)
+        function success = openIFace(obj, varargin)
             % Make a new C++ object and save the numeric handle to the allocated object
             %
             % Inputs:
@@ -47,7 +63,7 @@ classdef IFaceMixin < handle
                 obj.objectHandle = obj.ifaceHandle('@new', varargin{:});
 %             end
              
-            success= obj.objectHandle>0;
+            success = obj.objectHandle>0;
         end
 
         function closeIface(obj)
@@ -58,7 +74,7 @@ classdef IFaceMixin < handle
             end
         end
 
-        function varargout=call(obj, cmdstr, varargin)
+        function varargout = call(obj, cmdstr, varargin)
             % This is the entry point to call a method of the underlying C++ class.  The Matlab side of the wrapped class
             % should internally call this protected method to call member functions of the C++ class.
             %
@@ -73,7 +89,7 @@ classdef IFaceMixin < handle
             [varargout{1:nargout}]=obj.ifaceHandle(cmdstr,obj.objectHandle, varargin{:});
         end
         
-        function varargout=callstatic(obj, cmdstr, varargin)
+        function varargout = callstatic(obj, cmdstr, varargin)
             % callstatic   The entry point to call a static method of the underlying C++ class.  The Matlab side of the wrapped class
             % should internally call this protected method to call static member functions of the C++ class.  Because these are
             % static methods there is no need to have an active intantiation of the C++ class in objectHandle.
@@ -131,7 +147,7 @@ classdef IFaceMixin < handle
                         end
                     else
                         if ~isempty(structDict.(name{1})) && ~isstruct(structDict.(name{1})) 
-                            error('IFaceMixin:convertStatsToStructs','Mixed indexes and names for sub-struct/array');
+                            error('MexIFaceMixin:convertStatsToStructs','Mixed indexes and names for sub-struct/array');
                         end
                         structDict.(name{1}).(name{2}) = val;
                     end
