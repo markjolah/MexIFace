@@ -1,6 +1,6 @@
 /** @file MexIFace.h
  * @author Mark J. Olah (mjo\@cs.unm DOT edu)
- * @date 2013-2018
+ * @date 2013-2019
  * @copyright Licensed under the Apache License, Version 2.0.  See LICENSE file.
  * @brief The class declaration and inline and templated functions for MexIFace.
  */

@@ -25,7 +25,7 @@
 # Single Argument Keywords
 #  NAME - [Default: ${PACKAGE_NAME}] The name of the export. The name a client will use use to import with: find_package(NAME).  
 #  NAMESPACE - [Default: $NAME}] The namespace in which to place  the export.
-#  EXPORT_TARGETS_NAME - [Default: ${NAME}Targets] The name of the target export (the one used with the instal(TARGET EXPORT) keyword)
+#  EXPORT_TARGETS_NAME - [Default: ${NAME}Targets] The name of the target export (the one used with the install(TARGET EXPORT) keyword)
 #                         set to OFF to disable exporting Targets.cmake file.
 #  PACKAGE_CONFIG_TEMPLATE -  The template file for package config.
 #         [Default: Look for PackageConfig.cmake.in under ${CMAKE_SOURCE_DIR}/cmake/<Templates|templatesModules|modules|>]
@@ -68,6 +68,11 @@ if(NOT DEFINED ARG_EXPORT_TARGETS_NAME)
     set(ARG_EXPORT_TARGETS_NAME ${ARG_NAME}Targets)
 endif()
 
+if(NOT ${ARG_EXPORT_TARGETS_NAME})
+    message(AUTHOR_WARNING "[export_package_wizzard] No EXPORT_TARGETS_NAME Targets specified or EXPORT_TARGETS_NAME:${EXPORT_TARGETS_NAME} not found.  Disabling Exports.")
+    return()
+endif()
+
 if(NOT ARG_PACKAGE_CONFIG_TEMPLATE)
     find_file(ARG_PACKAGE_CONFIG_TEMPLATE PackageConfig.cmake.in PATHS "${CMAKE_SOURCE_DIR}/cmake"
               PATH_SUFFIXES Modules modules Templates templates NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
@@ -76,7 +81,6 @@ if(NOT ARG_PACKAGE_CONFIG_TEMPLATE)
         message(FATAL_ERROR "Unable to find PackageConfig.cmake.in. Cannot configure exports.")
     endif()
 endif()
-
 if(NOT ARG_VERSION_COMPATIBILITY)
     set(ARG_VERSION_COMPATIBILITY AnyNewerVersion)
 endif()

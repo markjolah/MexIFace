@@ -1,18 +1,45 @@
 # doc/CMakeLists.txt
-# Doxygen integration
-
-find_package(LATEX REQUIRED)
-find_package(Doxygen REQUIRED)
+# Doxygen integration adds build targets
+#  -- target: make doc    #Generate Doxygen Documentation
+#  -- target: make pdf    #Build pdf documentation
+#
+# Required dependencies:
+#  * LAPACK
+#  * Doxygen
+#  * graphviz
+#
+find_package(Doxygen)
 if(DOXYGEN_FOUND)
-    #Configure the doxyfile for the build directory
-    set(DOXYFILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
-    set(DOXYFILE_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
-    set(DOXYGEN_PDF_DIR ${CMAKE_CURRENT_BINARY_DIR}/pdf)
-    set(DOXYGEN_HTML_DIR ${CMAKE_CURRENT_BINARY_DIR}/html)
-    set(DOXYGEN_PDF_NAME refman.pdf)
-    set(PDF_DOC_NAME ${PROJECT_NAME}-${PROJECT_VERSION}-reference.pdf)
+    find_package(LATEX REQUIRED)
+    set(PDF_DOC_NAME ${PROJECT_NAME}-${PROJECT_VERSION}-reference.pdf) #Name of pdf document to produce
     set(DOC_INSTALL_DIR share/${PROJECT_NAME}/doc)
-    file(GLOB SRC_FILES src/*.h src/*.cpp)
+    set(DOXYGEN_MDFILE_AS_MAINPAGE ${CMAKE_SOURCE_DIR}/README.md)
+    set(DOXYGEN_INPUT ${CMAKE_SOURCE_DIR}/README.md
+                      ${CMAKE_SOURCE_DIR}/src/
+                      ${CMAKE_SOURCE_DIR}/include/MexIFace)
+    string(REPLACE ";" " " DOXYGEN_INPUT "${DOXYGEN_INPUT}")
+#     file(GLOB SRC_FILES src/*.h src/*.cpp)
+
+    set(DOXYGEN_PDF_DIR ${CMAKE_BINARY_DIR}/doc/pdf)
+    set(DOXYGEN_HTML_DIR ${CMAKE_BINARY_DIR}/doc/html)
+    set(DOXYGEN_PDF_NAME refman.pdf) #Output name produced by doxygen pdf process.
+
+    find_program(PERL_BINARY perl NO_CMAKE_FIND_ROOT_PATH)
+    if(PERL_BINARY)
+        set(DOXYGEN_PERL_PATH ${PERL_BINARY})
+    endif()
+
+    if(DOXYGEN_DOT_FOUND)
+        set(DOXYGEN_HAVE_DOT YES)
+    endif()
+
+    find_program(DIA_BINARY dia NO_CMAKE_FIND_ROOT_PATH)
+    if(DIA_BINARY)
+        set(DOXYGEN_DIA_PATH ${DIA_BINARY})
+    endif()
+
+    set(DOXYFILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in) #Doxyfile.in - main project Doxygen configuration file location
+    set(DOXYFILE_OUT ${CMAKE_BINARY_DIR}/doc/Doxyfile)
     configure_file(${DOXYFILE_IN} ${DOXYFILE_OUT} @ONLY)
     add_custom_target( doc VERBATIM
         COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYFILE_OUT}
@@ -26,8 +53,8 @@ if(DOXYGEN_FOUND)
         WORKING_DIRECTORY ${DOXYGEN_PDF_DIR}
         COMMENT "Build pdf documentation")
     add_dependencies(pdf doc)
-    install(FILES ${DOXYGEN_PDF_DIR}/${PDF_DOC_NAME} DESTINATION ${DOC_INSTALL_DIR} COMPONENT Development)
-    install(DIRECTORY ${DOXYGEN_HTML_DIR} DESTINATION ${DOC_INSTALL_DIR} COMPONENT Development)
+    install(FILES ${DOXYGEN_PDF_DIR}/${PDF_DOC_NAME} DESTINATION ${DOC_INSTALL_DIR} COMPONENT Documentation)
+    install(DIRECTORY ${DOXYGEN_HTML_DIR} DESTINATION ${DOC_INSTALL_DIR} COMPONENT Documentation)
 else()
     message(WARNING "Doxygen not found. Cannot build documentation.")
 endif()

@@ -16,6 +16,9 @@ set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries Ignored. Exists for 
 option(OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX "Enable interleaved complex API in R2018a+" OFF)
 option(OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS "Enable 64-bit array indexes in R2017a+.  If BLAS or LAPACK are used this needs to be on." ON)
 option(OPT_MexIFace_INSTALL_DISTRIBUTION_STARTUP "Install an additional copy of startupPackage.m at the INSTALL_PREFIX root in addition to the normal directory.  This makes it easy to distribute as a zip file." Off)
+option(OPT_MexIFace_PROFILE "Built-in gperftools profiling ProfileStart()/ProfileStop() for every method call to a MexIFace object." OFF)
+option(OPT_MexIFace_VERBOSE "Verbose output for MexIFace CMake configuration." OFF)
+option(OPT_MexIFace_SILENT  "Silent output for MexIFace CMake configuration.  Warnings and errors only." OFF)
 if(${CMAKE_BUILD_TYPE} MATCHES Debug)
     option(BUILD_TESTING "Build testing framework" ON)
 else()
@@ -25,17 +28,18 @@ option(OPT_DOC "Build documentation" OFF)
 option(OPT_INSTALL_TESTING "Install testing executables" OFF)
 option(OPT_EXPORT_BUILD_TREE "Configure the package so it is usable from the build tree.  Useful for development." OFF)
 option(OPT_EXTRA_DEBUG "Support extra noisy debugging features" OFF) #Extra debug features (Armadillo)
-option(OPT_MexIFace_PROFILE "Built-in gperftools profiling ProfileStart()/ProfileStop() for every method call to a MexIFace object." OFF)
 
 message(STATUS "OPTION: BUILD_TESTING: ${BUILD_TESTING}")
 message(STATUS "OPTION: OPT_DOC: ${OPT_DOC}")
 message(STATUS "OPTION: OPT_INSTALL_TESTING: ${OPT_INSTALL_TESTING}")
+message(STATUS "OPTION: OPT_EXTRA_DEBUG: ${OPT_EXTRA_DEBUG}")
 message(STATUS "OPTION: OPT_EXPORT_BUILD_TREE: ${OPT_EXPORT_BUILD_TREE}")
 message(STATUS "OPTION: OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX: ${OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX}")
 message(STATUS "OPTION: OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS: ${OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS}")
 message(STATUS "OPTION: OPT_MexIFace_INSTALL_DISTRIBUTION_STARTUP: ${OPT_MexIFace_INSTALL_DISTRIBUTION_STARTUP}")
-message(STATUS "OPTION: OPT_EXTRA_DEBUG: ${OPT_EXTRA_DEBUG}")
 message(STATUS "OPTION: OPT_MexIFace_PROFILE: ${OPT_MexIFace_PROFILE}")
+message(STATUS "OPTION: OPT_MexIFace_VERBOSE: ${OPT_MexIFace_VERBOSE}")
+message(STATUS "OPTION: OPT_MexIFace_SILENT: ${OPT_MexIFace_SILENT}")
 
 #Force the install() hook off [default:on in the toolchains].  MexIFace is fixup_dependencies aware and we will call manually
 set(OPT_FIXUP_DEPENDENCIES_AUTO OFF CACHE BOOL "MexIFace disables the auto hook on install() function for fixup_dependencies()." FORCE)
@@ -81,21 +85,22 @@ endif()
 #               the RE "^[r|R]20\d\d[a|b]"
 include(MexIFace-configure-matlab)
 
-#Debugging configuration
+#Debugging configuration - from cmake/UncommonCMakeModules
 include(ConfigureDebugBuilds)
-
-#include(MexIFace-Doxygen) #Add Doxygen documentation targets
 
 #Build MexIFace libraries
 add_subdirectory(src)
 
+#MexIFace testing consists of succefully building and using simple MexIFace modules
+#Test modules are exposed in Matlab subpackage MexIFace.Test
 if(BUILD_TESTING)
-    include(CTest)
-    enable_testing()
-    set(MexIFace_COMPATABLE_MATLAB_VERSION_STRINGS ${MexIFace_MATLAB_VERSION_STRINGS}) #Normally set when MexIFaceConfig.cmake is called by other cmake project with find_package(MexIFace)
+    #Normally MexIFace_COMPATABLE_MATLAB_VERSION_STRINGS is set when MexIFaceConfig.cmake is called by other cmake
+    #projects with find_package(MexIFace).  This is needed for mexiface_make_mex() to work correctly.
+    set(MexIFace_COMPATABLE_MATLAB_VERSION_STRINGS ${MexIFace_MATLAB_VERSION_STRINGS})
     add_subdirectory(test)
 endif()
 
+#Documentation
 if(OPT_DOC)
     add_subdirectory(doc)
 endif()
