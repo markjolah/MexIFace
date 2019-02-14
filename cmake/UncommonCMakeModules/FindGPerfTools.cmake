@@ -2,7 +2,7 @@
 #
 # Mark J. Olah (mjo@cs.unm DOT edu)
 # Copyright 2019
-# see file: LICENCE
+# see file: LICENSE
 #
 # Find the google profiler library and tcmalloc implementations
 # Provides the GPerfTools::profiler imported target.
@@ -34,11 +34,11 @@ mark_as_advanced(GPerfTools_INCLUDE_DIR
 if(GPerfTools_FOUND AND GPerfTools_PROFILER_LIBRARY AND NOT TARGET GPerfTools::profiler)
     add_library(GPerfTools::profiler SHARED IMPORTED)
     set_target_properties(GPerfTools::profiler PROPERTIES IMPORTED_LOCATION ${GPerfTools_PROFILER_LIBRARY})
-    target_include_directories(GPerfTools::profiler INTERFACE ${GPerfTools_INCLUDE_DIR})
+    set_property(TARGET GPerfTools::profiler APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${GPerfTools_INCLUDE_DIR})
 endif()
 
 if(GPerfTools_FOUND AND GPerfTools_TCMALLOC_LIBRARY AND NOT TARGET GPerfTools::tcmalloc)
     add_library(GPerfTools::tcmalloc SHARED IMPORTED)
     set_target_properties(GPerfTools::tcmalloc PROPERTIES IMPORTED_LOCATION ${GPerfTools_TCMALLOC_LIBRARY})
-    target_include_directories(GPerfTools::tcmalloc INTERFACE ${GPerfTools_INCLUDE_DIR})
+    set_property(TARGET GPerfTools::tcmalloc APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${GPerfTools_INCLUDE_DIR})
 endif()
