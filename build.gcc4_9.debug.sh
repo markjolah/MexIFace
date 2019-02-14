@@ -1,13 +1,15 @@
 #!/bin/bash
 #
-# build.gcc4_9.debug.sh
-#
+# scripts/build.gcc4_9.debug.sh
+# Build with gcc4_9 toolchain
 
 ARCH=gcc4_9
 FULL_ARCH=x86_64-${ARCH}-linux-gnu
-TOOLCHAIN_FILE=./cmake/UncommonCMakeModules/Toolchains/Toolchain-${FULL_ARCH}.cmake
-INSTALL_PATH=_${ARCH}.install
-BUILD_PATH=_${ARCH}.build/Debug
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+SRC_PATH=${SCRIPT_DIR}/..
+TOOLCHAIN_FILE=${SRC_PATH}/cmake/UncommonCMakeModules/Toolchains/Toolchain-${FULL_ARCH}.cmake
+INSTALL_PATH=${SRC_PATH}/_${ARCH}.install
+BUILD_PATH=${SRC_PATH}/_${ARCH}.build/Debug
 NUM_PROCS=`grep -c ^processor /proc/cpuinfo`
 
 ARGS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAIN_FILE"
@@ -26,5 +28,5 @@ ARGS="${ARGS} -DOPT_MexIFace_PROFILE=Off"
 
 set -ex
 rm -rf $BUILD_PATH
-cmake -H. -B$BUILD_PATH -DCMAKE_BUILD_TYPE=Debug ${ARGS} $@
-VERBOSE=1 cmake --build $BUILD_PATH --target install -- -j${NUM_PROCS}
+cmake -H${SRC_PATH} -B$BUILD_PATH -DCMAKE_BUILD_TYPE=Debug $ARGS $@
+VERBOSE=1 cmake --build $BUILD_PATH --target install -- -j$NUM_PROCS

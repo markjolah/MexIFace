@@ -100,7 +100,7 @@ if(BUILD_TESTING)
     add_subdirectory(test)
 endif()
 
-#Documentation
+### Documentation
 if(OPT_DOC)
     add_subdirectory(doc)
 endif()

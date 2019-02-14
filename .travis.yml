@@ -1,0 +1,22 @@
+branches:
+    only:
+        - master
+
+addons:
+    apt:
+        packages:
+            - doxygen
+            - doxygen-latex
+            - graphviz
+
+script:
+    - doc-build.sh
+
+deploy:
+    provider: pages
+    skip-cleanup: true
+    github-token: $GH_TRAVISCI_DOCUMENTATION_TOKEN
+    keep-history: true
+    local_dir: doc/html
+  on:
+    branch: master
