@@ -119,7 +119,10 @@ install(FILES ${MexIFace_CMAKE_DIR}/UncommonCMakeModules/Templates/FixupTargetDe
 
 ### PackageConfig
 include(ExportPackageWizzard)
-export_package_wizzard(FIND_MODULES cmake/UncommonCMakeModules/FindArmadillo.cmake) #setup build-tree and install-tree exports and packageconfig files
+if(MexIFace_TARGETS)
+    #Only export if we actuall made any targets.  This allows DOC to be built without Matlab on CI.
+    export_package_wizzard(FIND_MODULES cmake/UncommonCMakeModules/FindArmadillo.cmake) #setup build-tree and install-tree exports and packageconfig files
+endif()
 
 #Give path to FindMatlab.cmake so it can be called by PackageConfig.cmake correctly from build tree or install tree
 set(MATLAB_CODE_INSTALL_DIR lib/MexIFace/matlab)

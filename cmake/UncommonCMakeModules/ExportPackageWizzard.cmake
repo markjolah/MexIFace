@@ -68,11 +68,6 @@ if(NOT DEFINED ARG_EXPORT_TARGETS_NAME)
     set(ARG_EXPORT_TARGETS_NAME ${ARG_NAME}Targets)
 endif()
 
-if(NOT ${ARG_EXPORT_TARGETS_NAME})
-    message(AUTHOR_WARNING "[export_package_wizzard] No EXPORT_TARGETS_NAME Targets specified or EXPORT_TARGETS_NAME:${EXPORT_TARGETS_NAME} not found.  Disabling Exports.")
-    return()
-endif()
-
 if(NOT ARG_PACKAGE_CONFIG_TEMPLATE)
     find_file(ARG_PACKAGE_CONFIG_TEMPLATE PackageConfig.cmake.in PATHS "${CMAKE_SOURCE_DIR}/cmake"
               PATH_SUFFIXES Modules modules Templates templates NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
