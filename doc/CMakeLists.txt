@@ -10,7 +10,7 @@
 #
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-    find_package(LATEX REQUIRED)
+    find_package(LATEX)
     set(PDF_DOC_NAME ${PROJECT_NAME}-${PROJECT_VERSION}-reference.pdf) #Name of pdf document to produce
     set(DOC_INSTALL_DIR share/${PROJECT_NAME}/doc)
     set(DOXYGEN_MDFILE_AS_MAINPAGE ${CMAKE_SOURCE_DIR}/README.md)
@@ -18,7 +18,6 @@ if(DOXYGEN_FOUND)
                       ${CMAKE_SOURCE_DIR}/src/
                       ${CMAKE_SOURCE_DIR}/include/MexIFace)
     string(REPLACE ";" " " DOXYGEN_INPUT "${DOXYGEN_INPUT}")
-#     file(GLOB SRC_FILES src/*.h src/*.cpp)
 
     set(DOXYGEN_PDF_DIR ${CMAKE_BINARY_DIR}/doc/pdf)
     set(DOXYGEN_HTML_DIR ${CMAKE_BINARY_DIR}/doc/html)
@@ -46,15 +45,19 @@ if(DOXYGEN_FOUND)
         DEPENDS ${DOXYFILE_OUT} ${SRC_FILES}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         COMMENT "Generate Doxygen Documentation")
-    add_custom_target( pdf VERBATIM
-        COMMAND make ${DOXYGEN_PDF_NAME}
-        COMMAND mv ${DOXYGEN_PDF_NAME} ${PDF_DOC_NAME}
-        DEPENDS ${DOXYGEN_PDF_DIR}/refman.tex ${DOXYGEN_PDF_DIR}/Makefile
-        WORKING_DIRECTORY ${DOXYGEN_PDF_DIR}
-        COMMENT "Build pdf documentation")
-    add_dependencies(pdf doc)
-    install(FILES ${DOXYGEN_PDF_DIR}/${PDF_DOC_NAME} DESTINATION ${DOC_INSTALL_DIR} COMPONENT Documentation)
     install(DIRECTORY ${DOXYGEN_HTML_DIR} DESTINATION ${DOC_INSTALL_DIR} COMPONENT Documentation)
+    if(LATEX_FOUND)
+        add_custom_target( pdf VERBATIM
+            COMMAND make ${DOXYGEN_PDF_NAME}
+            COMMAND mv ${DOXYGEN_PDF_NAME} ${PDF_DOC_NAME}
+            DEPENDS ${DOXYGEN_PDF_DIR}/refman.tex ${DOXYGEN_PDF_DIR}/Makefile
+            WORKING_DIRECTORY ${DOXYGEN_PDF_DIR}
+            COMMENT "Build pdf documentation")
+        add_dependencies(pdf doc)
+        install(FILES ${DOXYGEN_PDF_DIR}/${PDF_DOC_NAME} DESTINATION ${DOC_INSTALL_DIR} COMPONENT Documentation)
+    else()
+        message(STATUS "LATEX not found disabling pdf documentation")
+    endif()
 else()
     message(WARNING "Doxygen not found. Cannot build documentation.")
 endif()

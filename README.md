@@ -22,7 +22,7 @@ For the impatient,
 
 Matlab uses compiled plugins called MEX files to enable linking and running compiled C and C++ code.  Each MEX file is a separate shared object file (ELF/DLL) that is dynamically loaded by the Matlab binary when called.  It presents to Matlab an interface consisting of a single function with variadic arguments.
 
-> function varargout = mexFunction(varargin)
+    function varargout = mexFunction(varargin)
 
 As C and C++ libraries and toolsets become more complex this single-function interface becomes restrictive. Complex libraries have both state and behavior, they provide multiple functions that interact with that state, they require initialization on load time and cleanup on unload time, and they require Matlab to manage the memory they must allocate.  In other words, complex libraries are much more like objects then functions, so an object-oriented MEX file interface provides an easier, safer, faster, and more organized way of interacting with complex C++ libraries from Matlab.
 
@@ -66,8 +66,27 @@ R2018b | 9.5 | 6.3.x | 3.4.22 | 1.3.10 | 6.5.0 | Limited C++17
 R2019a | 9.6 | 6.3.x | 3.4.22 | 1.3.10 | 6.5.0 | Limited C++17
 
 
+## Setup
+
+### CMake general Variables and Options
+
+ * `OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX` - Enable interleaved complex API in R2018a+.
+ * `OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS` - Enable 64-bit array indexes in R2017a+.  If *BLAS* or *LAPACK* are used this needs to be on, as Matlab uses 64-bit indexes.
+ * `OPT_MexIFace_INSTALL_DISTRIBUTION_STARTUP`- Install an additional copy of startupPackage.m at the `INSTALL_PREFIX` root in addition to the normal directory.  This makes it easy to distribute as a binary archive file (.zip, .tar.gz, etc.).
+ * `OPT_MexIFace_PROFILE` - Built-in [gperftools](https://github.com/gperftools/gperftools) profiling `ProfileStart()`/`ProfileStop()` for every method call to a MexIFace object.
+ * `OPT_MexIFace_VERBOSE`  - Verbose output for MexIFace CMake configuration.
+ * `OPT_MexIFace_SILENT` - Silent output for MexIFace CMake configuration.  Warnings and errors only.
+ * `BUILD_TESTING` - Build testing framework
+ * `OPT_DOC` - Build documentation
+ * `OPT_INSTALL_TESTING` - Install testing executables
+ * `OPT_EXPORT_BUILD_TREE` - Configure the package so it is usable from the build tree.  Useful for development.
+ * `OPT_EXTRA_DEBUG` - Support extra noisy debugging features (Armadillo).
+
 ### Other Dependencies
 
   * [BacktraceException](https://github.com/markjolah/BacktraceException) - An library that allows Debug builds to get a stack backtrace when an exception derived from `BacktraceException` is called.
 
     MexIFace translates `BacktraceException` exceptions into calls to Matlab's `mexErrMsgIdAndTxt` mechanism allowing very useful debugging output for tracing down errant exceptions.  Often this provides enough information to isolate bugs without attaching a debugger to the Matlab process.
+
+### Cross-compiling From Linux to Matlab's Linux environment
+

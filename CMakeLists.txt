@@ -65,7 +65,7 @@ add_external_dependency(NAME BacktraceException URL ${BacktraceExceptionURL} SHA
 # message(STATUS "CMAKE_MODULE_PATH:${CMAKE_MODULE_PATH}")
 # Armadillo
 find_package(Armadillo REQUIRED COMPONENTS CXX11 INT64) #INT64 required by Matlab BLAS and LAPACK
-add_compile_definitions(${ARMADILLO_PRIVATE_COMPILE_DEFINITIONS})
+set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS ${ARMADILLO_PRIVATE_COMPILE_DEFINITIONS})
 
 #Google profiler tools
 if(OPT_MexIFace_PROFILE)
