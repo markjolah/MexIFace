@@ -99,7 +99,7 @@ function(fixup_dependencies)
         endforeach()
         set(FIXUP_PROVIDED_LIBS ${_provided})
         if(WIN32)
-            list(TRANSFORM PROVIDED_LIBS TOLOWER) #Case insensitive-match on windows
+            string(TOLOWER "${PROVIDED_LIBS}" PROVIDED_LIBS) #Case insensitive-match on windows
         endif()
     endif()
 
