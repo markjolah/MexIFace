@@ -1,0 +1,12 @@
+<map id="mexiface::get_mx_class_name" name="mexiface::get_mx_class_name">
+<area shape="rect" id="node2" href="$classmexiface_1_1MexIFace.html#a1bc63ab6607be28746984fa06c74e110" title="mexiface::MexIFace\l::checkedFloatToFloatConversion" alt="" coords="256,5,461,43"/>
+<area shape="rect" id="node3" href="$classmexiface_1_1MexIFace.html#ab11573e3aadbd16acd11e7d1f0bf904c" title="mexiface::MexIFace\l::checkedFloatToIntegerConversion" alt="" coords="251,67,467,106"/>
+<area shape="rect" id="node4" href="$classmexiface_1_1MexIFace.html#a4538bd721402014ee94d3fa76ee42b65" title="mexiface::MexIFace\l::checkedIntegerToFloatConversion" alt="" coords="251,130,467,169"/>
+<area shape="rect" id="node5" href="$classmexiface_1_1MexIFace.html#aa169f2e0cb3a34b7aaf169cec1b14824" title="mexiface::MexIFace\l::checkedIntegerToIntegerConversion" alt="" coords="245,193,472,231"/>
+<area shape="rect" id="node6" href="$classmexiface_1_1MexIFace.html#a1a514d468276ece9f3426db2f601d658" title="mexiface::MexIFace\l::checkType" alt="" coords="293,255,424,294"/>
+<area shape="rect" id="node7" href="$namespacemexiface.html#a0a61f21777cac291b7baabb5726aacc1" title="Returns a string representation of the mxArray class name. " alt="" coords="263,318,454,343"/>
+<area shape="rect" id="node8" href="$classmexiface_1_1MexIFace.html#a4bcf47602ed790926d4f1358ea76f754" title="mexiface::MexIFace\l::getAsBool" alt="" coords="293,367,424,406"/>
+<area shape="rect" id="node10" href="$classmexiface_1_1MexIFace.html#a56ccee3414969acdf963074988814eaa" title="mexiface::MexIFace\l::getAsFloat" alt="" coords="293,430,424,469"/>
+<area shape="rect" id="node11" href="$classmexiface_1_1MexIFace.html#a56f4baac543e7f11bc20c70ec4c22a8e" title="Reads a mxArray as a scalar C++ int32_t type. " alt="" coords="293,493,424,531"/>
+<area shape="rect" id="node9" href="$classmexiface_1_1MexIFace.html#aae9ab3291f0c57e4f62db4155a793f7a" title="mexiface::MexIFace\l::getAsScalar" alt="" coords="520,367,651,406"/>
+</map>

@@ -1,0 +1,20 @@
+<map id="mexiface::explore::analyze_structure" name="mexiface::explore::analyze_structure">
+<area shape="rect" id="node2" href="$namespacemexiface_1_1explore.html#a5a5c7c4c0ce2b61c1fe8f55cd7a685c8" title="mexiface::explore::\lanalyze_class" alt="" coords="179,456,303,495"/>
+<area shape="rect" id="node4" href="$namespacemexiface_1_1explore.html#ad41bff4081494e68399068077d57f1ea" title="mexiface::explore::\ldisplay_subscript" alt="" coords="699,351,823,390"/>
+<area shape="rect" id="node5" href="$namespacemexiface_1_1explore.html#af20e073842721a53872d786a38f401fe" title="mexiface::explore::\lget_characteristics" alt="" coords="526,798,650,836"/>
+<area shape="rect" id="node3" href="$namespacemexiface_1_1explore.html#a2fd795aab0989018a48cfce5b8f63719" title="mexiface::explore::\lanalyze_cell" alt="" coords="353,603,477,642"/>
+<area shape="rect" id="node6" href="$namespacemexiface_1_1explore.html#aad11efd374cd1c241da644051e4d3479" title="mexiface::explore::\lanalyze_full" alt="" coords="353,414,477,452"/>
+<area shape="rect" id="node17" href="$namespacemexiface_1_1explore.html#ae6d95ef17338c9baa90e1ce1c3e33d0f" title="mexiface::explore::\lanalyze_logical" alt="" coords="353,498,477,536"/>
+<area shape="rect" id="node18" href="$namespacemexiface_1_1explore.html#a44ef87dec50add577651cf82ea3c8874" title="mexiface::explore::\lanalyze_sparse" alt="" coords="353,288,477,327"/>
+<area shape="rect" id="node19" href="$namespacemexiface_1_1explore.html#aaa319b6e0131959ff3d2fbd9a4c368b3" title="mexiface::explore::\lanalyze_string" alt="" coords="353,351,477,390"/>
+<area shape="rect" id="node7" href="$namespacemexiface_1_1explore.html#a3b7a85eeb040efe041ae992581c3861b" title="mexiface::explore::\lanalyze_double" alt="" coords="526,319,650,358"/>
+<area shape="rect" id="node8" href="$namespacemexiface_1_1explore.html#a2c3a4139675fbbf8ca7ab0f92d6f11fd" title="mexiface::explore::\lanalyze_int16" alt="" coords="526,382,650,420"/>
+<area shape="rect" id="node9" href="$namespacemexiface_1_1explore.html#ad8657b3604a735ef428823cdf0a72722" title="mexiface::explore::\lanalyze_int32" alt="" coords="526,444,650,483"/>
+<area shape="rect" id="node10" href="$namespacemexiface_1_1explore.html#a7025633935ccc85550b308e70b0fc771" title="mexiface::explore::\lanalyze_int64" alt="" coords="526,507,650,546"/>
+<area shape="rect" id="node11" href="$namespacemexiface_1_1explore.html#abbbd19941bd43d361d33e21fb0dadbae" title="mexiface::explore::\lanalyze_int8" alt="" coords="526,570,650,608"/>
+<area shape="rect" id="node12" href="$namespacemexiface_1_1explore.html#acaf0a238e5467e317ae037a966647626" title="mexiface::explore::\lanalyze_single" alt="" coords="526,632,650,671"/>
+<area shape="rect" id="node13" href="$namespacemexiface_1_1explore.html#aa1951af918bc0b264d05f2db4fbec9e1" title="mexiface::explore::\lanalyze_uint16" alt="" coords="526,68,650,107"/>
+<area shape="rect" id="node14" href="$namespacemexiface_1_1explore.html#aa0ebed3704023f9816e91293c9c08253" title="mexiface::explore::\lanalyze_uint32" alt="" coords="526,131,650,170"/>
+<area shape="rect" id="node15" href="$namespacemexiface_1_1explore.html#abe63c53129e4d37e66af71c8f66d9ae6" title="mexiface::explore::\lanalyze_uint64" alt="" coords="526,194,650,232"/>
+<area shape="rect" id="node16" href="$namespacemexiface_1_1explore.html#ae0e1687942c1e218a665eedeadc63456" title="mexiface::explore::\lanalyze_uint8" alt="" coords="526,256,650,295"/>
+</map>

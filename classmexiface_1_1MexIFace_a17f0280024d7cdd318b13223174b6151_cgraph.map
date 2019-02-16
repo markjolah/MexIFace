@@ -1,0 +1,9 @@
+<map id="mexiface::MexIFace::mexFunction" name="mexiface::MexIFace::mexFunction">
+<area shape="rect" id="node2" href="$classmexiface_1_1MexIFace.html#ad95e8356de808820df69cfb526803232" title="Checks the mex function was called with a minimum number of input and output arguments. " alt="" coords="199,5,329,43"/>
+<area shape="rect" id="node3" href="$classmexiface_1_1MexIFaceBase.html#ad5084392048409608fc95569cb986963" title="Helper method which saves a pointer to the wrapped class&#39;s object in an internal member variable call..." alt="" coords="185,67,343,106"/>
+<area shape="rect" id="node4" href="$classmexiface_1_1MexIFace.html#a82c2478cb12301e02edcef234fc80fb1" title="Reads a mxArray as a string. " alt="" coords="199,130,329,169"/>
+<area shape="rect" id="node7" href="$classmexiface_1_1MexIFaceBase.html#a87f8e1dd67a75ac4fa678d8aa8857d6c" title="Called when the mexFunction gets the @new command, passing on the remaining input arguments..." alt="" coords="185,193,343,231"/>
+<area shape="rect" id="node8" href="$classmexiface_1_1MexIFaceBase.html#ae6989244cafb4668681f9c9411ed6256" title="Called when the mexFunction gets the @delete command. " alt="" coords="185,255,343,294"/>
+<area shape="rect" id="node5" href="$classmexiface_1_1MexIFace.html#a4e3b68c1b831521c073e1ca13c874044" title="mexiface::MexIFace\l::checkType" alt="" coords="392,99,523,138"/>
+<area shape="rect" id="node6" href="$classmexiface_1_1MexIFace.html#a658f8f66c8d6bacce3947a42a90f5610" title="mexiface::MexIFace\l::checkVectorSize" alt="" coords="392,162,523,201"/>
+</map>
