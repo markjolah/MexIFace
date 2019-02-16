@@ -455,14 +455,11 @@ else()
     message(STATUS "After: ${MATLAB_ROOTS}")
 endif()
 if(NOT MATLAB_ROOTS)
-    message(FATAL_ERROR "[MexIFace::Matlab] Found no matlab roots.  Set MATLAB_ROOT or MATLAB_ROOTS in CMake Cache or in environment variables.")
+    message(WARNING "[MexIFace::Matlab] Found no matlab roots.  Set MATLAB_ROOT or MATLAB_ROOTS in CMake Cache or in environment variables.")
 endif()
 
 #Only look for new compatable matlab versions if we have not already found valid roots or
 # MATLAB_ROOTS has changed since the last time we did the search
-if(MATLAB_ROOT)
-    set(MATLAB_ROOT CACHE PATH "Primary matlab root to search.")
-endif()
 if(OPT_MexIFace_VERBOSE)
     message(STATUS "[MexIFace::Matlab] MATLAB_ROOTS:'${MATLAB_ROOTS}")
     message(STATUS "[MexIFace::Matlab] MexIFace_MATLAB_FOUND:${MexIFace_MATLAB_FOUND}")
