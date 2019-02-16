@@ -353,11 +353,17 @@ function(_mexiface_make_matlab_targets)
             set_property(TARGET ${target_prefix}MEX_LIBRARIES APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${include_dir})
             set_property(TARGET ${target_prefix}MEX_LIBRARIES APPEND PROPERTY INTERFACE_COMPILE_OPTIONS -fexceptions -fno-omit-frame-pointer)
             set_property(TARGET ${target_prefix}MEX_LIBRARIES APPEND PROPERTY INTERFACE_COMPILE_DEFINITIONS MATLAB_MEX_FILE)
-            set_property(TARGET ${target_prefix}MEX_LIBRARIES APPEND PROPERTY INTERFACE_LINK_LIBRARIES Pthread::Pthread)
-            set_property(TARGET ${target_prefix}MEX_LIBRARIES APPEND PROPERTY INTERFACE_LINK_OPTIONS -Wl,--no-undefined)
-            set_property(TARGET ${target_prefix}MEX_LIBRARIES APPEND PROPERTY INTERFACE_LINK_OPTIONS -Wl,--as-needed)
-            set_property(TARGET ${target_prefix}MEX_LIBRARIES APPEND PROPERTY INTERFACE_LINK_DIRECTORIES ${lib_dir} ${extern_lib_dir} ${os_lib_dir})
+            if(${CMAKE_VERSION} VERSION_GREATER "3.13.0")
+                target_link_options(${target_prefix}MEX_LIBRARIES -Wl,--no-undefined)
+                target_link_options(${target_prefix}MEX_LIBRARIES -Wl,--as-needed)
+                target_link_directories(${target_prefix}MEX_LIBRARIES ${lib_dir} ${extern_lib_dir} ${os_lib_dir})
+            else()
+                set_property(TARGET ${target_prefix}MEX_LIBRARIES APPEND PROPERTY INTERFACE_LINK_LIBRARIES -Wl,--no-undefined) #Older CMake doesn't have INTERFACE_LINK_OPTIONS
+                set_property(TARGET ${target_prefix}MEX_LIBRARIES APPEND PROPERTY INTERFACE_LINK_LIBRARIES -Wl,--as-needed) #Older CMake doesn't have INTERFACE_LINK_OPTIONS
+                set_property(TARGET ${target_prefix}MEX_LIBRARIES APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${lib_dir} ${extern_lib_dir} ${os_lib_dir}) #Older CMake doesn't have INTERFACE_LINK_DIRECTORIES
+            endif()
             set_property(TARGET ${target_prefix}MEX_LIBRARIES APPEND PROPERTY INTERFACE_LINK_LIBRARIES -lmx -lmat -lmex)
+            set_property(TARGET ${target_prefix}MEX_LIBRARIES APPEND PROPERTY INTERFACE_LINK_LIBRARIES Pthread::Pthread)
 
             #Support for interleaved complex
             if(OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX AND ${_vers} VERSION_GREATER_EQUAL 9.4)

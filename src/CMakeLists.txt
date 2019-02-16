@@ -39,10 +39,18 @@ else()
         endif()
         add_library(MexIFace::${lib} ALIAS ${lib})
         if(UNIX OR (CMAKE_CROSSCOMPILING AND WIN32))
-             #Sets visibility of symbols to only mexFunction and related interface
-             target_link_options(${lib} INTERFACE $<$<NOT:$<CONFIG:Debug>>:-Wl,--version-script,${map_file}>)
+            #Sets visibility of symbols to only mexFunction and related interface
+            if(${CMAKE_VERSION} VERSION_GREATER "3.13.0")
+                target_link_options(${lib} INTERFACE $<$<NOT:$<CONFIG:Debug>>:-Wl,--version-script,${map_file}>)
+            else()
+                set_property(TARGET ${lib} APPEND PROPERTY INTERFACE_LINK_LIBRARIES $<$<NOT:$<CONFIG:Debug>>:-Wl,--version-script,${map_file}>) #Older CMAKE don't have INTERFACE_LINK_OPTIONS
+            endif()
         endif()
-        target_link_options(${lib} PUBLIC "-Wl,--as-needed")
+        if(${CMAKE_VERSION} VERSION_GREATER "3.13.0")
+            target_link_options(${lib} PUBLIC "-Wl,--as-needed")
+        else()
+            target_link_libraries(${lib} PUBLIC "-Wl,--as-needed") #Older CMake does not have LINK_OPTIONS
+        endif()
         target_link_libraries(${lib} PUBLIC BacktraceException::BacktraceException) #Exception backtraces
         target_link_libraries(${lib} PUBLIC ${matlab_target}) #Matlab Mex libraries
         target_include_directories(${lib} PUBLIC $<BUILD_INTERFACE:${PUBLIC_HEADER_SRC_DIR}>
