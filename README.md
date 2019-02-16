@@ -1,9 +1,12 @@
 
-A Cross-Platform C++ / MEX Object-based interface wrapper and CMake build tool.
 
-Copyright 2013-2019
-Author: Mark J. Olah
-Email: (mjo@cs.unm DOT edu)
+# MexIFace <a href="https://travis-ci.org/markjolah/MexIFace"><img src="https://travis-ci.org/markjolah/MexIFace.svg?branch=master"/></a>
+A cross-platform C++ / Matlab object-based MEX interface wrapper and CMake build tool.
+
+* Copyright: 2013-2019
+* Author: Mark J. Olah
+* Email: (mjo@cs.unm DOT edu)
+* LICENSE: Apache 2.0.  See [LICENSE](LICENSE) file.
 
 ## About
 
@@ -87,6 +90,19 @@ R2019a | 9.6 | 6.3.x | 3.4.22 | 1.3.10 | 6.5.0 | Limited C++17
   * [BacktraceException](https://github.com/markjolah/BacktraceException) - An library that allows Debug builds to get a stack backtrace when an exception derived from `BacktraceException` is called.
 
     MexIFace translates `BacktraceException` exceptions into calls to Matlab's `mexErrMsgIdAndTxt` mechanism allowing very useful debugging output for tracing down errant exceptions.  Often this provides enough information to isolate bugs without attaching a debugger to the Matlab process.
+
+
+### Matlab
+
+#### Getting a linkable matlab stub environment
+
+Because Matlab is closed-source we cannot provide the actual matlab libraries neecessary to link the MexIFace library.  If you do have one or more valid releases of Matlab, and you would like to build or test build in an environment with no valid matlab licence, you can use what we call a linkable-stub Matlab environment.  The result is archives `matlab_stub-ARCH-VERS.tar.bz2` for each findable matlab root under the given search paths:
+
+    > ./scripts/create-matlab-linker-stub.py --outdir <outdir> <matlab_root_search_paths...>
+
+
+
+
 
 ### Cross-compiling From Linux to Matlab's Linux environment
 

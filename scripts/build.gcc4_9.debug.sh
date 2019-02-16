@@ -27,5 +27,6 @@ ARGS="${ARGS} -DOPT_MexIFace_PROFILE=Off"
 set -ex
 rm -rf $BUILD_PATH
 cmake -H${SRC_PATH} -B$BUILD_PATH -DCMAKE_BUILD_TYPE=Debug $ARGS $@
+VERBOSE=1 cmake --build $BUILD_PATH --target all -- -j$NUM_PROCS
 VERBOSE=1 cmake --build $BUILD_PATH --target pdf -- -j$NUM_PROCS
 VERBOSE=1 cmake --build $BUILD_PATH --target install -- -j$NUM_PROCS

@@ -25,5 +25,6 @@ ARGS="${ARGS} -DOPT_FIXUP_DEPENDENCIES_BUILD_TREE=On"
 set -ex
 rm -rf $INSTALL_PATH $BUILD_PATH
 cmake -H${SRC_PATH} -B$BUILD_PATH  -DCMAKE_BUILD_TYPE=Debug ${ARGS} $@
+VERBOSE=1 cmake --build $BUILD_PATH --target all -- -j$NUM_PROCS
 VERBOSE=1 cmake --build $BUILD_PATH --target pdf -- -j$NUM_PROCS
 VERBOSE=1 cmake --build $BUILD_PATH --target install -- -j${NUM_PROCS}
