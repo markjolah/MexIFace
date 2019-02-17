@@ -1,5 +1,5 @@
 <map id="explore.h" name="explore.h">
-<area shape="rect" id="node2" href="$explore_8cpp.html" title="Code to analyze the data in an mxArray. " alt="" coords="5,81,91,106"/>
-<area shape="rect" id="node3" href="$MexIFace_8cpp.html" title="The class definition for MexIFace. " alt="" coords="116,81,215,106"/>
-<area shape="rect" id="node4" href="$MexUtils_8cpp.html" title="Helper functions for working with Matlab mxArrays and mxClassIDs. " alt="" coords="239,81,331,106"/>
+<area shape="rect" id="node2" href="$explore_8cpp.html" title="Code to analyze the data in an mxArray. " alt="" coords="5,79,92,104"/>
+<area shape="rect" id="node3" href="$MexIFace_8cpp.html" title="The class definition for MexIFace. " alt="" coords="117,79,215,104"/>
+<area shape="rect" id="node4" href="$MexUtils_8cpp.html" title="Helper functions for working with Matlab mxArrays and mxClassIDs. " alt="" coords="240,79,332,104"/>
 </map>

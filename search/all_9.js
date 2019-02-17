@@ -1,6 +1,7 @@
 var searchData=
 [
   ['explore',['explore',['../namespacemexiface_1_1explore.html',1,'mexiface']]],
+  ['mexiface_20_3ca_20href_3d_22https_3a_2f_2ftravis_2dci_2eorg_2fmarkjolah_2fmexiface_22_3e_3cimg_20src_3d_22https_3a_2f_2ftravis_2dci_2eorg_2fmarkjolah_2fmexiface_2esvg_3fbranch_3dmaster_22_2f_3e_3c_2fa_3e',['MexIFace &lt;a href=&quot;https://travis-ci.org/markjolah/MexIFace&quot;&gt;&lt;img src=&quot;https://travis-ci.org/markjolah/MexIFace.svg?branch=master&quot;/&gt;&lt;/a&gt;',['../index.html',1,'']]],
   ['make_5funique',['make_unique',['../namespacemexiface.html#a330e00c3953e87f1db62ed5b1ec9155a',1,'mexiface']]],
   ['makehandle',['makeHandle',['../classmexiface_1_1Handle.html#ac1d36e375487c33f9424b27ac2fbd9cc',1,'mexiface::Handle']]],
   ['makeoutputarray',['makeOutputArray',['../classmexiface_1_1MexIFace.html#a4ce08a786ed8a2eec1e013b8abd49eb0',1,'mexiface::MexIFace::makeOutputArray(IdxT nelem)'],['../classmexiface_1_1MexIFace.html#a5b9da3a07c973da0f66369e54ac11866',1,'mexiface::MexIFace::makeOutputArray(IdxT rows, IdxT cols)'],['../classmexiface_1_1MexIFace.html#a88c595d2a4fdf8e11eadec10fedd0030',1,'mexiface::MexIFace::makeOutputArray(IdxT rows, IdxT cols, IdxT slices)'],['../classmexiface_1_1MexIFace.html#a99a751f920848626162990597b397ae5',1,'mexiface::MexIFace::makeOutputArray(IdxT rows, IdxT cols, IdxT slices, IdxT hyperslices)']]],

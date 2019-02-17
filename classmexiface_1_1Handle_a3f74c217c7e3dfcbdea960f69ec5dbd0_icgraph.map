@@ -1,0 +1,6 @@
+<map id="mexiface::Handle::getHandle" name="mexiface::Handle::getHandle">
+<area shape="rect" id="node2" href="$classmexiface_1_1Handle.html#ab0fd78da00e309b26ec673a62d0b0b71" title="Given a matlab mxArray object pointer to data that represents a handle, delete the handle which also ..." alt="" coords="239,8,402,47"/>
+<area shape="rect" id="node4" href="$classmexiface_1_1Handle.html#a2c3c72d6bef3ea3406e6028b3ffbad07" title="Given a matlab mxArray object pointer to data that represents a handle, retrieve the object pointer f..." alt="" coords="233,72,408,97"/>
+<area shape="rect" id="node3" href="$classmexiface_1_1MexIFaceHandler.html#ac809cfcc7b678330e56a58a8cd8f5f3d" title="Called when the mexFunction gets the @delete command. " alt="" coords="456,5,631,44"/>
+<area shape="rect" id="node5" href="$classmexiface_1_1MexIFaceHandler.html#a6757468ce8ec943db8d5203e81f535b0" title="Helper method which saves a pointer to the wrapped class&#39;s object in an internal member variable call..." alt="" coords="456,68,631,107"/>
+</map>

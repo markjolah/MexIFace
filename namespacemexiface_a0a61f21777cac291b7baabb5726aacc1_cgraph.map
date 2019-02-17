@@ -1,3 +1,4 @@
 <map id="mexiface::get_mx_class_name" name="mexiface::get_mx_class_name">
-<area shape="rect" id="node2" href="$namespacemexiface.html#a32119030d13151b65f1f70cd35e0ceb7" title="Returns a string representation of the class with given mxClassID. " alt="" coords="246,5,437,30"/>
+<area shape="rect" id="node2" href="$namespacemexiface.html#ae975525972a7d72c76057c96485b8c2e" title="mexiface::demangle" alt="" coords="273,5,405,31"/>
+<area shape="rect" id="node3" href="$namespacemexiface.html#a32119030d13151b65f1f70cd35e0ceb7" title="Returns a string representation of the class with given mxClassID. " alt="" coords="244,55,435,80"/>
 </map>

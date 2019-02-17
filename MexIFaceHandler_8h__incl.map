@@ -1,6 +1,6 @@
 <map id="MexIFaceHandler.h" name="MexIFaceHandler.h">
-<area shape="rect" id="node2" href="$Handle_8h.html" title="Helper class and templated functions to represent and manipulate Handles to C++ objects as Matlab mxA..." alt="" coords="296,81,424,106"/>
-<area shape="rect" id="node9" href="$MexUtils_8h.html" title="Helper functions for working with Matlab mxArrays and mxClassIDs. " alt="" coords="398,155,532,181"/>
-<area shape="rect" id="node10" href="$MexIFaceBase_8h.html" title="class MexIFaceBase declaration. " alt="" coords="609,155,777,181"/>
-<area shape="rect" id="node7" href="$MexIFaceError_8h.html" title="Exception classes for MexIFace. " alt="" coords="104,155,272,181"/>
+<area shape="rect" id="node2" href="$Handle_8h.html" title="Helper class and templated functions to represent and manipulate Handles to C++ objects as Matlab mxA..." alt="" coords="296,79,424,104"/>
+<area shape="rect" id="node9" href="$MexUtils_8h.html" title="Helper functions for working with Matlab mxArrays and mxClassIDs. " alt="" coords="398,152,533,177"/>
+<area shape="rect" id="node10" href="$MexIFaceBase_8h.html" title="class MexIFaceBase declaration. " alt="" coords="609,152,778,177"/>
+<area shape="rect" id="node7" href="$MexIFaceError_8h.html" title="Exception classes for MexIFace. " alt="" coords="104,152,272,177"/>
 </map>

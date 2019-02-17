@@ -1,19 +1,21 @@
 <map id="mexiface::explore::display_subscript" name="mexiface::explore::display_subscript">
-<area shape="rect" id="node2" href="$namespacemexiface_1_1explore.html#a2fd795aab0989018a48cfce5b8f63719" title="mexiface::explore::\lanalyze_cell" alt="" coords="353,305,477,343"/>
-<area shape="rect" id="node4" href="$namespacemexiface_1_1explore.html#a6205a96e991f64a98345df5645dd0ba5" title="mexiface::explore::\lanalyze_structure" alt="" coords="721,309,845,347"/>
-<area shape="rect" id="node6" href="$namespacemexiface_1_1explore.html#a3b7a85eeb040efe041ae992581c3861b" title="mexiface::explore::\lanalyze_double" alt="" coords="179,86,303,125"/>
-<area shape="rect" id="node8" href="$namespacemexiface_1_1explore.html#a2c3a4139675fbbf8ca7ab0f92d6f11fd" title="mexiface::explore::\lanalyze_int16" alt="" coords="179,149,303,187"/>
-<area shape="rect" id="node9" href="$namespacemexiface_1_1explore.html#ad8657b3604a735ef428823cdf0a72722" title="mexiface::explore::\lanalyze_int32" alt="" coords="179,211,303,250"/>
-<area shape="rect" id="node10" href="$namespacemexiface_1_1explore.html#a7025633935ccc85550b308e70b0fc771" title="mexiface::explore::\lanalyze_int64" alt="" coords="179,274,303,313"/>
-<area shape="rect" id="node11" href="$namespacemexiface_1_1explore.html#abbbd19941bd43d361d33e21fb0dadbae" title="mexiface::explore::\lanalyze_int8" alt="" coords="179,337,303,375"/>
-<area shape="rect" id="node12" href="$namespacemexiface_1_1explore.html#ae6d95ef17338c9baa90e1ce1c3e33d0f" title="mexiface::explore::\lanalyze_logical" alt="" coords="353,503,477,542"/>
-<area shape="rect" id="node13" href="$namespacemexiface_1_1explore.html#acaf0a238e5467e317ae037a966647626" title="mexiface::explore::\lanalyze_single" alt="" coords="179,399,303,438"/>
-<area shape="rect" id="node14" href="$namespacemexiface_1_1explore.html#aaa319b6e0131959ff3d2fbd9a4c368b3" title="mexiface::explore::\lanalyze_string" alt="" coords="353,714,477,753"/>
-<area shape="rect" id="node15" href="$namespacemexiface_1_1explore.html#aa1951af918bc0b264d05f2db4fbec9e1" title="mexiface::explore::\lanalyze_uint16" alt="" coords="179,462,303,501"/>
-<area shape="rect" id="node16" href="$namespacemexiface_1_1explore.html#aa0ebed3704023f9816e91293c9c08253" title="mexiface::explore::\lanalyze_uint32" alt="" coords="179,525,303,563"/>
-<area shape="rect" id="node17" href="$namespacemexiface_1_1explore.html#abe63c53129e4d37e66af71c8f66d9ae6" title="mexiface::explore::\lanalyze_uint64" alt="" coords="179,587,303,626"/>
-<area shape="rect" id="node18" href="$namespacemexiface_1_1explore.html#ae0e1687942c1e218a665eedeadc63456" title="mexiface::explore::\lanalyze_uint8" alt="" coords="179,650,303,689"/>
-<area shape="rect" id="node3" href="$namespacemexiface_1_1explore.html#a5a5c7c4c0ce2b61c1fe8f55cd7a685c8" title="mexiface::explore::\lanalyze_class" alt="" coords="526,337,650,375"/>
-<area shape="rect" id="node5" href="$namespacemexiface.html#ae54146cf35d29dcc6c83a8ca96b62549" title="Given the arguments to a matlab mex function call, print out the details of each arguments. " alt="" coords="699,371,866,397"/>
-<area shape="rect" id="node7" href="$namespacemexiface_1_1explore.html#aad11efd374cd1c241da644051e4d3479" title="mexiface::explore::\lanalyze_full" alt="" coords="353,367,477,406"/>
+<area shape="rect" id="node2" href="$namespacemexiface_1_1explore.html#a2fd795aab0989018a48cfce5b8f63719" title="mexiface::explore::\lanalyze_cell" alt="" coords="349,306,473,344"/>
+<area shape="rect" id="node4" href="$namespacemexiface_1_1explore.html#a6205a96e991f64a98345df5645dd0ba5" title="mexiface::explore::\lanalyze_structure" alt="" coords="715,310,839,348"/>
+<area shape="rect" id="node8" href="$namespacemexiface_1_1explore.html#a3b7a85eeb040efe041ae992581c3861b" title="mexiface::explore::\lanalyze_double" alt="" coords="177,87,301,126"/>
+<area shape="rect" id="node10" href="$namespacemexiface_1_1explore.html#a2c3a4139675fbbf8ca7ab0f92d6f11fd" title="mexiface::explore::\lanalyze_int16" alt="" coords="177,150,301,188"/>
+<area shape="rect" id="node11" href="$namespacemexiface_1_1explore.html#ad8657b3604a735ef428823cdf0a72722" title="mexiface::explore::\lanalyze_int32" alt="" coords="177,212,301,251"/>
+<area shape="rect" id="node12" href="$namespacemexiface_1_1explore.html#a7025633935ccc85550b308e70b0fc771" title="mexiface::explore::\lanalyze_int64" alt="" coords="177,275,301,314"/>
+<area shape="rect" id="node13" href="$namespacemexiface_1_1explore.html#abbbd19941bd43d361d33e21fb0dadbae" title="mexiface::explore::\lanalyze_int8" alt="" coords="177,338,301,376"/>
+<area shape="rect" id="node14" href="$namespacemexiface_1_1explore.html#ae6d95ef17338c9baa90e1ce1c3e33d0f" title="mexiface::explore::\lanalyze_logical" alt="" coords="349,504,473,543"/>
+<area shape="rect" id="node15" href="$namespacemexiface_1_1explore.html#acaf0a238e5467e317ae037a966647626" title="mexiface::explore::\lanalyze_single" alt="" coords="177,400,301,439"/>
+<area shape="rect" id="node16" href="$namespacemexiface_1_1explore.html#aaa319b6e0131959ff3d2fbd9a4c368b3" title="mexiface::explore::\lanalyze_string" alt="" coords="349,715,473,754"/>
+<area shape="rect" id="node17" href="$namespacemexiface_1_1explore.html#aa1951af918bc0b264d05f2db4fbec9e1" title="mexiface::explore::\lanalyze_uint16" alt="" coords="177,463,301,502"/>
+<area shape="rect" id="node18" href="$namespacemexiface_1_1explore.html#aa0ebed3704023f9816e91293c9c08253" title="mexiface::explore::\lanalyze_uint32" alt="" coords="177,526,301,564"/>
+<area shape="rect" id="node19" href="$namespacemexiface_1_1explore.html#abe63c53129e4d37e66af71c8f66d9ae6" title="mexiface::explore::\lanalyze_uint64" alt="" coords="177,588,301,627"/>
+<area shape="rect" id="node20" href="$namespacemexiface_1_1explore.html#ae0e1687942c1e218a665eedeadc63456" title="mexiface::explore::\lanalyze_uint8" alt="" coords="177,651,301,690"/>
+<area shape="rect" id="node3" href="$namespacemexiface_1_1explore.html#a5a5c7c4c0ce2b61c1fe8f55cd7a685c8" title="mexiface::explore::\lanalyze_class" alt="" coords="521,338,645,376"/>
+<area shape="rect" id="node5" href="$namespacemexiface.html#ae54146cf35d29dcc6c83a8ca96b62549" title="Given the arguments to a matlab mex function call, print out the details of each arguments. " alt="" coords="693,372,860,398"/>
+<area shape="rect" id="node6" href="$namespacemexiface.html#a54c9b82ac7205b64d9725bd8115614a4" title="Templated function to returns the matlab mxClassID for given C++ data type. " alt="" coords="908,344,1060,370"/>
+<area shape="rect" id="node7" href="$classmexiface_1_1MexIFace.html#a17f0280024d7cdd318b13223174b6151" title="The mexFunction that will be exposed as the entry point for the .mex file. " alt="" coords="919,394,1049,432"/>
+<area shape="rect" id="node9" href="$namespacemexiface_1_1explore.html#aad11efd374cd1c241da644051e4d3479" title="mexiface::explore::\lanalyze_full" alt="" coords="349,368,473,407"/>
 </map>

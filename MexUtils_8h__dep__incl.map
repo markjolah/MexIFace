@@ -1,7 +1,7 @@
 <map id="MexUtils.h" name="MexUtils.h">
-<area shape="rect" id="node2" href="$MexUtils_8cpp.html" title="Helper functions for working with Matlab mxArrays and mxClassIDs. " alt="" coords="5,81,96,106"/>
-<area shape="rect" id="node3" href="$Handle_8h.html" title="Helper class and templated functions to represent and manipulate Handles to C++ objects as Matlab mxA..." alt="" coords="121,81,193,106"/>
-<area shape="rect" id="node4" href="$MexIFaceHandler_8h.html" title="class MexIFaceBase declaration. " alt="" coords="114,155,243,181"/>
-<area shape="rect" id="node5" href="$MexIFace_8h.html" title="The class declaration and inline and templated functions for MexIFace. " alt="" coords="187,230,272,255"/>
-<area shape="rect" id="node6" href="$MexIFace_8cpp.html" title="The class definition for MexIFace. " alt="" coords="180,305,279,330"/>
+<area shape="rect" id="node2" href="$MexUtils_8cpp.html" title="Helper functions for working with Matlab mxArrays and mxClassIDs. " alt="" coords="5,79,97,104"/>
+<area shape="rect" id="node3" href="$Handle_8h.html" title="Helper class and templated functions to represent and manipulate Handles to C++ objects as Matlab mxA..." alt="" coords="122,79,194,104"/>
+<area shape="rect" id="node4" href="$MexIFaceHandler_8h.html" title="class MexIFaceBase declaration. " alt="" coords="115,152,244,177"/>
+<area shape="rect" id="node5" href="$MexIFace_8h.html" title="The class declaration and inline and templated functions for MexIFace. " alt="" coords="187,225,273,251"/>
+<area shape="rect" id="node6" href="$MexIFace_8cpp.html" title="The class definition for MexIFace. " alt="" coords="181,299,279,324"/>
 </map>

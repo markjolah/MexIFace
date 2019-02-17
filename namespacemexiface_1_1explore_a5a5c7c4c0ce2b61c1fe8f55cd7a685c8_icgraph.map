@@ -1,5 +1,7 @@
 <map id="mexiface::explore::analyze_class" name="mexiface::explore::analyze_class">
-<area shape="rect" id="node2" href="$namespacemexiface_1_1explore.html#a2fd795aab0989018a48cfce5b8f63719" title="mexiface::explore::\lanalyze_cell" alt="" coords="201,5,325,43"/>
-<area shape="rect" id="node3" href="$namespacemexiface_1_1explore.html#a6205a96e991f64a98345df5645dd0ba5" title="mexiface::explore::\lanalyze_structure" alt="" coords="201,67,325,106"/>
-<area shape="rect" id="node4" href="$namespacemexiface.html#ae54146cf35d29dcc6c83a8ca96b62549" title="Given the arguments to a matlab mex function call, print out the details of each arguments. " alt="" coords="179,130,346,155"/>
+<area shape="rect" id="node2" href="$namespacemexiface_1_1explore.html#a2fd795aab0989018a48cfce5b8f63719" title="mexiface::explore::\lanalyze_cell" alt="" coords="199,5,323,44"/>
+<area shape="rect" id="node3" href="$namespacemexiface_1_1explore.html#a6205a96e991f64a98345df5645dd0ba5" title="mexiface::explore::\lanalyze_structure" alt="" coords="199,68,323,107"/>
+<area shape="rect" id="node4" href="$namespacemexiface.html#ae54146cf35d29dcc6c83a8ca96b62549" title="Given the arguments to a matlab mex function call, print out the details of each arguments. " alt="" coords="177,131,344,156"/>
+<area shape="rect" id="node5" href="$namespacemexiface.html#a54c9b82ac7205b64d9725bd8115614a4" title="Templated function to returns the matlab mxClassID for given C++ data type. " alt="" coords="392,103,544,128"/>
+<area shape="rect" id="node6" href="$classmexiface_1_1MexIFace.html#a17f0280024d7cdd318b13223174b6151" title="The mexFunction that will be exposed as the entry point for the .mex file. " alt="" coords="403,152,533,191"/>
 </map>

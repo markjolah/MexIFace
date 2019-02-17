@@ -1,6 +1,8 @@
 <map id="mexiface::explore::analyze_logical" name="mexiface::explore::analyze_logical">
-<area shape="rect" id="node2" href="$namespacemexiface_1_1explore.html#a5a5c7c4c0ce2b61c1fe8f55cd7a685c8" title="mexiface::explore::\lanalyze_class" alt="" coords="179,67,303,106"/>
-<area shape="rect" id="node3" href="$namespacemexiface_1_1explore.html#a2fd795aab0989018a48cfce5b8f63719" title="mexiface::explore::\lanalyze_cell" alt="" coords="374,5,498,43"/>
-<area shape="rect" id="node4" href="$namespacemexiface_1_1explore.html#a6205a96e991f64a98345df5645dd0ba5" title="mexiface::explore::\lanalyze_structure" alt="" coords="374,67,498,106"/>
-<area shape="rect" id="node5" href="$namespacemexiface.html#ae54146cf35d29dcc6c83a8ca96b62549" title="Given the arguments to a matlab mex function call, print out the details of each arguments. " alt="" coords="353,130,519,155"/>
+<area shape="rect" id="node2" href="$namespacemexiface_1_1explore.html#a5a5c7c4c0ce2b61c1fe8f55cd7a685c8" title="mexiface::explore::\lanalyze_class" alt="" coords="177,68,301,107"/>
+<area shape="rect" id="node3" href="$namespacemexiface_1_1explore.html#a2fd795aab0989018a48cfce5b8f63719" title="mexiface::explore::\lanalyze_cell" alt="" coords="371,5,495,44"/>
+<area shape="rect" id="node4" href="$namespacemexiface_1_1explore.html#a6205a96e991f64a98345df5645dd0ba5" title="mexiface::explore::\lanalyze_structure" alt="" coords="371,68,495,107"/>
+<area shape="rect" id="node5" href="$namespacemexiface.html#ae54146cf35d29dcc6c83a8ca96b62549" title="Given the arguments to a matlab mex function call, print out the details of each arguments. " alt="" coords="349,131,516,156"/>
+<area shape="rect" id="node6" href="$namespacemexiface.html#a54c9b82ac7205b64d9725bd8115614a4" title="Templated function to returns the matlab mxClassID for given C++ data type. " alt="" coords="564,103,716,128"/>
+<area shape="rect" id="node7" href="$classmexiface_1_1MexIFace.html#a17f0280024d7cdd318b13223174b6151" title="The mexFunction that will be exposed as the entry point for the .mex file. " alt="" coords="575,152,705,191"/>
 </map>
