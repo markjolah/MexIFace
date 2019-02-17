@@ -10,7 +10,7 @@
 
 cmake_minimum_required( VERSION 3.9 )
 
-project(MexIFace VERSION 0.1.1 LANGUAGES CXX)
+project(MexIFace VERSION 0.2 LANGUAGES CXX)
 set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries Ignored. Exists for comparability. Always build shared." FORCE)
 
 option(OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX "Enable interleaved complex API in R2018a+" OFF)
@@ -102,6 +102,7 @@ endif()
 
 ### Documentation
 if(OPT_DOC)
+    message("Why am I here.")
     add_subdirectory(doc)
 endif()
 

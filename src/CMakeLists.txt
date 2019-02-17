@@ -38,7 +38,7 @@ else()
             target_sources(${lib} PRIVATE ${vers_src_file})
         endif()
         add_library(MexIFace::${lib} ALIAS ${lib})
-        if(UNIX OR (CMAKE_CROSSCOMPILING AND WIN32))
+        if(UNIX)
             #Sets visibility of symbols to only mexFunction and related interface
             if(${CMAKE_VERSION} VERSION_GREATER "3.13.0")
                 target_link_options(${lib} INTERFACE $<$<NOT:$<CONFIG:Debug>>:-Wl,--version-script,${map_file}>)
