@@ -94,7 +94,7 @@ R2019a | 9.6 | 6.3.x | 3.4.22 | 1.3.10 | 6.5.0 | Full C++14 Limited C++17
 ## Dependencies
   * [*OpenMP*](https://www.openmp.org/)
   * [*Armadillo*](http://arma.sourceforge.net/docs.html) - A high-performance array library for C++.
- * [*Doxygen*](https://github.com/google/googletest) - Required to generate documentation (`OPT_DOC=On`)
+  * [*Doxygen*](https://github.com/google/googletest) - Required to generate documentation (`OPT_DOC=On`)
     * *graphviz* - Required to generate documentation (`make doc`)
     * *LAPACK* - Required for generate pdf documenation (`make pdf`)
 

@@ -38,6 +38,10 @@ list(REMOVE_AT CMAKE_MODULE_PATH 0)
 
 list(APPEND CMAKE_MODULE_PATH ${MexIFace_CMAKE_MODULES_DIR} )
 
+### Find dependencies
+include(CMakeFindDependencyMacro)
+find_dependency(BacktraceException REQUIRED)
+
 #Find all matlab dependencies
 set(MexIFace_TARGETS "@MexIFace_TARGETS@")
 set(MexIFace_COMPATABLE_MATLAB_VERSION_STRINGS "@MexIFace_MATLAB_VERSION_STRINGS@")

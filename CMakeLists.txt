@@ -102,7 +102,6 @@ endif()
 
 ### Documentation
 if(OPT_DOC)
-    message("Why am I here.")
     add_subdirectory(doc)
 endif()
 
