@@ -2,7 +2,7 @@ MexIFace
 
 A Cross-Platform C++ / MEX Object-based interface wrapper and CMake build tool.
 
-Copyright 2014-2017 
+Copyright 2014-2019
 Author: Mark J. Olah 
 Email: (mjo@cs.unm DOT edu)
 

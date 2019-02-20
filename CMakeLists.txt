@@ -60,7 +60,7 @@ include(AddExternalDependency)
 # message(STATUS "CMAKE_MODULE_PATH:${CMAKE_MODULE_PATH}")
 #BacktraceException allows for exceptions that encode a backtrace for debugging
 set(BacktraceExceptionURL https://github.com/markjolah/BacktraceException.git)
-add_external_dependency(NAME BacktraceException URL ${BacktraceExceptionURL} SHARED TESTING PASS_CACHE_VARIABLES OPT_INSTALL_TESTING)
+add_external_dependency(NAME BacktraceException URL ${BacktraceExceptionURL} VARS OPT_INSTALL_TESTING)
 
 # message(STATUS "CMAKE_MODULE_PATH:${CMAKE_MODULE_PATH}")
 # Armadillo
@@ -109,19 +109,21 @@ endif()
 set(SHARED_CMAKE_INSTALL_DIR share/${PROJECT_NAME}/cmake)
 install(DIRECTORY ${MexIFace_CMAKE_MODULES_DIR}/ DESTINATION ${SHARED_CMAKE_INSTALL_DIR}/Modules COMPONENT Development)
 install(DIRECTORY ${MexIFace_CMAKE_FUNCTIONS_DIR}/ DESTINATION ${SHARED_CMAKE_INSTALL_DIR}/Functions COMPONENT Development)
-install(DIRECTORY ${MexIFace_CMAKE_EXECUTABLE_DIR}/ DESTINATION ${SHARED_CMAKE_INSTALL_DIR}/Executables COMPONENT Development)
 install(DIRECTORY ${MexIFace_CMAKE_TEMPLATES_DIR}/ DESTINATION ${SHARED_CMAKE_INSTALL_DIR}/Templates COMPONENT Development)
-
-#Install cmake files from UncommonCMakeModules subrepo that consumers might use.
-install(DIRECTORY ${MexIFace_CMAKE_TOOLCHAINS_DIR}/ DESTINATION ${SHARED_CMAKE_INSTALL_DIR}/Toolchains COMPONENT Development)
-install(FILES ${MexIFace_CMAKE_DIR}/UncommonCMakeModules/FixupDependencies.cmake DESTINATION ${SHARED_CMAKE_INSTALL_DIR}/Modules COMPONENT Development)
-install(FILES ${MexIFace_CMAKE_DIR}/UncommonCMakeModules/Templates/FixupTargetDependenciesScript.cmake.in DESTINATION ${SHARED_CMAKE_INSTALL_DIR}/Templates COMPONENT Development)
+install(DIRECTORY ${MexIFace_CMAKE_DIR}/UncommonCMakeModules/Toolchains DESTINATION ${SHARED_CMAKE_INSTALL_DIR}/Toolchains COMPONENT Development)
+install(DIRECTORY ${MexIFace_CMAKE_DIR}/UncommonCMakeModules/
+        DESTINATION ${SHARED_CMAKE_INSTALL_DIR}/Modules COMPONENT Development
+        REGEX UncommonCMakeModules/Toolchains EXCLUDE)
 
 ### PackageConfig
 include(ExportPackageWizzard)
 if(MexIFace_TARGETS)
-    #Only export if we actuall made any targets.  This allows DOC to be built without Matlab on CI.
-    export_package_wizzard(FIND_MODULES cmake/UncommonCMakeModules/FindArmadillo.cmake) #setup build-tree and install-tree exports and packageconfig files
+    #Only export if we actually made any targets.  This allows DOC to be built without Matlab on CI.
+    set(EXPORTED_FIND_MODULES cmake/UncommonCMakeModules/FindArmadillo.cmake
+                          cmake/UncommonCMakeModules/FindBLAS.cmake
+                          cmake/UncommonCMakeModules/FindLAPACK.cmake
+                          cmake/UncommonCMakeModules/MakePkgConfigTarget.cmake)
+    export_package_wizzard(FIND_MODULES ${EXPORTED_FIND_MODULES}) #setup build-tree and install-tree exports and packageconfig files
 endif()
 
 #Give path to FindMatlab.cmake so it can be called by PackageConfig.cmake correctly from build tree or install tree

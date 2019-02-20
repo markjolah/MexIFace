@@ -63,7 +63,7 @@ function(mexiface_configure_install)
                 PATHS ${_mexiface_configure_install_PATH}/../Templates NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
         mark_as_advanced(ARG_PACKAGE_CONFIG_TEMPLATE)
         if(NOT ARG_PACKAGE_CONFIG_TEMPLATE)
-            message(FATAL_ERROR "Unable to find PackageConfig-mexiface.cmake.in. Cannot configure exports.")
+            message(FATAL_ERROR "Unable to find startupPackage.m.in. Cannot configure exports.")
         endif()
     endif()
 
