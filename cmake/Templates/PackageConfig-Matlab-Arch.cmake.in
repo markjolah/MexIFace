@@ -1,0 +1,7 @@
+#PackageConfig-Matlab-Arch.cmake.in
+# Configure-per arch settings for MexIFace so that multiple arch installs can co-exist.
+set(MexIFace_TARGETS "@MexIFace_TARGETS@")
+set(MexIFace_COMPATABLE_MATLAB_VERSION_STRINGS "@MexIFace_MATLAB_VERSION_STRINGS@")
+set(MexIFace_COMPATABLE_MATLAB_VERSIONS "@MexIFace_MATLAB_VERSIONS@")
+set(MexIFace_COMPATABLE_MATLAB_RELEASES "@MexIFace_MATLAB_RELEASES@")
+set(MexIFace_COMPATABLE_MATLAB_ARCH @MexIFace_MATLAB_SYSTEM_ARCH@)

@@ -2,16 +2,6 @@
 
 #MexIFaceConfig.cmake
 
-include(CMakeFindDependencyMacro)
-find_dependency(BacktraceException)
-
-set_and_check(PACKAGE_FIND_MODULES_PATH @PACKAGE_FIND_MODULES_PATH@)
-list(INSERT CMAKE_MODULE_PATH 0 ${PACKAGE_FIND_MODULES_PATH})
-#Use find_package because find_dependency does not respect COMPONENTS argument or allow
-#re-finding of packages with different COMPONENTS settings
-find_package(Armadillo REQUIRED COMPONENTS CXX11 BLAS_INT64) #BLAS_INT64 always required for MATLAB
-list(REMOVE_AT CMAKE_MODULE_PATH 0)
-
 #Sets:
 # MexIFace_BUILD_TYPES
 # MexIFace_CMAKE_DIR
@@ -35,17 +25,24 @@ list(REMOVE_AT CMAKE_MODULE_PATH 0)
 # mexiface_make_mex()
 # mexiface_configure_install()
 
-### Find dependencies
 
 include(CMakeFindDependencyMacro)
-find_dependency(BacktraceException REQUIRED)
+find_dependency(BacktraceException)
 
-#Find all matlab dependencies
-set(MexIFace_TARGETS "@MexIFace_TARGETS@")
-set(MexIFace_COMPATABLE_MATLAB_VERSION_STRINGS "@MexIFace_MATLAB_VERSION_STRINGS@")
-set(MexIFace_COMPATABLE_MATLAB_VERSIONS "@MexIFace_MATLAB_VERSIONS@")
-set(MexIFace_COMPATABLE_MATLAB_RELEASES "@MexIFace_MATLAB_RELEASES@")
-set(MexIFace_COMPATABLE_MATLAB_ARCH @MexIFace_MATLAB_SYSTEM_ARCH@)
+set_and_check(PACKAGE_FIND_MODULES_PATH @PACKAGE_FIND_MODULES_PATH@)
+list(INSERT CMAKE_MODULE_PATH 0 ${PACKAGE_FIND_MODULES_PATH})
+#Use find_package because find_dependency does not respect COMPONENTS argument or allow
+#re-finding of packages with different COMPONENTS settings
+find_package(Armadillo REQUIRED COMPONENTS CXX11 BLAS_INT64) #BLAS_INT64 always required for MATLAB
+list(REMOVE_AT CMAKE_MODULE_PATH 0)
+
+#Find matlab dependencies for current arch
+if(UNIX)
+    include(${CMAKE_CURRENT_LIST_DIR}/MexIFaceConfig-Matlab-glnxa64.cmake)
+elseif(WIN32)
+    include(${CMAKE_CURRENT_LIST_DIR}/MexIFaceConfig-Matlab-win64.cmake)
+endif()
+
 option(OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX "Enable interleaved complex API in R2018a+" @OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX@) #Propagate settings for complex API
 option(OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS "Enable 64-bit array indexes in R2017a+" @OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS@) #Propagate settings for array index types API
 option(OPT_MexIFace_INSTALL_DISTRIBUTION_STARTUP "Install an additional copy of startupPackage.m at the INSTALL_PREFIX root in addition to the normal directory.  This makes it easy to distribute as a zip file." Off)
@@ -62,15 +59,6 @@ set_and_check(MexIFace_CMAKE_MODULES_DIR ${MexIFace_CMAKE_DIR}/Modules)
 set_and_check(MexIFace_CMAKE_TOOLCHAINS_DIR ${MexIFace_CMAKE_DIR}/Toolchains)
 set_and_check(MexIFace_CMAKE_FUNCTIONS_DIR ${MexIFace_CMAKE_DIR}/Functions)
 set_and_check(MexIFace_CMAKE_TEMPLATES_DIR ${MexIFace_CMAKE_DIR}/Templates)
-
-#Also look in UncommonCMakeModules dir so as to work from build tree and install tree.
-list(INSERT CMAKE_MODULE_PATH 0 ${PACKAGE_FIND_MODULES_PATH} ${MexIFace_CMAKE_DIR}/UncommonCMakeModules)
-#Use find_package because find_dependency does not respect COMPONENTS argument or allow
-#re-finding of packages with different COMPONENTS settings
-find_package(BLAS REQUIRED COMPONENTS BLAS_INT64) #Optional, but if you do need it, then must use 64-bit because Matlab does
-find_package(LAPACK REQUIRED COMPONENTS BLAS_INT64) #Optional, but if you do need it, then must use 64-bit because Matlab does
-find_package(Armadillo REQUIRED COMPONENTS CXX11 BLAS LAPACK BLAS_INT64)
-list(REMOVE_AT CMAKE_MODULE_PATH 0 1)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL GNU AND NOT MexIFace_SYSTEM_LIBSTDCXX_VERSION)
     set(MexIFace_SYSTEM_LIBSTDCXX_VERSION @MexIFace_SYSTEM_LIBSTDCXX_VERSION@)

@@ -126,6 +126,11 @@ if(MexIFace_TARGETS)
     export_package_wizzard(FIND_MODULES ${EXPORTED_FIND_MODULES}) #setup build-tree and install-tree exports and packageconfig files
 endif()
 
+#Configure Matlab arch dependent variables
+set(_CONFIG_MATLAB_ARCH_FILE MexIFaceConfig-Matlab-${MexIFace_MATLAB_SYSTEM_ARCH}.cmake)
+configure_file(${CMAKE_SOURCE_DIR}/cmake/Templates/PackageConfig-Matlab-Arch.cmake.in ${_CONFIG_MATLAB_ARCH_FILE} @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/${_CONFIG_MATLAB_ARCH_FILE} DESTINATION lib/MexIFace/cmake COMPONENT Development)
+
 #Give path to FindMatlab.cmake so it can be called by PackageConfig.cmake correctly from build tree or install tree
 set(MATLAB_CODE_INSTALL_DIR lib/MexIFace/matlab)
 
