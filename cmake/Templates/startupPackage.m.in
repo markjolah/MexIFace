@@ -186,7 +186,7 @@ function startup@PROJECT_NAME@(debug)
             elseif is_absolute_path(location) %Absolute path.
                 m_file = location;
             else %Relative path.  Relative to package_matlab_code_path
-                m_file = make_absolute_path(fullfile(startup_install_path, location));
+                m_file = make_absolute_path(fullfile(package_install_prefix,prefix_relative_path,location));
             end
             if ~exist(m_file,'file')
                 error('@PROJECT_NAME@:BadDependentLocation',['Package @PROJECT_NAME@ cannot find dependent startup.m file at location: ',strrep(m_file,'\','/')]);
