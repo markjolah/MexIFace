@@ -48,6 +48,10 @@ template<> mxClassID get_mx_class<uint8_t>();
 template<> mxClassID get_mx_class<uint16_t>();
 template<> mxClassID get_mx_class<uint32_t>();
 template<> mxClassID get_mx_class<uint64_t>();
+//In 64-bit mode the the headers use "typedef long int64_t" and "typedef unsigned long uint64_t"
+//So, we need to add the typedefs for long long and unsigned long long also since they don't match int64_t or uint64_t
+template<> mxClassID get_mx_class<long long>();
+template<> mxClassID get_mx_class<unsigned long long>();
 /* Generic template definition */
 template<class T> mxClassID get_mx_class(){return mxUNKNOWN_CLASS;}
 

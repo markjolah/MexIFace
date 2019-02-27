@@ -6,10 +6,10 @@ A cross-platform C++ / Matlab object-based MEX interface wrapper and CMake build
 * Copyright: 2013-2019
 * Author: Mark J. Olah
 * Email: (mjo@cs.unm DOT edu)
-* LICENSE: Apache 2.0.  See [LICENSE](LICENSE) file.
+* LICENSE: Apache 2.0.  See [LICENSE](https://github.com/markjolah/MexIFace/blob/master/LICENSE) file.
 
 ## About
-
+[![MexIFace](https://github.com/markjolah/MexIFace/blob/master/doc/images/mexiface_diagram.png){:width="300px"}{:style="float: right;margin-right: 7px;margin-top: 7px;"}](https://github.com/markjolah/MexIFace/blob/master/doc/images/mexiface_diagram.png)
 The [`MexIFace`](https://markjolah.github.io/MexIFace/classmexiface_1_1MexIFace.html) class provides a flexible means of wrapping a complex C++ library into a Matlab class via Matlab's MEX function extension method.
 
 The MexIFace class is designed to cross-compile from Linux to target Matlab versions R2016b and newer on Linux 64-bit (Matlab *glnxa64*) and Windows 64-bit (Matlab *win64*) platforms.  Details on setting up a compatible cross-compilation environment are in Build Environment Configuration.

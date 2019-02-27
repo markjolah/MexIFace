@@ -43,6 +43,8 @@ template<> mxClassID get_mx_class<uint8_t>() {return mxUINT8_CLASS;}
 template<> mxClassID get_mx_class<uint16_t>() {return mxUINT16_CLASS;}
 template<> mxClassID get_mx_class<uint32_t>() {return mxUINT32_CLASS;}
 template<> mxClassID get_mx_class<uint64_t>() {return mxUINT64_CLASS;}
+template<> mxClassID get_mx_class<long long>() {return mxINT64_CLASS;}
+template<> mxClassID get_mx_class<unsigned long long>() {return mxUINT64_CLASS;}
 // template<> mxClassID get_mx_class<int>() {return mxINT32_CLASS;}
 // template<> mxClassID get_mx_class<unsigned>() {return mxINT64_CLASS;}
 // template<> mxClassID get_mx_class<long>() {return mxUINT32_CLASS;}
