@@ -1,4 +1,0 @@
-<map id="mexiface::MexIFaceHandler::objDestroy" name="mexiface::MexIFaceHandler::objDestroy">
-<area shape="rect" id="node2" href="$classmexiface_1_1Handle.html#ab0fd78da00e309b26ec673a62d0b0b71" title="Given a matlab mxArray object pointer to data that represents a handle, delete the handle which also ..." alt="" coords="228,5,391,44"/>
-<area shape="rect" id="node3" href="$classmexiface_1_1Handle.html#a3f74c217c7e3dfcbdea960f69ec5dbd0" title="Given a Matlab mxArray object pointer to data that represents a handle, return a Handle object pointe..." alt="" coords="439,12,619,37"/>
-</map>

@@ -1,4 +1,0 @@
-<map id="mexiface::MexIFace::output" name="mexiface::MexIFace::output">
-<area shape="rect" id="node2" href="$classmexiface_1_1MexIFace.html#a6cccc4ae5754b4ace780a1c7ed580560" title="Append a generic mxArray to the output arguments This is virtual because MexIFaceHandler need to use ..." alt="" coords="184,5,315,44"/>
-<area shape="rect" id="node3" href="$classmexiface_1_1MexIFace.html#a624e38256a840e24cf12811aa0646c32" title="mexiface::MexIFace\l::toMXArray" alt="" coords="184,68,315,107"/>
-</map>

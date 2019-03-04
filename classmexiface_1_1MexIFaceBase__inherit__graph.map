@@ -1,4 +1,4 @@
 <map id="mexiface::MexIFaceBase" name="mexiface::MexIFaceBase">
-<area shape="rect" id="node2" href="$classmexiface_1_1MexIFace.html" title="Acts as a base class for implementing a C++ class &lt;–&gt; Matlab class interface. " alt="" coords="5,85,136,111"/>
+<area shape="rect" id="node2" href="$classmexiface_1_1MexIFace.html" title="Base class for the C++ side of a MexIFace interface class. " alt="" coords="5,85,136,111"/>
 <area shape="rect" id="node3" href="$classmexiface_1_1MexIFaceHandler.html" title="Class encompassing the MexIFace type&#45;dependent operations. Must be inherited from to form a concrete ..." alt="" coords="161,79,335,117"/>
 </map>

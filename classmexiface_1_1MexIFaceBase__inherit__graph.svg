@@ -16,7 +16,7 @@
 </g>
 <!-- Node2 -->
 <g id="node2" class="node"><title>Node2</title>
-<g id="a_node2"><a xlink:href="classmexiface_1_1MexIFace.html" target="_top" xlink:title="Acts as a base class for implementing a C++ class &lt;–&gt; Matlab class interface. ">
+<g id="a_node2"><a xlink:href="classmexiface_1_1MexIFace.html" target="_top" xlink:title="Base class for the C++ side of a MexIFace interface class. ">
 <polygon fill="white" stroke="black" points="0,-5.5 0,-23.5 98,-23.5 98,-5.5 0,-5.5"/>
 <text text-anchor="middle" x="49" y="-12.3" font-family="Helvetica,sans-Serif" font-size="9.00">mexiface::MexIFace</text>
 </a>

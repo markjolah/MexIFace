@@ -25,7 +25,7 @@
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MexIFace
    </div>
-   <div id="projectbrief">A Cross-Platform C++ / MEX Object-based interface wrapper and CMake build tool.</div>
+   <div id="projectbrief">A C++/Matlab object-based interface library and cross-platform CMake MEX build tool.</div>
   </td>
  </tr>
  </tbody>
@@ -39,6 +39,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -97,7 +98,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>Class encompassing the <a class="el" href="classmexiface_1_1MexIFace.html" title="Acts as a base class for implementing a C++ class &lt;–&gt; Matlab class interface. ">MexIFace</a> type-dependent operations. Must be inherited from to form a concrete <a class="el" href="classmexiface_1_1MexIFace.html" title="Acts as a base class for implementing a C++ class &lt;–&gt; Matlab class interface. ">MexIFace</a>. The class encapsulates the management of the Handle&lt;T&gt; type to hide it from the end user.  
+<p>Class encompassing the <a class="el" href="classmexiface_1_1MexIFace.html" title="Base class for the C++ side of a MexIFace interface class. ">MexIFace</a> type-dependent operations. Must be inherited from to form a concrete <a class="el" href="classmexiface_1_1MexIFace.html" title="Base class for the C++ side of a MexIFace interface class. ">MexIFace</a>. The class encapsulates the management of the Handle&lt;T&gt; type to hide it from the end user.  
  <a href="classmexiface_1_1MexIFaceHandler.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="MexIFaceHandler_8h_source.html">/home/travis/build/markjolah/MexIFace/include/MexIFace/MexIFaceHandler.h</a>&gt;</code></p>
@@ -126,7 +127,7 @@ Protected Member Functions</h2></td></tr>
 <tr class="memdesc:af9aa92e6c4cbe1cf5ebd595c70850147"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the name of the class of the stored object.  <a href="#af9aa92e6c4cbe1cf5ebd595c70850147">More...</a><br /></td></tr>
 <tr class="separator:af9aa92e6c4cbe1cf5ebd595c70850147"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaa8b6d2ebc1c78770ed73f5c34f48291"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmexiface_1_1MexIFaceHandler.html#aaa8b6d2ebc1c78770ed73f5c34f48291">outputHandle</a> (ObjT *<a class="el" href="classmexiface_1_1MexIFaceHandler.html#a4edf21fdcd9446b04b17039a9017a2a3">obj</a>)</td></tr>
-<tr class="memdesc:aaa8b6d2ebc1c78770ed73f5c34f48291"><td class="mdescLeft">&#160;</td><td class="mdescRight">Should be called from all and only from objConstructor() overrides of <a class="el" href="classmexiface_1_1MexIFace.html" title="Acts as a base class for implementing a C++ class &lt;–&gt; Matlab class interface. ">MexIFace</a> sub-classes.  <a href="#aaa8b6d2ebc1c78770ed73f5c34f48291">More...</a><br /></td></tr>
+<tr class="memdesc:aaa8b6d2ebc1c78770ed73f5c34f48291"><td class="mdescLeft">&#160;</td><td class="mdescRight">Should be called from all and only from objConstructor() overrides of <a class="el" href="classmexiface_1_1MexIFace.html" title="Base class for the C++ side of a MexIFace interface class. ">MexIFace</a> sub-classes.  <a href="#aaa8b6d2ebc1c78770ed73f5c34f48291">More...</a><br /></td></tr>
 <tr class="separator:aaa8b6d2ebc1c78770ed73f5c34f48291"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a87f8e1dd67a75ac4fa678d8aa8857d6c"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmexiface_1_1MexIFaceBase.html#a87f8e1dd67a75ac4fa678d8aa8857d6c">objConstruct</a> ()=0</td></tr>
 <tr class="memdesc:a87f8e1dd67a75ac4fa678d8aa8857d6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called when the mexFunction gets the @new command, passing on the remaining input arguments.  <a href="#a87f8e1dd67a75ac4fa678d8aa8857d6c">More...</a><br /></td></tr>
@@ -144,7 +145,7 @@ Protected Attributes</h2></td></tr>
 <div class="textblock"><h3>template&lt;class ObjT&gt;<br />
 class mexiface::MexIFaceHandler&lt; ObjT &gt;</h3>
 
-<p>Class encompassing the <a class="el" href="classmexiface_1_1MexIFace.html" title="Acts as a base class for implementing a C++ class &lt;–&gt; Matlab class interface. ">MexIFace</a> type-dependent operations. Must be inherited from to form a concrete <a class="el" href="classmexiface_1_1MexIFace.html" title="Acts as a base class for implementing a C++ class &lt;–&gt; Matlab class interface. ">MexIFace</a>. The class encapsulates the management of the Handle&lt;T&gt; type to hide it from the end user. </p>
+<p>Class encompassing the <a class="el" href="classmexiface_1_1MexIFace.html" title="Base class for the C++ side of a MexIFace interface class. ">MexIFace</a> type-dependent operations. Must be inherited from to form a concrete <a class="el" href="classmexiface_1_1MexIFace.html" title="Base class for the C++ side of a MexIFace interface class. ">MexIFace</a>. The class encapsulates the management of the Handle&lt;T&gt; type to hide it from the end user. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">ObjT</td><td>Wrapped C++ class type. </td></tr>
@@ -220,13 +221,6 @@ template&lt;class ObjT &gt; </div>
 
 <p>References <a class="el" href="Handle_8h_source.html#l00145">mexiface::Handle&lt; T &gt;::getObject()</a>.</p>
 
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classmexiface_1_1MexIFaceHandler_a6757468ce8ec943db8d5203e81f535b0_cgraph.svg" width="636" height="50"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
-</div>
-</p>
-
 </div>
 </div>
 <a class="anchor" id="af9aa92e6c4cbe1cf5ebd595c70850147"></a>
@@ -283,16 +277,9 @@ template&lt;class ObjT &gt; </div>
 
 <p>Called when the mexFunction gets the @new command, passing on the remaining input arguments. </p>
 <p>The rhs should have a single output argument which is the handle (number) which corresponds to the wrapped object.</p>
-<p>This pure virtual function must be overloaded by the concrete <a class="el" href="classmexiface_1_1MexIFace.html" title="Acts as a base class for implementing a C++ class &lt;–&gt; Matlab class interface. ">MexIFace</a> subclass that can use the get&lt;&gt; methods to take in arbitrary parameters for whatever constrctor(s) exists for that wrapped class. </p>
+<p>This pure virtual function must be overloaded by the concrete <a class="el" href="classmexiface_1_1MexIFace.html" title="Base class for the C++ side of a MexIFace interface class. ">MexIFace</a> subclass that can use the get&lt;&gt; methods to take in arbitrary parameters for whatever constrctor(s) exists for that wrapped class. </p>
 
-<p>Referenced by <a class="el" href="MexIFace_8cpp_source.html#l00088">mexiface::MexIFace::mexFunction()</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classmexiface_1_1MexIFaceBase_a87f8e1dd67a75ac4fa678d8aa8857d6c_icgraph.svg" width="348" height="50"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
-</div>
-</p>
+<p>Referenced by <a class="el" href="MexIFace_8cpp_source.html#l00085">mexiface::MexIFace::mexFunction()</a>.</p>
 
 </div>
 </div>
@@ -334,13 +321,6 @@ template&lt;class ObjT &gt; </div>
 
 <p>References <a class="el" href="Handle_8h_source.html#l00161">mexiface::Handle&lt; T &gt;::destroyObject()</a>.</p>
 
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classmexiface_1_1MexIFaceHandler_ac809cfcc7b678330e56a58a8cd8f5f3d_cgraph.svg" width="624" height="50"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
-</div>
-</p>
-
 </div>
 </div>
 <a class="anchor" id="a7b02010942d96c00d7e456b41139cc18"></a>
@@ -377,13 +357,6 @@ Here is the call graph for this function:</div>
 
 <p>Referenced by <a class="el" href="MexIFaceHandler_8h_source.html#l00081">mexiface::MexIFaceHandler&lt; ObjT &gt;::outputHandle()</a>.</p>
 
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classmexiface_1_1MexIFaceBase_a7b02010942d96c00d7e456b41139cc18_icgraph.svg" width="392" height="50"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
-</div>
-</p>
-
 </div>
 </div>
 <a class="anchor" id="aaa8b6d2ebc1c78770ed73f5c34f48291"></a>
@@ -410,7 +383,7 @@ template&lt;class ObjT &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Should be called from all and only from objConstructor() overrides of <a class="el" href="classmexiface_1_1MexIFace.html" title="Acts as a base class for implementing a C++ class &lt;–&gt; Matlab class interface. ">MexIFace</a> sub-classes. </p>
+<p>Should be called from all and only from objConstructor() overrides of <a class="el" href="classmexiface_1_1MexIFace.html" title="Base class for the C++ side of a MexIFace interface class. ">MexIFace</a> sub-classes. </p>
 <p>Takes over the memory management of the object for the remainder of its lifetime over multiple calls to the mex function until the @delete command is sent</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -422,13 +395,6 @@ template&lt;class ObjT &gt; </div>
 <p>Definition at line <a class="el" href="MexIFaceHandler_8h_source.html#l00081">81</a> of file <a class="el" href="MexIFaceHandler_8h_source.html">MexIFaceHandler.h</a>.</p>
 
 <p>References <a class="el" href="classmexiface_1_1MexIFaceBase.html#a7b02010942d96c00d7e456b41139cc18">mexiface::MexIFaceBase::output()</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classmexiface_1_1MexIFaceHandler_aaa8b6d2ebc1c78770ed73f5c34f48291_cgraph.svg" width="392" height="50"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
-</div>
-</p>
 
 </div>
 </div>

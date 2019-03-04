@@ -1,5 +1,8 @@
 var searchData=
 [
+  ['matlab_2dmex_2dlinking_2emd',['matlab-mex-linking.md',['../matlab-mex-linking_8md.html',1,'']]],
+  ['mexiface_2dblas_2dand_2dlapack_2emd',['mexiface-blas-and-lapack.md',['../mexiface-blas-and-lapack_8md.html',1,'']]],
+  ['mexiface_2dtutorial_2emd',['mexiface-tutorial.md',['../mexiface-tutorial_8md.html',1,'']]],
   ['mexiface_2ecpp',['MexIFace.cpp',['../MexIFace_8cpp.html',1,'']]],
   ['mexiface_2eh',['MexIFace.h',['../MexIFace_8h.html',1,'']]],
   ['mexifacebase_2eh',['MexIFaceBase.h',['../MexIFaceBase_8h.html',1,'']]],

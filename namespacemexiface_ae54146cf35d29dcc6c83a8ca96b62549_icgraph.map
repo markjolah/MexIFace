@@ -1,4 +1,0 @@
-<map id="mexiface::exploreMexArgs" name="mexiface::exploreMexArgs">
-<area shape="rect" id="node2" href="$namespacemexiface.html#a54c9b82ac7205b64d9725bd8115614a4" title="Templated function to returns the matlab mxClassID for given C++ data type. " alt="" coords="220,5,372,31"/>
-<area shape="rect" id="node3" href="$classmexiface_1_1MexIFace.html#a17f0280024d7cdd318b13223174b6151" title="The mexFunction that will be exposed as the entry point for the .mex file. " alt="" coords="231,55,361,93"/>
-</map>
