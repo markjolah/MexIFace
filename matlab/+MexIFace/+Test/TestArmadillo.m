@@ -4,7 +4,7 @@
 classdef TestArmadillo < MexIFace.MexIFaceMixin
     methods
         function obj = TestArmadillo(vec)
-            obj = obj@MexIFace.MexIFaceMixin('TestArmadilloIFace');
+            obj = obj@MexIFace.MexIFaceMixin('TestArmadillo');
             obj.openIFace(vec);
         end
 

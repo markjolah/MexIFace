@@ -121,10 +121,9 @@ mxArray* Handle<T>::makeHandle(T *obj)
     return m;
 }
 
-/**
- * @brief Given a Matlab mxArray object pointer to data that represents a handle, return a Handle object pointer.
- * @param arr A Matlab mxArray where the handle is stored as a uint64_t scalar.
- * @returns A pointer to the Handle object
+/** @brief Given a Matlab mxArray object pointer to data that represents a handle, return a Handle object pointer.
+ * @param m mxArray with the handle is stored as a uint64_t scalar (size=1 array).
+ * @returns pointer to the Handle object
  */
 template<class T>
 Handle<T>* Handle<T>::getHandle(const mxArray *m)
@@ -137,9 +136,10 @@ Handle<T>* Handle<T>::getHandle(const mxArray *m)
 }
 
 /**
- * @brief Given a matlab mxArray object pointer to data that represents a handle, retrieve the object pointer for the C++ object.
- * @param arr A Matlab mxArray where the handle is stored as a uint64_t scalar.
- * @returns A pointer to the actual object that was wrapped in the Handle object that was itself stored in the array numerically
+ * @brief Given a matlab mxArray object pointer to data that represents a handle, retrieve the object pointer for the underlying C++ object.
+ * Return sthe actual object that was wrapped in the Handle object that was itself stored in the array numerically
+ * @param arr  mxArray where the handle is stored as a uint64_t scalar (size=1 array).
+ * @returns Pointer to object
  */
 template<class T>
 T* Handle<T>::getObject(const mxArray *arr)

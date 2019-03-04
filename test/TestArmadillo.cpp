@@ -7,13 +7,14 @@
 #include "TestArmadillo.h"
 #include "MexIFace/MexIFace.h"
 
-/* In this example we aim to wrap the pure C++ class TestArmadillo.  The TestArmadilloIFace class is the C++ side of the
+/**
+ * In this example we aim to wrap the pure C++ class TestArmadillo.  The TestArmadilloIFace class is the C++ side of the
  * MexIFace interface.  Separating TestArmadilloIFace from TestArmadillo allows C++ consumers of TestArmadillo to
  * be completely independent of the Matlab interface managed by TestArmadilloIFace.
  *
  * The mexiface::MexIFace base class contains all of the member functions that are useful in marshaling data
  * into and out of member functions.  The checkNumArgs(), getXYZ(), and output() methods, and nrhs, and nlhs member variables
- * are all that is needed to pass array and scalar augments back and forth in member functions with variadic inputs and outputs.
+ * are all that are needed to pass array and scalar augments back and forth in member functions with variadic inputs and outputs.
  *
  * The mexiface::MexIFaceHandler<TestArmadillo> subclass is a templated class that manages the object handle this->obj,
  * which is available for use in all non-constructor and non-static mapped methods.  The templated type argument of MexIFaceHandler is
@@ -46,7 +47,7 @@ private:
 
 TestArmadilloIFace::TestArmadilloIFace()
 {
-    /* The constructor of a MexIFace obeject must initialize the method maps for normal and static methods.
+    /* The constructor of a MexIFace object must initialize the method maps for normal and static methods.
      *
      * The names given in the map will correspond to the name used in the MexIFaceMixin.call(name,...) method.
      * Each method is implemented by a member function of the IFace class, this allows the use of the MexIFace

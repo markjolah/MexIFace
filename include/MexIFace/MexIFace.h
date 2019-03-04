@@ -27,14 +27,10 @@
 namespace mexiface  {
 
 /** @class MexIFace 
- * @brief Acts as a base class for implementing a C++ class <--> Matlab class interface.
+ * @brief Base class for the C++ side of a MexIFace interface class.
  *
- * The MexIFace class provides a generic means of wrapping a C++ class as a Matlab MEX function, that
- * can then be exposed as a Matlab class.  This flexibility allows the code to be used in an
- * object-oriented style either from other C++ code or from Matlab.
- *
- * This type of interface is necessary because a Matlab .mex plug-in can only act as a Matlab function, not
- * a Matlab class.  The MexIFace class exposes a mexFunction method which takes in a variable number of arguments
+ * The MexIFace class is responsible for managing the C++ side of the MEX interface.
+ * The primary entry point from Matlab is the MexIFace::mexFunction method which takes in a variable number of arguments
  * and returns a variable number of arguments.  The first input argument is always a string that gives the command name.
  * If it the special command "\@new" or "\@delete" a C++ instance is created or destroyed.  The \@new command
  * returns a unique handle (number)
@@ -46,13 +42,13 @@ namespace mexiface  {
  * 
  * Otherwise the command is interpreted as a named method which is registered in the methodmap,
  * internal data structure which maps strings to callable member functions of the interface object which take in no
- * arguments and return no arguments.  The matlab arguments are passed to these functions through the internal storage of the
+ * arguments and return no arguments.  The Matlab arguments are passed to these functions through the internal storage of the
  * MexIFace object's rhs and lhs member variables.
  *
  * A C++ class is wrapped by creating a new Iface class that inherits from MexIFace.  At a minimum
  * the Iface class must define the pure virtual functions objConstruct(), objDestroy(), and getObjectFromHandle().  It also
  * must implement the interface for any of the methods and static methods that are required.  Each of these methods in the
- * Iface class must process the passed matlab arguments in the rhs member variable and save outputs in the lhs member variable.
+ * Iface class must process the passed Matlab arguments in the rhs member variable and save outputs in the lhs member variable.
  *
  * In general the Iface mex modules are not intended to be used directly, but rather are paired with a special Matlab
  * class that inherits from the IfaceMixin.m base class.
@@ -84,9 +80,13 @@ public:
     template<class T> using IsFloatingPointT = typename std::enable_if< std::is_floating_point<T>::value >::type;
     
     MexIFace();
+
     void mexFunction(MXArgCountT _nlhs, mxArray *_lhs[], MXArgCountT _nrhs, const mxArray *_rhs[]);
     
     /* Public Static methods */
+
+    //@{
+    /** Test doc here. And more here */
     template<class ElemT> static void checkType(const mxArray *m);
     static void checkType(const mxArray *m, mxClassID classid);
     static void checkNdim(const mxArray *m, mwSize expected_dim);
@@ -96,7 +96,8 @@ public:
     static void checkVectorSize(const mxArray *m, mwSize expected_numel);
     static void checkMatrixSize(const mxArray *m, mwSize expected_rows, mwSize expected_cols);
     static void checkSameLastDim(const mxArray *m1, const mxArray *m2);
-    
+    //@}
+
     
     /* Unchecked converters allowing direct access to mxArray */
     template<class ElemT=double, typename=IsArithmeticT<ElemT>> 
@@ -175,15 +176,15 @@ public:
 protected:
     using MethodMap = std::map<std::string, std::function<void()>>; /**< The type of mapping for mapping names to member functions to call */    
     
-    MethodMap methodmap; /**< A map from names to wrapped member functions to be called */
-    MethodMap staticmethodmap; /**< A map from names to wrapped static member functions to be called */
+    MethodMap methodmap; ///< Maps names (std::string) to member functions (std::function<void()>)
+    MethodMap staticmethodmap; ///< Maps names (std::string) to static member functions (std::function<void()>)
 
-    MXArgCountT nlhs; /**< The number of lhs (output) arguments asked for */
-    mxArray **lhs; /**< The lhs (output) arguments to be returned */
-    IdxT lhs_idx; /**< The index of the next lhs argument to write as output */
-    MXArgCountT nrhs; /**< The number of rhs (input) arguments given */
-    const mxArray **rhs; /**< The rhs (input) arguments given */
-    IdxT rhs_idx; /**< The index of the next rhs argument to read as input */
+    MXArgCountT nlhs; ///< Number of left-hand-side (output) arguments passed to MexIFace::mexFunction
+    mxArray **lhs; ///< Left-hand-side (output) argument array.  Size=nlhs
+    IdxT lhs_idx; ///< Index of the next left-hand-side argument to write as output
+    MXArgCountT nrhs; ///< Number of right-hand-side (input) arguments passed to MexIFace::mexFunction
+    const mxArray **rhs; ///< Right-hand-side (input) argument array.  Size=nrhs
+    IdxT rhs_idx; ///< Index of the next right-hand-side argument to read as input
 
     /* methods to check the number and shape of arguments */
     void checkNumArgs(MXArgCountT expected_nlhs, MXArgCountT expected_nrhs) const;
@@ -288,25 +289,25 @@ private:
     template<class ElemT>
     struct GetNumericFunctor<Vec,ElemT>
     {
-        Vec<ElemT> operator()(MexIFace *obj, const mxArray *m) const;
+        Vec<ElemT> operator()(MexIFace *obj, const mxArray *m) const { return obj->template getVec<ElemT>(m); }
     };
     
     template<class ElemT>
     struct GetNumericFunctor<Mat,ElemT>
     {
-        Mat<ElemT> operator()(MexIFace *obj, const mxArray *m) const;
+        Mat<ElemT> operator()(MexIFace *obj, const mxArray *m) const { return obj->template getMat<ElemT>(m); }
     };
 
     template<class ElemT>
     struct GetNumericFunctor<Cube,ElemT>
     {
-        Cube<ElemT> operator()(MexIFace *obj, const mxArray *m) const;
+        Cube<ElemT> operator()(MexIFace *obj, const mxArray *m) const { return obj->template getCube<ElemT>(m); }
     };
 
     template<class ElemT>
     struct GetNumericFunctor<Hypercube,ElemT>
     {
-        Hypercube<ElemT> operator()(MexIFace *obj, const mxArray *m) const;
+        Hypercube<ElemT> operator()(MexIFace *obj, const mxArray *m) const { return obj->template getHypercube<ElemT>(m); }
     };
 };
 
@@ -486,8 +487,8 @@ void MexIFace::checkMaxNumArgs(MXArgCountT max_nlhs,MXArgCountT max_nrhs) const
 }
 
 /** @brief Checks the mex function was called with an exact number of input and output arguments.
- * @param max_nlhs Maxmum number of left hand side (output) arguments required.
- * @param max_nrhs Maxmum number of right hand side (input) arguments required.
+ * @param expected_nlhs Expected number of left hand side (output) arguments required.
+ * @param expected_nrhs Expected  number of right hand side (input) arguments required.
  */
 inline
 void MexIFace::checkNumArgs(MXArgCountT expected_nlhs, MXArgCountT expected_nrhs) const
@@ -932,7 +933,7 @@ Array<std::string>  MexIFace::getStringArray(const mxArray *m)
 }
 
 
-/** @breif Get exact type.  No conversions.
+/** Get exact type.  No conversions.
  * 
  */
 template<class ElemT, typename> 
@@ -1006,31 +1007,6 @@ NumericArrayT<ElemT> MexIFace::getNumeric(const mxArray *m)
     auto func=GetNumericFunctor<NumericArrayT,ElemT>();
     return func(this,m);
 }
-
-template<class ElemT>
-MexIFace::Vec<ElemT> MexIFace::GetNumericFunctor<MexIFace::template Vec,ElemT>::operator()(MexIFace *obj, const mxArray *m) const
-{
-    return obj->template getVec<ElemT>(m);
-}
-
-template<class ElemT>
-MexIFace::Mat<ElemT> MexIFace::GetNumericFunctor<MexIFace::template Mat,ElemT>::operator()(MexIFace *obj, const mxArray *m) const
-{
-    return obj->template getMat<ElemT>(m);
-}
-
-template<class ElemT>
-MexIFace::Cube<ElemT> MexIFace::GetNumericFunctor<MexIFace::template Cube,ElemT>::operator()(MexIFace *obj, const mxArray *m) const
-{
-    return obj->template getCube<ElemT>(m);
-}
-
-template<class ElemT>
-MexIFace::Hypercube<ElemT> MexIFace::GetNumericFunctor<MexIFace::template Hypercube,ElemT>::operator()(MexIFace *obj, const mxArray *m) const
-{
-    return obj->template getHypercube<ElemT>(m);    
-}
-
 
 template<template<typename...> class Array, class ElemT>
 Array<ElemT> MexIFace::getScalarArray(const mxArray *m)

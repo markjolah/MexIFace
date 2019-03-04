@@ -14,12 +14,9 @@
 
 namespace mexiface {
 
+/** @brief Default constructor */
 MexIFace::MexIFace()
 {
-//     #ifndef WIN32
-//     //This sets the openmp thread count to the same as the hardware concurrency
-//     omp_set_num_threads(std::thread::hardware_concurrency());
-//     #endif
 }
 
 /** @brief Reports an error condition to Matlab using the mexErrMsgIdAndTxt function
