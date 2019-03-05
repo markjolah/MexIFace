@@ -94,9 +94,9 @@ add_subdirectory(src)
 #MexIFace testing consists of succefully building and using simple MexIFace modules
 #Test modules are exposed in Matlab subpackage MexIFace.Test
 if(BUILD_TESTING)
-    #Normally MexIFace_COMPATABLE_MATLAB_VERSION_STRINGS is set when MexIFaceConfig.cmake is called by other cmake
+    #Normally MexIFace_COMPATIBLE_MATLAB_VERSION_STRINGS is set when MexIFaceConfig.cmake is called by other cmake
     #projects with find_package(MexIFace).  This is needed for mexiface_make_mex() to work correctly.
-    set(MexIFace_COMPATABLE_MATLAB_VERSION_STRINGS ${MexIFace_MATLAB_VERSION_STRINGS})
+    set(MexIFace_COMPATIBLE_MATLAB_VERSION_STRINGS ${MexIFace_MATLAB_VERSION_STRINGS})
     add_subdirectory(test)
 endif()
 

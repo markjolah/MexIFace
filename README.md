@@ -22,7 +22,6 @@ Instead of the procedural workflow implied by the static `mexFunction()` interfa
     * See: [Cross-compiling to Windows Targets](#cross-compiling-to-windows-targets)
 
 
-
 ### Quick Start
   * [MexIFace-ArmadilloExample](https://github.com/markjolah/MexIFace-ArmadilloExample) - A fully functional MexIFace module that demonstrates the MexIFace C++ and Matlab interfaces, as well as the suggested CMake build environment, and github repository layout.
 

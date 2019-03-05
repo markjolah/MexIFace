@@ -33,22 +33,23 @@ const char* get_mx_class_name(mxClassID id)
         default: return "mysteryclass???";
     }
 }
+
+/** Templates for get_mx_class
+ * Can't use uint64_t as sometimes it may be long or long long.
+ * best to set mxClassID for long  and long long individually
+ */
 template<> mxClassID get_mx_class<double>() {return mxDOUBLE_CLASS;}
 template<> mxClassID get_mx_class<float>() {return mxSINGLE_CLASS;}
 template<> mxClassID get_mx_class<int8_t>() {return mxINT8_CLASS;}
 template<> mxClassID get_mx_class<int16_t>() {return mxINT16_CLASS;}
 template<> mxClassID get_mx_class<int32_t>() {return mxINT32_CLASS;}
-template<> mxClassID get_mx_class<int64_t>() {return mxINT64_CLASS;}
+template<> mxClassID get_mx_class<long>() {return mxINT64_CLASS;}
+template<> mxClassID get_mx_class<long long>() {return mxINT64_CLASS;}
 template<> mxClassID get_mx_class<uint8_t>() {return mxUINT8_CLASS;}
 template<> mxClassID get_mx_class<uint16_t>() {return mxUINT16_CLASS;}
 template<> mxClassID get_mx_class<uint32_t>() {return mxUINT32_CLASS;}
-template<> mxClassID get_mx_class<uint64_t>() {return mxUINT64_CLASS;}
-template<> mxClassID get_mx_class<long long>() {return mxINT64_CLASS;}
 template<> mxClassID get_mx_class<unsigned long long>() {return mxUINT64_CLASS;}
-// template<> mxClassID get_mx_class<int>() {return mxINT32_CLASS;}
-// template<> mxClassID get_mx_class<unsigned>() {return mxINT64_CLASS;}
-// template<> mxClassID get_mx_class<long>() {return mxUINT32_CLASS;}
-// template<> mxClassID get_mx_class<unsigned long>() {return mxUINT64_CLASS;}
+template<> mxClassID get_mx_class<unsigned long>() {return mxUINT64_CLASS;}
 
 /* TODO Finish this method to replace matlab .c code dependencies */
 // void get_characteristics(const mxArray *arr)

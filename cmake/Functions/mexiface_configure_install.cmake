@@ -3,24 +3,24 @@
 # Author: Mark J. Olah
 # Email: (mjo@cs.unm DOT edu)
 #
-# Sets up a ${PACKAGE_NAME}config-mexiface.cmake file for passing mexiface and matlab configuration to dependencies
-# Installs matlab code and startup${PACKAGE_NAME}.m file for matlab integration, which is able to run dependennt startup.m file
+# Sets up a ${PACKAGE_NAME}config-mexiface.cmake file for passing mexiface and Matlab configuration to dependencies
+# Installs Matlab code and startup${PACKAGE_NAME}.m file for Matlab integration, which is able to run dependent startup.m file
 # from DEPENDENT_STARTUP_M_LOCATIONS
 #
 # Configures a build-tree export which enables editing of the sources .m files in-repository. [EXPORT_BUILD_TREE True]
 #
 # Options:
-#  NOMEX - Disable mex. This flag should be added by packages that export matlab code only, no mex modules.
+#  NOMEX - Disable mex. This flag should be added by packages that export Matlab code only, no MEX modules.
 # Single Argument Keywords:
 #  CONFIG_DIR - [Default: ${CMAKE_BINARY_DIR}] Path within build directory to make configured files before installation.  Also serves as the exported build directory.
 #  PACKAGE_CONFIG_TEMPLATE -  The template file for package config.
-#         [Default: Look for PackageConfig-mexiface.cmake.in under ${CMAKE_SOURCE_DIR}/cmake/<Templates|templatesModules|modules|>]
+#         [Default: Look for PackageConfig-mexiface.cmake.in under ${CMAKE_SOURCE_DIR}/cmake/<Templates|templates|Modules|modules|>]
 #  CONFIG_INSTALL_DIR - [Default: lib/cmake/${PROJECT_NAME}] Relative path from ${CMAKE_INSTALL_PREFIX} at which to install PackageConfig.cmake files
 #  MATLAB_SRC_DIR - [Default: matlab] relative to ${CMAKE_SOURCE_DIR}
 #  STARTUP_M_TEMPLATE - [Default: ${CMAKE_CURRENT_LIST_DIR}/../[Templates|templates]/startupPackage.m.in
 #  STARTUP_M_FILE - [Default: startup${PROJECT_NAME}.m
 #  MATLAB_CODE_INSTALL_DIR - [Default: lib/${PACKAGE_NAME}/matlab] Should be relative to CMAKE_INSTALL_PREFIX
-#  MATLAB_MEX_INSTALL_DIR - [Defualt: lib/${PACKAGE_NAME}/mex] Should be relative to CMAKE_INSTALL_PREFIX
+#  MATLAB_MEX_INSTALL_DIR - [Default: lib/${PACKAGE_NAME}/mex] Should be relative to CMAKE_INSTALL_PREFIX
 #  EXPORT_BUILD_TREE - Bool. [optional] [Default: False] - Enable the export of the build tree. And configuration of startup<PACKAGE_NAME>.cmake
 #                        script that can be used from the build tree.  For development.
 # Multi-Argument Keywords:
@@ -136,7 +136,7 @@ function(mexiface_configure_install)
     set(_MATLAB_CODE_DIR ".") # Relative to startup<PACKAGE_NAME>.m file startup.m
     set(_STARTUP_M_INSTALL_DIR ${ARG_MATLAB_CODE_INSTALL_DIR}) #Install dir relative to install prefix
     if(ARG_NOMEX)
-        set(_MATLAB_INSTALLED_MEX_PATH) #Disable mex exporting in startup.m
+        set(_MATLAB_INSTALLED_MEX_PATH) #Disable MEX exporting in startup.m
     else()
         set(_MATLAB_INSTALLED_MEX_PATH ${ARG_MATLAB_MEX_INSTALL_DIR})
     endif()
@@ -175,7 +175,7 @@ function(mexiface_configure_install)
         set(_STARTUP_M_INSTALL_DIR) #Set to empty in build tree export to signal to startup.m that it is run from build tree
         get_property(_MATLAB_BUILD_MEX_PATHS GLOBAL PROPERTY MexIFace_MODULE_BUILD_DIRS)
         if(NOT _MATLAB_BUILD_MEX_PATHS OR ARG_NOMEX)
-            set(_MATLAB_BUILD_MEX_PATHS) #Disable mex exporting
+            set(_MATLAB_BUILD_MEX_PATHS) #Disable MEX exporting
         endif()
         #Remap build time dependent startup.m locations to be relative to startupp@PACKAGE_NAME@.m location
         set(_DEPENDENT_STARTUP_M_LOCATIONS)

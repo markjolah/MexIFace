@@ -64,7 +64,7 @@ function(mexiface_make_mex)
         message(WARNING "  [MexIFace::make_mex()] Crosscompiling, but OPT_FIXUP_DEPENDENCIES is not set.  Dependencies may not be found correctly for mex files that link to external shared libraries.")
     endif()
 
-    foreach(vers IN LISTS MexIFace_COMPATABLE_MATLAB_VERSION_STRINGS)
+    foreach(vers IN LISTS MexIFace_COMPATIBLE_MATLAB_VERSION_STRINGS)
         set(mexfile ${ARG_MEXNAME}${vers})
         if(UNIX)
             set(mex_dir "${ARG_MATLAB_MEX_INSTALL_DIR}/glnxa64$<$<CONFIG:Debug>:.debug>")
