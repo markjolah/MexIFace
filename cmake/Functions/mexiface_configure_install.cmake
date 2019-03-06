@@ -128,7 +128,7 @@ function(mexiface_configure_install)
     #Configure Matlab arch dependent variables  @PROJECT_NAME@Config-Matlab-<ARCH>.cmake
     set(_CONFIG_MATLAB_ARCH_FILE ${PROJECT_NAME}Config-Matlab-${MexIFace_MATLAB_SYSTEM_ARCH}.cmake)
     configure_file(${ARG_PACKAGE_CONFIG_MATLAB_ARCH_TEMPLATE} ${ARG_CONFIG_DIR}/${_CONFIG_MATLAB_ARCH_FILE} @ONLY)
-    message(STATUS "INSTALL: ${ARG_CONFIG_DIR}/${_CONFIG_MATLAB_ARCH_FILE} -> ${ARG_CONFIG_INSTALL_DIR}")
+    #message(STATUS "INSTALL: ${ARG_CONFIG_DIR}/${_CONFIG_MATLAB_ARCH_FILE} -> ${ARG_CONFIG_INSTALL_DIR}")
     install(FILES ${ARG_CONFIG_DIR}/${_CONFIG_MATLAB_ARCH_FILE} DESTINATION ${ARG_CONFIG_INSTALL_DIR} COMPONENT Development)
 
     #startup.m install-tree
@@ -141,7 +141,6 @@ function(mexiface_configure_install)
     endif()
     #Remap install time dependent startup.m locations to be relative to startup@PROJECT_NAME@.m location
     set(_DEPENDENCY_STARTUP_M_LOCATIONS)
-    message("GOT ARG_DEPENDENCY_STARTUP_M_LOCATIONS:${ARG_DEPENDENCY_STARTUP_M_LOCATIONS}")
     file(RELATIVE_PATH _install_rpath "/${ARG_MATLAB_CODE_INSTALL_DIR}" "/")
     foreach(location IN LISTS ARG_DEPENDENCY_STARTUP_M_LOCATIONS)
         string(REGEX REPLACE "^${CMAKE_INSTALL_PREFIX}/" "${_install_rpath}" location ${location})

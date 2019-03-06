@@ -1,18 +1,18 @@
 # mexiface_make_mex.cmake
-# Copyright 2013-2017 
+# Copyright 2013-2019
 # Author: Mark J. Olah
 # Email: (mjo@cs.unm DOT edu)
 #
 # Variable Dependencies:
-# MEX_ARCH_DIR - Arch and build dependent relative path for mex module installation
+# MEX_ARCH_DIR - Arch and build dependent relative path for MEX module installation
 
 # X-Platform Mex function Linking function.
-# useage: make_mex(MyModule) will compile MyModule.cpp into MyModule.${MexIFace_MATLAB_SYSTEM_MEXEXT} for the appropriate platform
+# usage: make_mex(MyModule) will compile MyModule.cpp into MyModule.${MexIFace_MATLAB_SYSTEM_MEXEXT} for the appropriate platform
 # This is mainly done by linking against the MexIFace library
 ## Options
 ## Single-Argument Keywords
 # MEXNAME - name of mexfile [Defaults to ${SOURCE} base name]
-# MATLAB_MEX_INSTALL_DIR - [Defualt: lib/${PROJECT_NAME}/mex] Should be relative to CMAKE_INSTALL_PREFIX
+# MATLAB_MEX_INSTALL_DIR - [Default: lib/${PROJECT_NAME}/mex] Should be relative to CMAKE_INSTALL_PREFIX
 ## Multi-Argument Keywords
 # SOURCES - source file. [Defaults to ${MEXNAME}.cpp].  Must specify either SOURCE or MEXNAME or both
 # LINK_LIBRARIES - [optional] Additional target libraries to link to.
@@ -41,11 +41,11 @@ function(mexiface_make_mex)
         file(RELATIVE_PATH ARG_MATLAB_MEX_INSTALL_DIR ${CMAKE_INSTALL_PREFIX} ${ARG_MATLAB_MEX_INSTALL_DIR})
     endif()
 
-    #TODO: This might not work totally as intetended.  We need to disable the intall(TARGETS) hook.
+    #TODO: This might not work totally as intended.  We need to disable the install(TARGETS) hook.
     set(OPT_FIXUP_DEPENDENCIES_AUTO OFF CACHE BOOL "MexIFace disables the auto hook on install() function for fixup_dependencies()." FORCE)
 
     # Looks for FIXUP_DEPENDENCIES options:
-    #   OPT_FIXUP_DEPENDENCIES - Fixup dependencies.  Should be ON if crosscompiling.
+    #   OPT_FIXUP_DEPENDENCIES - Fixup dependencies.  Should be ON if cross-compiling.
     #   OPT_FIXUP_DEPENDENCIES_LINK_INSTALLED_LIBS
     #   OPT_FIXUP_DEPENDENCIES_COPY_GCC_LIBS
     #   OPT_FIXUP_DEPENDENCIES_COPY_GLIBC_LIBS
@@ -61,7 +61,7 @@ function(mexiface_make_mex)
             list(APPEND _fixup_args EXPORT_BUILD_TREE)
         endif()
     elseif(CMAKE_CROSSCOMPILING)
-        message(WARNING "  [MexIFace::make_mex()] Crosscompiling, but OPT_FIXUP_DEPENDENCIES is not set.  Dependencies may not be found correctly for mex files that link to external shared libraries.")
+        message(WARNING "  [MexIFace::make_mex()] Crosscompiling, but OPT_FIXUP_DEPENDENCIES is not set.  Dependencies may not be found correctly for MEX files that link to external shared libraries.")
     endif()
 
     foreach(vers IN LISTS MexIFace_COMPATIBLE_MATLAB_VERSION_STRINGS)
@@ -77,7 +77,7 @@ function(mexiface_make_mex)
             target_link_libraries(${mexfile} PUBLIC ${ARG_LINK_LIBRARIES}) #Additional libraries
         endif()
         if(ARG_MATLAB_LINK_LIBRARIES)
-            target_link_libraries(${mexfile} PUBLIC ${MATLAB_LINK_LIBRARIES}) #Additional matlab libraries
+            target_link_libraries(${mexfile} PUBLIC ${MATLAB_LINK_LIBRARIES}) #Additional Matlab libraries
         endif()
         set_target_properties(${mexfile} PROPERTIES PREFIX "" DEBUG_POSTFIX "" SUFFIX .${MexIFace_MATLAB_SYSTEM_MEXEXT})
         string(REGEX REPLACE "[^/]+" ".." relpath_install_prefix ${mex_dir})
@@ -88,40 +88,45 @@ function(mexiface_make_mex)
             install(TARGETS ${mexfile} LIBRARY DESTINATION ${mex_dir} COMPONENT Runtime)
             get_target_property(_build_rpath ${mexfile} BUILD_RPATH)
 
-            if(CMAKE_CROSSCOMPILING AND OPT_FIXUP_DEPENDENCIES) #Fixup before install as otherwise the toolchain install override will auto-call fixup-dependencies
+            if(CMAKE_CROSSCOMPILING AND OPT_FIXUP_DEPENDENCIES)
+                #Fixup before install as otherwise the toolchain install override will auto-call fixup-dependencies
                 get_target_property(_MATLAB_INCLUDE_PATH MATLAB::${vers}::MEX_LIBRARIES INTERFACE_INCLUDE_DIRECTORIES)
                 get_filename_component(_matlab_executable "${_MATLAB_INCLUDE_PATH}/../../bin/${MexIFace_MATLAB_SYSTEM_ARCH}/MATLAB" ABSOLUTE)
-                fixup_dependencies(TARGETS ${mexfile} TARGET_DESTINATIONS ${mex_dir} COPY_DESTINATION lib PROVIDED_LIB_DIRS ${_MATLAB_LIB_PATH} PARENT_LIB ${_matlab_executable} ${_fixup_args})
+                fixup_dependencies(TARGETS ${mexfile} TARGET_DESTINATIONS ${mex_dir}
+                                   COPY_DESTINATION lib PROVIDED_LIB_DIRS ${_MATLAB_LIB_PATH}
+                                   PARENT_LIB ${_matlab_executable} ${_fixup_args})
             endif()
         elseif(WIN32)
             install(TARGETS ${mexfile} RUNTIME DESTINATION ${mex_dir} COMPONENT Runtime)
-            if(CMAKE_CROSSCOMPILING AND OPT_FIXUP_DEPENDENCIES) #Fixup before install as otherwise the toolchain install override will auto-call fixup-dependencies
+            if(CMAKE_CROSSCOMPILING AND OPT_FIXUP_DEPENDENCIES)
+                #Fixup before install as otherwise the toolchain install override will auto-call fixup-dependencies
                 fixup_dependencies(TARGETS ${mexfile} TARGET_DESTINATIONS ${mex_dir} COPY_DESTINATION bin PROVIDED_LIB_DIRS ${_MATLAB_LIB_PATH} ${_fixup_args})
             endif()
-#         elseif(APPLE)
-#             set_target_properties(${mexfile} PROPERTIES INSTALL_RPATH "@loader_path/../../..:@loader_path/../../../..") #link back to lib directory
-#             fixup_dependencies(${mexfile} COPY_DESTINATION "../../../.." RPATH "../../..")
+        #elseif(APPLE)
+             #set_target_properties(${mexfile} PROPERTIES INSTALL_RPATH "@loader_path/../../..:@loader_path/../../../..") #link back to lib directory
+             #fixup_dependencies(${mexfile} COPY_DESTINATION "../../../.." RPATH "../../..")
         endif()
 
-
-        set_property(GLOBAL APPEND PROPERTY MexIFace_MODULE_TARGETS ${mexfile})
-        set(_Print_Properties TYPE INCLUDE_DIRECTORIES INTERFACE_INCLUDE_DIRECTORIES LINK_LIBRARIES INTERFACE_LINK_LIBRARIES LINK_DIRECTORIES INTERFACE_LINK_DIRECTORIES
-                              COMPILE_FEATURES INTERFACE_COMPILE_FEATURES)
-        set(_Config_Properties LIBRARY_OUTPUT_DIRECTORY LIBRARY_OUTPUT_NAME)
-        set(_Config_Type RELEASE DEBUG RELWITHDEBINFO MINSIZEREL)
-        foreach(prop IN LISTS _Config_Properties)
-            foreach(type IN LISTS _Config_Types)
-                list(APPEND _Print_Properties ${prop}_${type})
+        if(OPT_MexIFace_DEBUG)
+            #Debugging output
+            set_property(GLOBAL APPEND PROPERTY MexIFace_MODULE_TARGETS ${mexfile})
+            set(_Print_Properties TYPE INCLUDE_DIRECTORIES INTERFACE_INCLUDE_DIRECTORIES LINK_LIBRARIES INTERFACE_LINK_LIBRARIES LINK_DIRECTORIES INTERFACE_LINK_DIRECTORIES
+                                COMPILE_FEATURES INTERFACE_COMPILE_FEATURES)
+            set(_Config_Properties LIBRARY_OUTPUT_DIRECTORY LIBRARY_OUTPUT_NAME)
+            set(_Config_Type RELEASE DEBUG RELWITHDEBINFO MINSIZEREL)
+            foreach(prop IN LISTS _Config_Properties)
+                foreach(type IN LISTS _Config_Types)
+                    list(APPEND _Print_Properties ${prop}_${type})
+                endforeach()
             endforeach()
-        endforeach()
-        foreach(prop IN LISTS _Print_Properties)
-            get_target_property(v ${mexfile} ${prop})
-            if(v)
-                message(STATUS "[MexIFace::mexiface_make_mex] [${mexfile}] ${prop}: ${v}")
-            endif()
-        endforeach()
+            foreach(prop IN LISTS _Print_Properties)
+                get_target_property(v ${mexfile} ${prop})
+                if(v)
+                    message(STATUS "[MexIFace::mexiface_make_mex] [${mexfile}] ${prop}: ${v}")
+                endif()
+            endforeach()
+        endif()
     endforeach()
     file(RELATIVE_PATH binary_module_path ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
     set_property(GLOBAL APPEND PROPERTY MexIFace_MODULE_BUILD_DIRS ${binary_module_path}) #Record build directories for build-tree exports
 endfunction()
-
