@@ -125,9 +125,9 @@ classdef MexIFaceMixin < handle
             % [in] statsDict - structure mapping parameter names to values
             % [out] structDict - a more structured representation of the same dictionary
             fullnames = fieldnames(statsDict);
-            names = MexIFace.cellmap(@(n) strsplit(n,'.'),fullnames);
+            names = cellfun(@(n) strsplit(n,'.'),fullnames,'uniform',0);
             dictname_idxs = cellfun(@numel, names)==2;
-            dictnames = unique(MexIFace.cellmap(@(n) n{1}, names(dictname_idxs)));
+            dictnames = unique(cellfun(@(n) n{1}, names(dictname_idxs),'uniform',0));
             structDict = cell2struct(cell(1,numel(dictnames)),dictnames,2);
             
             for n=1:numel(names)

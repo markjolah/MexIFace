@@ -458,7 +458,7 @@ if(NOT MATLAB_ROOTS)
     message(WARNING "[MexIFace::Matlab] Found no matlab roots.  Set MATLAB_ROOT or MATLAB_ROOTS in CMake Cache or in environment variables.")
 endif()
 
-#Only look for new compatable matlab versions if we have not already found valid roots or
+#Only look for new compatible Matlab versions if we have not already found valid roots or
 # MATLAB_ROOTS has changed since the last time we did the search
 if(OPT_MexIFace_VERBOSE)
     message(STATUS "[MexIFace::Matlab] MATLAB_ROOTS:'${MATLAB_ROOTS}")
@@ -538,7 +538,7 @@ endif()
 
 if(NOT MexIFace_MATLAB_ROOTS)
     if(MexIFace_MATLAB_INCOMPATIBLE_VERSIONS)
-        message(WARNING "[Mexiface]: No compatable MATLAB_ROOTS found.  Incompatable MATLAB versions:${MexIFace_MATLAB_INCOMPATIBLE_VERSIONS} incompatable reasons:${MexIFace_MATLAB_INCOMPATIBLE_REASONS}")
+        message(WARNING "[Mexiface]: No compatible MATLAB_ROOTS found.  Incompatible MATLAB versions:${MexIFace_MATLAB_INCOMPATIBLE_VERSIONS} incompatible reasons:${MexIFace_MATLAB_INCOMPATIBLE_REASONS}")
     else()
         message(WARNING "[Mexiface]: No valid MATLAB_ROOTS.  Set MATLAB_ROOT or MATLAB_ROOTS as a CMake variable or environment variable to a valid matlab install directory(s).")
     endif()

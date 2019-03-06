@@ -13,8 +13,8 @@
 #  NOMEX - Disable mex. This flag should be added by packages that export Matlab code only, no MEX modules.
 # Single Argument Keywords:
 #  CONFIG_DIR - [Default: ${CMAKE_BINARY_DIR}] Path within build directory to make configured files before installation.  Also serves as the exported build directory.
-#  PACKAGE_CONFIG_TEMPLATE -  The template file for package config.
-#         [Default: Look for PackageConfig-mexiface.cmake.in under ${CMAKE_SOURCE_DIR}/cmake/<Templates|templates|Modules|modules|>]
+#  PACKAGE_CONFIG_TEMPLATE -  [Default: ../Templates/PackageConfig-mexiface.cmake.in] Template file for package config.
+#  PACKAGE_CONFIG_MATLAB_ARCH_TEMPLATE -  [Default: ../Templates/PackageConfig-Matlab-Arch.cmake.in] Template file for arch dependent Matlab package config.
 #  CONFIG_INSTALL_DIR - [Default: lib/cmake/${PROJECT_NAME}] Relative path from ${CMAKE_INSTALL_PREFIX} at which to install PackageConfig.cmake files
 #  MATLAB_SRC_DIR - [Default: matlab] relative to ${CMAKE_SOURCE_DIR}
 #  STARTUP_M_TEMPLATE - [Default: ${CMAKE_CURRENT_LIST_DIR}/../[Templates|templates]/startupPackage.m.in
@@ -30,12 +30,13 @@
 set(_mexiface_configure_install_PATH ${CMAKE_CURRENT_LIST_DIR})
 function(mexiface_configure_install)
     set(options NOMEX)
-    set(oneValueArgs CONFIG_DIR PACKAGE_CONFIG_TEMPLATE CONFIG_INSTALL_DIR MATLAB_SRC_DIR STARTUP_M_TEMPLATE STARTUP_M_FILE
+    set(oneValueArgs CONFIG_DIR PACKAGE_CONFIG_TEMPLATE PACKAGE_CONFIG_MATLAB_ARCH_TEMPLATE
+                     CONFIG_INSTALL_DIR MATLAB_SRC_DIR STARTUP_M_TEMPLATE STARTUP_M_FILE
                      MATLAB_CODE_INSTALL_DIR MATLAB_MEX_INSTALL_DIR EXPORT_BUILD_TREE)
     set(multiValueArgs DEPENDENT_STARTUP_M_LOCATIONS)
     cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}"  ${ARGN})
     if(ARG_UNPARSED_ARGUMENTS)
-        message(FATAL_ERROR "Unknown keywords given to install_smarter_package_version_file(): \"${_SVF_UNPARSED_ARGUMENTS}\"")
+        message(FATAL_ERROR "Unknown keywords given to mexiface_configure_install(): \"${_SVF_UNPARSED_ARGUMENTS}\"")
     endif()
     if(NOT ARG_CONFIG_DIR)
         set(ARG_CONFIG_DIR ${CMAKE_BINARY_DIR})
@@ -50,6 +51,16 @@ function(mexiface_configure_install)
         endif()
     endif()
 
+    if(NOT ARG_PACKAGE_CONFIG_MATLAB_ARCH_TEMPLATE)
+        find_file(ARG_PACKAGE_CONFIG_MATLAB_ARCH_TEMPLATE PackageConfig-Matlab-Arch.cmake.in
+                PATHS ${_mexiface_configure_install_PATH}/../Templates NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+        mark_as_advanced(ARG_PACKAGE_PACKAGE_CONFIG_MATLAB_ARCH_TEMPLATE)
+        if(NOT ARG_PACKAGE_CONFIG_MATLAB_ARCH_TEMPLATE)
+            message(FATAL_ERROR "Unable to find PackageConfig-Matlab-Arch.cmake.in Cannot configure Matlab arch dependent export variables.")
+        endif()
+    endif()
+
+
     if(NOT ARG_CONFIG_INSTALL_DIR)
         set(ARG_CONFIG_INSTALL_DIR lib/${PROJECT_NAME}/cmake) #Where to install project Config.cmake and ConfigVersion.cmake files
     endif()
@@ -63,9 +74,10 @@ function(mexiface_configure_install)
                 PATHS ${_mexiface_configure_install_PATH}/../Templates NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
         mark_as_advanced(ARG_PACKAGE_CONFIG_TEMPLATE)
         if(NOT ARG_PACKAGE_CONFIG_TEMPLATE)
-            message(FATAL_ERROR "Unable to find startupPackage.m.in. Cannot configure exports.")
+            message(FATAL_ERROR "Unable to find startupPackage.m.in. Cannot configure Matlab package for use by downstream.")
         endif()
     endif()
+
 
     if(NOT ARG_STARTUP_M_FILE)
         set(ARG_STARTUP_M_FILE startup${PROJECT_NAME}.m)
@@ -87,10 +99,12 @@ function(mexiface_configure_install)
     if(NOT ARG_BUILD_TREE_STARTUP_M_LOCATION)
         set(ARG_BUILD_TREE_STARTUP_M_LOCATION ${CMAKE_BINARY_DIR}/startup${PACKAGE_NAME}.m)
     endif()
+
     if(NOT ARG_DEPENDENT_STARTUP_M_LOCATIONS)
         set(ARG_DEPENDENT_STARTUP_M_LOCATIONS)
     endif()
     list(APPEND ARG_DEPENDENT_STARTUP_M_LOCATIONS ${MexIFace_MATLAB_STARTUP_M})
+    list(REMOVE_DUPLICATES ARG_DEPENDENT_STARTUP_M_LOCATIONS)
 
     # Set different names for build-tree and install-tree files
     set(ARG_PACKAGE_CONFIG_FILE ${PROJECT_NAME}Config-mexiface.cmake)
@@ -115,15 +129,15 @@ function(mexiface_configure_install)
     unset(_EXCLUDE)
 
     include(CMakePackageConfigHelpers)
-    #install-tree export config @PACKAGE_NAME@Config-mexiface.cmake
 
+    #install-tree export config @PACKAGE_NAME@Config-mexiface.cmake
     if(IS_ABSOLUTE ARG_CONFIG_INSTALL_DIR)
         set(ABSOLUTE_CONFIG_INSTALL_DIR ${ARG_CONFIG_INSTALL_DIR})
     else()
         set(ABSOLUTE_CONFIG_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/${ARG_CONFIG_INSTALL_DIR})
     endif()
     set(_MATLAB_CODE_DIR ${ARG_MATLAB_CODE_INSTALL_DIR}) #Set relative to install prefix for configure_package_config_file
-    set(_MATLAB_STARTUP_M ${ARG_CONFIG_DIR}/${STARTUP_M_FILE})
+    set(_MATLAB_STARTUP_M ${ARG_MATLAB_CODE_INSTALL_DIR}/${ARG_STARTUP_M_FILE})
     configure_package_config_file(${ARG_PACKAGE_CONFIG_TEMPLATE} ${ARG_CONFIG_DIR}/${ARG_PACKAGE_CONFIG_INSTALL_TREE_FILE}
                                     INSTALL_DESTINATION ${ARG_CONFIG_INSTALL_DIR}
                                     PATH_VARS _MATLAB_CODE_DIR _MATLAB_STARTUP_M
@@ -131,6 +145,10 @@ function(mexiface_configure_install)
     install(FILES ${ARG_CONFIG_DIR}/${ARG_PACKAGE_CONFIG_INSTALL_TREE_FILE} RENAME ${ARG_PACKAGE_CONFIG_FILE}
             DESTINATION ${ARG_CONFIG_INSTALL_DIR} COMPONENT Development)
 
+    #Configure Matlab arch dependent variables  @PACKAGE_NAME@Config-Matlab-<ARCH>.cmake
+    set(_CONFIG_MATLAB_ARCH_FILE MexIFaceConfig-Matlab-${MexIFace_MATLAB_SYSTEM_ARCH}.cmake)
+    configure_file(${ARG_PACKAGE_CONFIG_MATLAB_ARCH_TEMPLATE} ${ARG_CONFIG_DIR}/${_CONFIG_MATLAB_ARCH_FILE} @ONLY)
+    install(FILES ${ARG_CONFIG_DIR}/${_CONFIG_MATLAB_ARCH_FILE} DESTINATION ${ARG_CONFIG_INSTALL_DIR} COMPONENT Development)
 
     #startup.m install-tree
     set(_MATLAB_CODE_DIR ".") # Relative to startup<PACKAGE_NAME>.m file startup.m
@@ -177,7 +195,7 @@ function(mexiface_configure_install)
         if(NOT _MATLAB_BUILD_MEX_PATHS OR ARG_NOMEX)
             set(_MATLAB_BUILD_MEX_PATHS) #Disable MEX exporting
         endif()
-        #Remap build time dependent startup.m locations to be relative to startupp@PACKAGE_NAME@.m location
+        #Remap build time dependent startup.m locations to be relative to startup@PACKAGE_NAME@.m location
         set(_DEPENDENT_STARTUP_M_LOCATIONS)
         foreach(location IN LISTS ARG_DEPENDENT_STARTUP_M_LOCATIONS)
             file(RELATIVE_PATH location ${CMAKE_BINARY_DIR} ${location})

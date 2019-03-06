@@ -90,9 +90,6 @@ function startup@PROJECT_NAME@(debug)
             all_path_dirs(end)=[];
         end
         package_install_prefix = strjoin(all_path_dirs,filesep());
-        if isempty(all_path_dirs{1})
-            package_install_prefix = ['/', package_install_prefix]; %On unix
-        end
     end
 
     if ~exist(package_install_prefix,'dir')
@@ -192,7 +189,12 @@ function startup@PROJECT_NAME@(debug)
                 error('@PROJECT_NAME@:BadDependentLocation',['Package @PROJECT_NAME@ cannot find dependent startup.m file at location: ',strrep(m_file,'\','/')]);
             end
             disp(['@PROJECT_NAME@ Processing Dependent startup.m :', strrep(m_file,'\','/')]);
-            run(m_file); %Process dependent startup.m file
+            %Run dependent startupPackage.m file
+            [m_file_dir,m_file_name,~] = fileparts(m_file);
+            old_dir = cd(m_file_dir);
+            startup_func = str2func(m_file_name);
+            startup_func(debug); %propagate debug flag
+            cd(old_dir);
         end
     end
 

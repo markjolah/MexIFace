@@ -15,14 +15,14 @@ set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries Ignored. Exists for 
 
 option(OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX "Enable interleaved complex API in R2018a+" OFF)
 option(OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS "Enable 64-bit array indexes in R2017a+.  If BLAS or LAPACK are used this needs to be on." ON)
-option(OPT_MexIFace_INSTALL_DISTRIBUTION_STARTUP "Install an additional copy of startupPackage.m at the INSTALL_PREFIX root in addition to the normal directory.  This makes it easy to distribute as a zip file." Off)
+option(OPT_MexIFace_INSTALL_DISTRIBUTION_STARTUP "Install an additional copy of startupPackage.m at the INSTALL_PREFIX root in addition to the normal directory. Set only if this is the primary Matlab target for a standalone distribution archive." Off)
 option(OPT_MexIFace_PROFILE "Built-in gperftools profiling ProfileStart()/ProfileStop() for every method call to a MexIFace object." OFF)
 option(OPT_MexIFace_VERBOSE "Verbose output for MexIFace CMake configuration." OFF)
 option(OPT_MexIFace_SILENT  "Silent output for MexIFace CMake configuration.  Warnings and errors only." OFF)
 if(${CMAKE_BUILD_TYPE} MATCHES Debug)
-    option(BUILD_TESTING "Build testing framework" ON)
+    option(BUILD_TESTING "Enable testing" ON)
 else()
-    option(BUILD_TESTING "Build testing framework" OFF)
+    option(BUILD_TESTING "Enable testing" OFF)
 endif()
 option(OPT_DOC "Build documentation" OFF)
 option(OPT_INSTALL_TESTING "Install testing executables" OFF)
@@ -57,12 +57,10 @@ set(MexIFace_CMAKE_TOOLCHAINS_DIR ${MexIFace_CMAKE_DIR}/UncommonCMakeModules/Too
 list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_CURRENT_LIST_DIR}/cmake/UncommonCMakeModules)
 
 include(AddExternalDependency)
-# message(STATUS "CMAKE_MODULE_PATH:${CMAKE_MODULE_PATH}")
 #BacktraceException allows for exceptions that encode a backtrace for debugging
 set(BacktraceExceptionURL https://github.com/markjolah/BacktraceException.git)
 add_external_dependency(NAME BacktraceException URL ${BacktraceExceptionURL} VARS OPT_INSTALL_TESTING)
 
-# message(STATUS "CMAKE_MODULE_PATH:${CMAKE_MODULE_PATH}")
 # Armadillo
 find_package(Armadillo REQUIRED COMPONENTS CXX11 INT64) #INT64 required by Matlab BLAS and LAPACK
 set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS ${ARMADILLO_PRIVATE_COMPILE_DEFINITIONS})
