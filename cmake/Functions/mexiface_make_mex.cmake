@@ -12,7 +12,7 @@
 ## Options
 ## Single-Argument Keywords
 # MEXNAME - name of mexfile [Defaults to ${SOURCE} base name]
-# MATLAB_MEX_INSTALL_DIR - [Defualt: lib/${PACKAGE_NAME}/mex] Should be relative to CMAKE_INSTALL_PREFIX
+# MATLAB_MEX_INSTALL_DIR - [Defualt: lib/${PROJECT_NAME}/mex] Should be relative to CMAKE_INSTALL_PREFIX
 ## Multi-Argument Keywords
 # SOURCES - source file. [Defaults to ${MEXNAME}.cpp].  Must specify either SOURCE or MEXNAME or both
 # LINK_LIBRARIES - [optional] Additional target libraries to link to.

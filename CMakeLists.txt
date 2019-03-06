@@ -1,4 +1,4 @@
-# MexIface - Main CMakeLists.txt
+# MexIFace - Main CMakeLists.txt
 #
 # A Cross-Platform C++ / MEX Object-based interface wrapper and CMake build tool.
 #
@@ -143,7 +143,7 @@ unset(_EXCLUDE)
 
 #install-tree export config MexIFaceConfig-mexiface.cmake
 include(CMakePackageConfigHelpers)
-set(_DEPENDENT_STARTUP_M_LOCATIONS)
+set(_PROJECT_NAME)
 set(_MATLAB_CODE_DIR ${MATLAB_CODE_INSTALL_DIR}) #Set relative to install prefix for configure_package_config_file
 set(_MATLAB_STARTUP_M ${_MATLAB_CODE_DIR}/startup${PROJECT_NAME}.m)
 if(BUILD_TESTING AND OPT_INSTALL_TESTING)
@@ -162,7 +162,7 @@ install(FILES ${_CONFIGURE_FILE_INSTALL_TREE} RENAME MexIFaceConfig-mexiface.cma
 unset(_CONFIGURE_FILE_INSTALL_TREE)
 
 #startup.m install-tree
-set(_MATLAB_CODE_DIR ".") # Relative to startup<PACKAGE_NAME>.m file startup.m
+set(_MATLAB_CODE_DIR ".") # Relative to startup<PROJECT_NAME>.m file startup.m
 set(_STARTUP_M_INSTALL_DIR ${MATLAB_CODE_INSTALL_DIR}) #Install dir relative to install prefix of startupMexIFace.m
 set(_STARTUP_M_TEMPLATE ${CMAKE_SOURCE_DIR}/cmake/Templates/startupPackage.m.in)
 configure_file(${_STARTUP_M_TEMPLATE} ${CMAKE_BINARY_DIR}/startupMexIFace.m.install-tree)
@@ -206,4 +206,4 @@ unset(_STARTUP_M_TEMPLATE)
 unset(_MATLAB_CODE_DIR)
 unset(_MATLAB_STARTUP_M)
 unset(_MATLAB_BUILD_MEX_PATHS)
-unset(_DEPENDENT_STARTUP_M_LOCATIONS)
+unset(_PROJECT_NAME)

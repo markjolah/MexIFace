@@ -70,10 +70,10 @@ function startup@PROJECT_NAME@(debug)
         %We are being run from the build directory
         package_install_prefix = prefix_relative_path;
     elseif exist(fullfile(startup_install_path, prefix_relative_path, [startup_file_name, '.m']),'file')
-        %We are being run from copied startup@PACKAGE_NAME@.m located at install_prefix root
+        %We are being run from copied startup@PROJECT_NAME@.m located at install_prefix root
         package_install_prefix = startup_install_path;
     else
-        %We are being run from normal  startup@PACKAGE_NAME@.m located at prefix_relative_path
+        %We are being run from normal  startup@PROJECT_NAME@.m located at prefix_relative_path
         all_path_dirs = strsplit(startup_install_path,filesep());
         prefix_relative_path_dirs = strsplit(prefix_relative_path,'/');
         while ~isempty(prefix_relative_path_dirs)
@@ -171,7 +171,7 @@ function startup@PROJECT_NAME@(debug)
     end
 
     %Load dependency startup.m files
-    dependent_startup_m_locations = strsplit('@_DEPENDENT_STARTUP_M_LOCATIONS@',';');
+    dependent_startup_m_locations = strsplit('@_DEPENDENCY_STARTUP_M_LOCATIONS@',';');
     dependent_startup_m_locations(cellfun(@isempty,dependent_startup_m_locations)) = []; %Remove empty cells
     if ~isempty(dependent_startup_m_locations)
         for location_idx = dependent_startup_m_locations
