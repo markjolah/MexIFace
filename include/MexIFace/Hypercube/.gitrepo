@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/markjolah/Hypercube.git
 	branch = master
-	commit = 1162cdde829b37926223a2b584fd97874a7d43e5
-	parent = 2ab651172da7c9cbdddd11126b3d112c98dfc8db
+	commit = 900e7ed285e1a045633426bdea5b87de20672516
+	parent = fe4c99572821c31d8b2045081336143be982e5e5
 	method = merge
 	cmdver = 0.4.0

@@ -81,7 +81,7 @@ public:
      */
     const Cube& slice(IdxT i) const
     {
-        if(i >= sN) throw std::out_of_range("Hypercube","hyperslice out of bounds");
+        if(i >= sN) throw std::out_of_range("Hypercube: hyperslice out of bounds");
         return *hcube[i];
     }
 
@@ -92,7 +92,7 @@ public:
      */
     Cube& slice(IdxT i)
     {
-        if(i >= sN) throw std::out_of_range("Hypercube","hyperslice out of bounds");
+        if(i >= sN) throw std::out_of_range("Hypercube: hyperslice out of bounds");
         return *hcube[i];
     }
 
@@ -106,7 +106,7 @@ public:
      */
     ElemT& operator()(IdxT iX, IdxT iY, IdxT iZ, IdxT iN) const
     {
-        if(iN >= sN) throw std::out_of_range("Hypercube","hyperslice out of bounds");
+        if(iN >= sN) throw std::out_of_range("Hypercube: hyperslice out of bounds");
         return (*hcube[iN])(iX,iY,iZ);
     }
 
