@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/markjolah/Hypercube.git
+	branch = master
+	commit = fdf114cc5495285946b381b52fd15b01ddf96458
+	parent = f3494394e5f912589d1cf3148160bd6be39cd444
+	method = merge
+	cmdver = 0.4.0
