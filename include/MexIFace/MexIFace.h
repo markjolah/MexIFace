@@ -19,7 +19,7 @@
 #include "mex.h"
 
 #include "MexIFace/MexIFaceError.h"
-#include "MexIFace/hypercube.h"
+#include "MexIFace/Hypercube/Hypercube.h"
 #include "MexIFace/MexUtils.h"
 #include "MexIFace/MexIFaceBase.h"
 #include "MexIFace/MexIFaceHandler.h"
@@ -69,7 +69,7 @@ public:
     template<class T> using Vec = arma::Col<T>;
     template<class T> using Mat = arma::Mat<T>;
     template<class T> using Cube = arma::Cube<T>;
-    template<class T> using Hypercube = Hypercube<T>;
+    template<class T> using Hypercube = hypercube::Hypercube<T>;
     
     template<class T> using Dict = std::map<std::string,T>; /**< A convenient form for reporting dictionaries of named FP data to matlab */
     
@@ -543,7 +543,7 @@ MexIFace::Cube<ElemT> MexIFace::toCube(const mxArray *m)
 }
 
 template<class ElemT, typename> 
-Hypercube<ElemT> MexIFace::toHypercube(const mxArray *m)
+MexIFace::Hypercube<ElemT> MexIFace::toHypercube(const mxArray *m)
 {
     int ndims = mxGetNumberOfDimensions(m);
     const mwSize *sz = mxGetDimensions(m);
@@ -995,7 +995,7 @@ MexIFace::Cube<ElemT> MexIFace::getCube(const mxArray *m)
 * @returns A new Hypercube that interprets the data stored in the m pointer.
 */
 template<class ElemT, typename> 
-Hypercube<ElemT> MexIFace::getHypercube(const mxArray *m)
+MexIFace::Hypercube<ElemT> MexIFace::getHypercube(const mxArray *m)
 {
     if(m == nullptr) m = rhs[rhs_idx++];
     return checkedToHypercube<ElemT>(m);
@@ -1071,7 +1071,7 @@ Array<MexIFace::Cube<ElemT>> MexIFace::getCubeArray(const mxArray *m)
 
 
 template<template<typename> class Array, class ElemT, typename> 
-Array<Hypercube<ElemT>> MexIFace::getHypercubeArray(const mxArray *m)
+Array<MexIFace::Hypercube<ElemT>> MexIFace::getHypercubeArray(const mxArray *m)
 {
     if(m == nullptr) m = rhs[rhs_idx++];  //Default to first unhandled rhs argument    
     checkType(m, mxCELL_CLASS);
@@ -1131,7 +1131,7 @@ MexIFace::Dict<MexIFace::Cube<ElemT>> MexIFace::getCubeDict(const mxArray *m)
 }
 
 template<class ElemT, typename>
-MexIFace::Dict<Hypercube<ElemT>> MexIFace::getHypercubeDict(const mxArray *m)
+MexIFace::Dict<MexIFace::Hypercube<ElemT>> MexIFace::getHypercubeDict(const mxArray *m)
 {
     if(m == nullptr) m = rhs[rhs_idx++];
     checkType(m, mxSTRUCT_CLASS); //Only accept structs arrays
@@ -1171,7 +1171,7 @@ MexIFace::Cube<ElemT> MexIFace::makeOutputArray(IdxT rows, IdxT cols, IdxT slice
 }
 
 template<class ElemT, typename> 
-Hypercube<ElemT> MexIFace::makeOutputArray(IdxT rows, IdxT cols, IdxT slices, IdxT hyperslices)
+MexIFace::Hypercube<ElemT> MexIFace::makeOutputArray(IdxT rows, IdxT cols, IdxT slices, IdxT hyperslices)
 {
     const mwSize size[4] = {rows,cols,slices,hyperslices};
     auto m = mxCreateNumericArray(4,size,get_mx_class<ElemT>(), mxREAL);

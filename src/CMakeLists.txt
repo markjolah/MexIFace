@@ -55,7 +55,7 @@ else()
         target_link_libraries(${lib} PUBLIC ${matlab_target}) #Matlab Mex libraries
         target_include_directories(${lib} PUBLIC $<BUILD_INTERFACE:${PUBLIC_HEADER_SRC_DIR}>
                                                 $<INSTALL_INTERFACE:include>)
-        target_compile_features(${lib} PUBLIC cxx_std_11) #Declare C++11 required for building
+        target_compile_features(${lib} PUBLIC cxx_std_14) #Declare C++14 required for building
 
         if(OPT_MexIFace_PROFILE)
             target_link_libraries(${lib} PRIVATE GPerfTools::profiler)

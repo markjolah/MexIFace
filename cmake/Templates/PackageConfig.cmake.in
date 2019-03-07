@@ -4,16 +4,15 @@
 
 #Sets:
 # MexIFace_BUILD_TYPES
-# MexIFace_CMAKE_DIR
-# MexIFace_CMAKE_MODULES_DIR
-# MexIFace_CMAKE_TOOLCHAINS_DIR
-# MexIFace_CMAKE_FUNCTIONS_DIR
-# MexIFace_CMAKE_EXECUTABLE_DIR
-# MexIFace_CMAKE_TEMPLATES_DIR
+# MexIFace_CMAKE_DIR - Shared directory of all MexIFace CMake resources
+# MexIFace_CMAKE_MODULES_DIR - MexIFace shared modules directory
+# MexIFace_CMAKE_TOOLCHAINS_DIR - MexIFace shared toolchains directory
+# MexIFace_CMAKE_FUNCTIONS_DIR - MexIFace shared functions directory
+# MexIFace_CMAKE_TEMPLATES_DIR -- MexIFace shared templates directory
 #
-# MexIFace_MATLAB_CODE_DIR
-# MexIFace_MATLAB_STARTUP_M
-# MexIFace_TARGETS
+# @PROJECT_NAME@_MATLAB_CODE_DIR - Matlab code directory
+# @PROJECT_NAME@_MATLAB_STARTUP_M - Matlab startup@PROJECT_NAME@.m
+# MexIFace_TARGETS - List of all MexIFace targets available
 # MexIFace_COMPATIBLE_MATLAB_VERSION_STRINGS
 # MexIFace_COMPATIBLE_MATLAB_VERSIONS
 # MexIFace_COMPATIBLE_MATLAB_RELEASES
@@ -23,6 +22,7 @@
 #
 # MexIFace_SYSTEM_LIBSTDCXX_VERSION
 #
+
 # Provides functions:
 # mexiface_make_mex()
 # mexiface_configure_install()

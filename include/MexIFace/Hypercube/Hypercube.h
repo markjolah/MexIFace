@@ -1,30 +1,23 @@
-/** @file hypercube.h
+/** @file Hypercube.h
  * @author Mark J. Olah (mjo\@cs.unm DOT edu)
- * @date 2013-2017
+ * @date 2013-2019
  * @copyright Licensed under the Apache License, Version 2.0.  See LICENSE file.
  * @brief The class declaration and inline and templated functions for hypercube.
  */
 
-#ifndef MEXIFACE_HYPERCUBE_H
-#define MEXIFACE_HYPERCUBE_H
+#ifndef HYPERCUBE_HYPERCUBE_H
+#define HYPERCUBE_HYPERCUBE_H
 #include <armadillo>
 #include <memory>
 #include <vector>
-#include "MexIFace/MexIFaceError.h"
+#include <stdexcept>
 
-namespace mexiface {
-
-/** @brief a make_unique implementation for use when compiling with C++11 
- * std::make_unique is availible in C++14
- */
-template<typename T, typename ...Args>
-std::unique_ptr<T> make_unique( Args&& ...args )
-{
-    return std::unique_ptr<T>( new T( std::forward<Args>(args)... ) );
-}
+namespace hypercube {
 
 /**
  * @brief A class to create a 4D armadillo array that can use externally allocated memory.
+ *
+ * TODO: Do a single allocation for 4D data.
  *
  * This class provides a way to manipulate externally allocated 4D column-major arrays as
  * a armadillo-like Array object.  Really we just store a vector of arma::Cube's each of which
@@ -52,7 +45,7 @@ public:
         : sX(sX),sY(sY),sZ(sZ),sN(sN), n_slices(sN),
           hcube(CubeVecT(sN))
     {
-        for(IdxT i=0;i<sN;i++) hcube[i]=make_unique<Cube>(sX,sY,sZ);
+        for(IdxT i=0;i<sN;i++) hcube[i] = std::make_unique<Cube>(sX,sY,sZ);
     }
 
     /**
@@ -71,7 +64,7 @@ public:
         IdxT sz = subcube_size();
         auto dmem = static_cast<ElemT*>(mem);
         for(IdxT i=0;i<sN;i++) {
-            hcube.push_back(make_unique<Cube>(dmem,sX,sY,sZ, false));
+            hcube.push_back(std::make_unique<Cube>(dmem,sX,sY,sZ, false));
             dmem+=sz;
         }
     }
@@ -88,7 +81,7 @@ public:
      */
     const Cube& slice(IdxT i) const
     {
-        if(i >= sN) throw MexIFaceError("Hypercube","hyperslice out of bounds");
+        if(i >= sN) throw std::out_of_range("Hypercube","hyperslice out of bounds");
         return *hcube[i];
     }
 
@@ -99,7 +92,7 @@ public:
      */
     Cube& slice(IdxT i)
     {
-        if(i >= sN) throw MexIFaceError("Hypercube","hyperslice out of bounds");
+        if(i >= sN) throw std::out_of_range("Hypercube","hyperslice out of bounds");
         return *hcube[i];
     }
 
@@ -113,7 +106,7 @@ public:
      */
     ElemT& operator()(IdxT iX, IdxT iY, IdxT iZ, IdxT iN) const
     {
-        if(iN >= sN) throw MexIFaceError("Hypercube","hyperslice out of bounds");
+        if(iN >= sN) throw std::out_of_range("Hypercube","hyperslice out of bounds");
         return (*hcube[iN])(iX,iY,iZ);
     }
 
@@ -146,10 +139,10 @@ private:
     CubeVecT hcube; /**< The vector of cubes that stores the data */
 };
 
-/* Declate Expclict Template Instantiations */
+/* Declare Explicit Template Instantiation */
 typedef Hypercube<double> hypercube;
 typedef Hypercube<float>  fhypercube;
 
-} /* namespace mexiface */
+} /* namespace hypercube */
 
-#endif /* MEXIFACE_HYPERCUBE_H */
+#endif /* HYPERCUBE_HYPERCUBE_H */
