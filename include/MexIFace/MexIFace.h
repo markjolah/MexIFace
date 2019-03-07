@@ -45,13 +45,13 @@ namespace mexiface  {
  * arguments and return no arguments.  The Matlab arguments are passed to these functions through the internal storage of the
  * MexIFace object's rhs and lhs member variables.
  *
- * A C++ class is wrapped by creating a new Iface class that inherits from MexIFace.  At a minimum
+ * A C++ class is wrapped by creating a new IFace class that inherits from MexIFace.  At a minimum
  * the Iface class must define the pure virtual functions objConstruct(), objDestroy(), and getObjectFromHandle().  It also
  * must implement the interface for any of the methods and static methods that are required.  Each of these methods in the
  * Iface class must process the passed Matlab arguments in the rhs member variable and save outputs in the lhs member variable.
  *
  * In general the Iface mex modules are not intended to be used directly, but rather are paired with a special Matlab
- * class that inherits from the IfaceMixin.m base class.
+ * class that inherits from the MexIFaceMixin.m base class.
  *
  * Design decision:  Because of the complexities of inheriting from a templated base class with regard to name lookups
  * in superclasses, we chose to keep this MexIFace class non-templated.  For this reason any methods and member variables which
@@ -85,7 +85,7 @@ public:
     
     /* Public Static methods */
 
-    //@{
+    ///@{
     /** Test doc here. And more here */
     template<class ElemT> static void checkType(const mxArray *m);
     static void checkType(const mxArray *m, mxClassID classid);
@@ -96,7 +96,7 @@ public:
     static void checkVectorSize(const mxArray *m, mwSize expected_numel);
     static void checkMatrixSize(const mxArray *m, mwSize expected_rows, mwSize expected_cols);
     static void checkSameLastDim(const mxArray *m1, const mxArray *m2);
-    //@}
+    ///@}
 
     
     /* Unchecked converters allowing direct access to mxArray */

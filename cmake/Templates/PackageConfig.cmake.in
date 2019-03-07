@@ -19,14 +19,11 @@
 # MexIFace_COMPATIBLE_MATLAB_ARCH
 # OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX - Settings for Matlab complex API
 # OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS - Settings for Matlab 64-bit index API
+# MexIFace_SYSTEM_LIBSTDCXX_VERSION - System libstd++.so that system installed dependencies were build with.
 #
-# MexIFace_SYSTEM_LIBSTDCXX_VERSION
-#
-
 # Provides functions:
 # mexiface_make_mex()
 # mexiface_configure_install()
-
 
 include(CMakeFindDependencyMacro)
 find_dependency(BacktraceException)
@@ -41,7 +38,6 @@ list(REMOVE_AT CMAKE_MODULE_PATH 0)
 option(OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX "Enable interleaved complex API in R2018a+" @OPT_MexIFace_MATLAB_INTERLEAVED_COMPLEX@) #Propagate settings for complex API
 option(OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS "Enable 64-bit array indexes in R2017a+" @OPT_MexIFace_MATLAB_LARGE_ARRAY_DIMS@) #Propagate settings for array index types API
 option(OPT_MexIFace_INSTALL_DISTRIBUTION_STARTUP "Install an additional copy of startupPackage.m at the INSTALL_PREFIX root in addition to the normal directory.  This makes it easy to distribute as a zip file." Off)
-
 
 #Main cmake dir for MexIFace. For install-tree export should be a relative path.  May be absolute for build-tree export.
 set_and_check(MexIFace_CMAKE_DIR @PACKAGE_SHARED_CMAKE_DIR@)

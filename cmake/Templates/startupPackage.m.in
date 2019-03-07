@@ -125,7 +125,9 @@ function startup@PROJECT_NAME@(debug)
             if ~exist(build_path,'dir')
                 error('@PROJECT_NAME@:InvalidPackageLayout',['Package @PROJECT_NAME@ cannot find mex directory: ',strrep(build_path,'\','/')]);
             end
-            mexfile_paths = [mexfile_paths, build_path];
+            if ~any(strcmp(mexfile_paths, build_path)) %check for uniqueness
+                mexfile_paths = [mexfile_paths, build_path];
+            end
         end
     else
         %Install tree
@@ -156,7 +158,9 @@ function startup@PROJECT_NAME@(debug)
                     error('@PROJECT_NAME@:InvalidPackageLayout',['Package @PROJECT_NAME@ cannot find mex directory: ',strrep(installed_package_mex_arch_path,'\','/')]);
                 end
             end
-            mexfile_paths = [mexfile_paths, installed_package_mex_arch_path];
+            if ~any(strcmp(mexfile_paths, installed_package_mex_arch_path)) %check for uniqueness
+                mexfile_paths = [mexfile_paths, installed_package_mex_arch_path];
+            end
 
             if ispc() %For windows linking add the bin directory at install_prefix if we have a mex directory
                 installed_bin_path = fullfile(package_install_prefix,'bin');
