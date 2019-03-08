@@ -86,7 +86,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div class="summary">
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">mexiface Namespace Reference</div>  </div>
@@ -103,9 +102,6 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmexiface_1_1Handle.html">Handle</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A class to represent and manipulate handles to C++ classes that can be wrapped as Matlab arrays, allowing C++ objects to persist between Mex calls.  <a href="classmexiface_1_1Handle.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmexiface_1_1Hypercube.html">Hypercube</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A class to create a 4D armadillo array that can use externally allocated memory.  <a href="classmexiface_1_1Hypercube.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmexiface_1_1MexIFace.html">MexIFace</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base class for the C++ side of a <a class="el" href="classmexiface_1_1MexIFace.html" title="Base class for the C++ side of a MexIFace interface class. ">MexIFace</a> interface class.  <a href="classmexiface_1_1MexIFace.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -117,13 +113,6 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmexiface_1_1MexIFaceHandler.html">MexIFaceHandler</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class encompassing the <a class="el" href="classmexiface_1_1MexIFace.html" title="Base class for the C++ side of a MexIFace interface class. ">MexIFace</a> type-dependent operations. Must be inherited from to form a concrete <a class="el" href="classmexiface_1_1MexIFace.html" title="Base class for the C++ side of a MexIFace interface class. ">MexIFace</a>. The class encapsulates the management of the Handle&lt;T&gt; type to hide it from the end user.  <a href="classmexiface_1_1MexIFaceHandler.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr class="memitem:aa5435537c2ea5aa01fb3d9b7cf8bdae9"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classmexiface_1_1Hypercube.html">Hypercube</a>&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacemexiface.html#aa5435537c2ea5aa01fb3d9b7cf8bdae9">hypercube</a></td></tr>
-<tr class="separator:aa5435537c2ea5aa01fb3d9b7cf8bdae9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaea17baf4664d0c9aed16e6e4b057e53"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classmexiface_1_1Hypercube.html">Hypercube</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacemexiface.html#aaea17baf4664d0c9aed16e6e4b057e53">fhypercube</a></td></tr>
-<tr class="separator:aaea17baf4664d0c9aed16e6e4b057e53"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -171,10 +160,6 @@ Functions</h2></td></tr>
 <tr class="separator:ae54146cf35d29dcc6c83a8ca96b62549"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae975525972a7d72c76057c96485b8c2e"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacemexiface.html#ae975525972a7d72c76057c96485b8c2e">demangle</a> (const char *name)</td></tr>
 <tr class="separator:ae975525972a7d72c76057c96485b8c2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a330e00c3953e87f1db62ed5b1ec9155a"><td class="memTemplParams" colspan="2">template&lt;typename T , typename... Args&gt; </td></tr>
-<tr class="memitem:a330e00c3953e87f1db62ed5b1ec9155a"><td class="memTemplItemLeft" align="right" valign="top">std::unique_ptr&lt; T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacemexiface.html#a330e00c3953e87f1db62ed5b1ec9155a">make_unique</a> (Args &amp;&amp;...args)</td></tr>
-<tr class="memdesc:a330e00c3953e87f1db62ed5b1ec9155a"><td class="mdescLeft">&#160;</td><td class="mdescRight">a make_unique implementation for use when compiling with C++11 std::make_unique is availible in C++14  <a href="#a330e00c3953e87f1db62ed5b1ec9155a">More...</a><br /></td></tr>
-<tr class="separator:a330e00c3953e87f1db62ed5b1ec9155a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0a61f21777cac291b7baabb5726aacc1"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacemexiface.html#a0a61f21777cac291b7baabb5726aacc1">get_mx_class_name</a> (const mxArray *array)</td></tr>
 <tr class="memdesc:a0a61f21777cac291b7baabb5726aacc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a string representation of the mxArray class name.  <a href="#a0a61f21777cac291b7baabb5726aacc1">More...</a><br /></td></tr>
 <tr class="separator:a0a61f21777cac291b7baabb5726aacc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -195,35 +180,6 @@ Functions</h2></td></tr>
 <tr class="memitem:a4ddbb20fc716fcad2fc21725713cb25a"><td class="memTemplItemLeft" align="right" valign="top">std::string&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacemexiface.html#a4ddbb20fc716fcad2fc21725713cb25a">type_name</a> ()</td></tr>
 <tr class="separator:a4ddbb20fc716fcad2fc21725713cb25a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Typedef Documentation</h2>
-<a class="anchor" id="aaea17baf4664d0c9aed16e6e4b057e53"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="classmexiface_1_1Hypercube.html">Hypercube</a>&lt;float&gt; <a class="el" href="namespacemexiface.html#aaea17baf4664d0c9aed16e6e4b057e53">mexiface::fhypercube</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="hypercube_8h_source.html#l00151">151</a> of file <a class="el" href="hypercube_8h_source.html">hypercube.h</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="aa5435537c2ea5aa01fb3d9b7cf8bdae9"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="classmexiface_1_1Hypercube.html">Hypercube</a>&lt;double&gt; <a class="el" href="namespacemexiface.html#aa5435537c2ea5aa01fb3d9b7cf8bdae9">mexiface::hypercube</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="hypercube_8h_source.html#l00150">150</a> of file <a class="el" href="hypercube_8h_source.html">hypercube.h</a>.</p>
-
-</div>
-</div>
 <h2 class="groupheader">Function Documentation</h2>
 <a class="anchor" id="ae975525972a7d72c76057c96485b8c2e"></a>
 <div class="memitem">
@@ -637,28 +593,6 @@ template&lt;&gt; </div>
 <p>Definition at line <a class="el" href="MexUtils_8h_source.html#l00070">70</a> of file <a class="el" href="MexUtils_8h_source.html">MexUtils.h</a>.</p>
 
 <p>References <a class="el" href="MexUtils_8cpp_source.html#l00075">demangle()</a>, and <a class="el" href="MexUtils_8cpp_source.html#l00015">get_mx_class_name()</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a330e00c3953e87f1db62ed5b1ec9155a"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename T , typename... Args&gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">std::unique_ptr&lt;T&gt; mexiface::make_unique </td>
-          <td>(</td>
-          <td class="paramtype">Args &amp;&amp;...&#160;</td>
-          <td class="paramname"><em>args</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>a make_unique implementation for use when compiling with C++11 std::make_unique is availible in C++14 </p>
-
-<p>Definition at line <a class="el" href="hypercube_8h_source.html#l00021">21</a> of file <a class="el" href="hypercube_8h_source.html">hypercube.h</a>.</p>
 
 </div>
 </div>

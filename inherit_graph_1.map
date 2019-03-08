@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classmexiface_1_1Hypercube.html" title="A class to create a 4D armadillo array that can use externally allocated memory. " alt="" coords="5,5,143,44"/>
+<area shape="rect" id="node1" href="$classmexiface_1_1MexIFaceBase.html" title="Base class defining the virtual functions that will be implemented by MexIFaceHandler and the concret..." alt="" coords="5,33,164,59"/>
+<area shape="rect" id="node2" href="$classmexiface_1_1MexIFace.html" title="Base class for the C++ side of a MexIFace interface class. " alt="" coords="234,5,365,31"/>
+<area shape="rect" id="node3" href="$classmexiface_1_1MexIFaceHandler.html" title="Class encompassing the MexIFace type&#45;dependent operations. Must be inherited from to form a concrete ..." alt="" coords="212,55,387,93"/>
 </map>

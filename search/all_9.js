@@ -1,31 +1,5 @@
 var searchData=
 [
-  ['explore',['explore',['../namespacemexiface_1_1explore.html',1,'mexiface']]],
-  ['make_5funique',['make_unique',['../namespacemexiface.html#a330e00c3953e87f1db62ed5b1ec9155a',1,'mexiface']]],
-  ['makehandle',['makeHandle',['../classmexiface_1_1Handle.html#ac1d36e375487c33f9424b27ac2fbd9cc',1,'mexiface::Handle']]],
-  ['makeoutputarray',['makeOutputArray',['../classmexiface_1_1MexIFace.html#a4ce08a786ed8a2eec1e013b8abd49eb0',1,'mexiface::MexIFace::makeOutputArray(IdxT nelem)'],['../classmexiface_1_1MexIFace.html#a5b9da3a07c973da0f66369e54ac11866',1,'mexiface::MexIFace::makeOutputArray(IdxT rows, IdxT cols)'],['../classmexiface_1_1MexIFace.html#a88c595d2a4fdf8e11eadec10fedd0030',1,'mexiface::MexIFace::makeOutputArray(IdxT rows, IdxT cols, IdxT slices)'],['../classmexiface_1_1MexIFace.html#a99a751f920848626162990597b397ae5',1,'mexiface::MexIFace::makeOutputArray(IdxT rows, IdxT cols, IdxT slices, IdxT hyperslices)']]],
-  ['mat',['Mat',['../classmexiface_1_1MexIFace.html#ab4f44326020254bbbce65562e254e8b4',1,'mexiface::MexIFace']]],
-  ['matlab_2dmex_2dlinking_2emd',['matlab-mex-linking.md',['../matlab-mex-linking_8md.html',1,'']]],
-  ['matlab_20and_20mex_20linking',['Matlab and MEX linking',['../md__home_travis_build_markjolah_MexIFace_doc_text_matlab-mex-linking.html',1,'']]],
-  ['mexiface_20blas_20and_20lapack_2064_2dbit_20integer_20setup',['MexIFace BLAS and LAPACK 64-bit Integer Setup',['../md__home_travis_build_markjolah_MexIFace_doc_text_mexiface-blas-and-lapack.html',1,'']]],
-  ['mexiface_20overview',['MexIFace overview',['../md__home_travis_build_markjolah_MexIFace_doc_text_mexiface-tutorial.html',1,'']]],
-  ['methodmap',['methodmap',['../classmexiface_1_1MexIFace.html#aa708e7bed1c75ed50c75fa344bdcc1ee',1,'mexiface::MexIFace::methodmap()'],['../classmexiface_1_1MexIFace.html#a83ec7315243c8b1659b07d0bbc0655d5',1,'mexiface::MexIFace::MethodMap()']]],
-  ['mexfunction',['mexFunction',['../classmexiface_1_1MexIFace.html#a17f0280024d7cdd318b13223174b6151',1,'mexiface::MexIFace']]],
-  ['mexiface',['mexiface',['../namespacemexiface.html',1,'mexiface'],['../classmexiface_1_1MexIFace.html#adb7437ec8c8a9f719e87a1a8e9237d9d',1,'mexiface::MexIFace::MexIFace()']]],
-  ['mexiface',['MexIFace',['../classmexiface_1_1MexIFace.html',1,'mexiface']]],
-  ['mexiface_2dblas_2dand_2dlapack_2emd',['mexiface-blas-and-lapack.md',['../mexiface-blas-and-lapack_8md.html',1,'']]],
-  ['mexiface_2dtutorial_2emd',['mexiface-tutorial.md',['../mexiface-tutorial_8md.html',1,'']]],
-  ['mexiface_2ecpp',['MexIFace.cpp',['../MexIFace_8cpp.html',1,'']]],
-  ['mexiface_2eh',['MexIFace.h',['../MexIFace_8h.html',1,'']]],
-  ['mexifacebase',['MexIFaceBase',['../classmexiface_1_1MexIFaceBase.html',1,'mexiface']]],
-  ['mexifacebase_2eh',['MexIFaceBase.h',['../MexIFaceBase_8h.html',1,'']]],
-  ['mexifaceerror',['MexIFaceError',['../classmexiface_1_1MexIFaceError.html#aa65e79549103f95ef901a5e89e06fcdc',1,'mexiface::MexIFaceError::MexIFaceError(std::string condition, std::string what)'],['../classmexiface_1_1MexIFaceError.html#ad49da958d8e9dcd6764de19df62f66e2',1,'mexiface::MexIFaceError::MexIFaceError(std::string component, std::string condition, std::string what)']]],
-  ['mexifaceerror',['MexIFaceError',['../classmexiface_1_1MexIFaceError.html',1,'mexiface']]],
-  ['mexifaceerror_2eh',['MexIFaceError.h',['../MexIFaceError_8h.html',1,'']]],
-  ['mexifacehandler',['MexIFaceHandler',['../classmexiface_1_1MexIFaceHandler.html',1,'mexiface']]],
-  ['mexifacehandler',['MexIFaceHandler',['../classmexiface_1_1MexIFaceHandler.html#ac91cc1fb9af515d2aa5235d5155475f9',1,'mexiface::MexIFaceHandler']]],
-  ['mexifacehandler_2eh',['MexIFaceHandler.h',['../MexIFaceHandler_8h.html',1,'']]],
-  ['mexutils_2ecpp',['MexUtils.cpp',['../MexUtils_8cpp.html',1,'']]],
-  ['mexutils_2eh',['MexUtils.h',['../MexUtils_8h.html',1,'']]],
-  ['mxargcountt',['MXArgCountT',['../classmexiface_1_1MexIFace.html#adcbe2769ea49090a05345a37cc614923',1,'mexiface::MexIFace']]]
+  ['nlhs',['nlhs',['../classmexiface_1_1MexIFace.html#add71cdb308a49724d08048c432828b82',1,'mexiface::MexIFace']]],
+  ['nrhs',['nrhs',['../classmexiface_1_1MexIFace.html#a50181530d8947f1a699a04c49e447ac5',1,'mexiface::MexIFace']]]
 ];
